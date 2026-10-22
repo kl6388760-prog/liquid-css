@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid CSS — Documentation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ══ Liquid CSS (updated library, see main.css below) ══ -->
+  <link rel="stylesheet" href="main.css">
+
+  <style>
+    /* ══════════════════════════════════════════════════════
+       DOC PAGE LAYOUT (uses Liquid CSS tokens)
+       ══════════════════════════════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.6;
+      padding: var(--space-7) var(--space-5);
+    }
+
+    .doc {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-7);
+    }
+
+    /* ── Hero ── */
+    .doc-hero {
+      text-align: center;
+      padding-bottom: var(--space-5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .doc-hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: var(--space-3) 0 var(--space-4);
+      color: var(--text-primary);
+    }
+
+    .doc-hero p {
+      font-size: var(--fs-lg);
+      color: var(--text-secondary);
+      max-width: 60ch;
+      margin: 0 auto;
+    }
+
+    .doc-version {
+      display: inline-flex;
+      gap: var(--space-2);
+      margin-top: var(--space-5);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ── Language switch ── */
+    .lang-switch {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      background: var(--glass-fill-sunken);
+      border: 1px solid var(--glass-border-ghost);
+      border-radius: var(--radius-pill);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+      margin-top: var(--space-5);
+    }
+
+    .lang-switch button {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition:
+        background var(--dur-base) var(--ease-glass),
+        color var(--dur-base) var(--ease-glass),
+        box-shadow var(--dur-base) var(--ease-glass);
+    }
+
+    .lang-switch button:hover {
+      color: var(--text-primary);
+    }
+
+    .lang-switch button.is-active {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .lang-switch button:focus-visible {
+      outline: 1px solid rgba(255, 255, 255, 0.6);
+      outline-offset: 2px;
+    }
+
+    /* ── Section ── */
+    .doc-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .doc-section h2 {
+      font-size: var(--fs-2xl);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .doc-section h3 {
+      font-size: var(--fs-xl);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-top: var(--space-3);
+    }
+
+    .doc-section p,
+    .doc-section li {
+      font-size: var(--fs-md);
+      color: var(--text-secondary);
+    }
+
+    .doc-section ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .doc-section ul li {
+      padding-left: var(--space-5);
+      position: relative;
+    }
+
+    .doc-section ul li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.7em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--glass-fill-sunken);
+      border: 1px solid var(--glass-border-ghost);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      overflow-x: auto;
+      font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+      font-size: var(--fs-sm);
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        inset 0 2px 8px rgba(0, 0, 0, 0.25);
+      white-space: pre;
+    }
+
+    code {
+      font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* ── Live examples ── */
+    .example {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .example--column {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .example__label {
+      width: 100%;
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    /* ── Token table ── */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fs-sm);
+    }
+
+    .token-table th,
+    .token-table td {
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .token-table th {
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: var(--fs-xs);
+    }
+
+    .token-table td {
+      color: var(--text-secondary);
+    }
+
+    .token-table td:first-child {
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* ── Sticky nav ── */
+    .doc-nav {
+      position: sticky;
+      top: var(--space-4);
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--glass-border-primary);
+      backdrop-filter: var(--blur-lg);
+      -webkit-backdrop-filter: var(--blur-lg);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 12px 32px rgba(0, 0, 0, 0.6);
+      margin-bottom: var(--space-4);
+    }
+
+    .doc-nav a {
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      transition: color var(--dur-base) var(--ease-glass),
+                  background var(--dur-base) var(--ease-glass);
+    }
+
+    .doc-nav a:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* ── Footer ── */
+    .doc-footer {
+      text-align: center;
+      padding-top: var(--space-5);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-tertiary);
+      font-size: var(--fs-sm);
+    }
+
+    /* language visibility: hide all, show active */
+    [data-lang] { display: none; }
+    html[data-active-lang="en"] [data-lang="en"],
+    html[data-active-lang="ru"] [data-lang="ru"] {
+      display: revert;
+    }
+  </style>
+</head>
+<body>
+
+<div class="doc">
+
+  <!-- ══════════════════ HERO ══════════════════ -->
+  <header class="doc-hero">
+    <div class="lg-eyebrow" data-lang="en">CSS Library · v1.1.0</div>
+    <div class="lg-eyebrow" data-lang="ru">CSS-библиотека · v1.1.0</div>
+
+    <h1>Liquid CSS</h1>
+
+    <p data-lang="en">A premium, dependency-free CSS library for building frosted-glass interfaces on pure black. Monochrome, physically-plausible materials with the polish of visionOS / iOS 26.</p>
+    <p data-lang="ru">Премиальная CSS-библиотека без зависимостей для создания интерфейсов из матового стекла на чистом чёрном фоне. Монохром, физически правдоподобные материалы с полировкой уровня visionOS / iOS 26.</p>
+
+    <div class="doc-version">
+      <span class="lg-badge" data-lang="en">Zero dependencies</span>
+      <span class="lg-badge" data-lang="ru">Без зависимостей</span>
+      <span class="lg-badge" data-lang="en">Pure black canvas</span>
+      <span class="lg-badge" data-lang="ru">Чистый чёрный холст</span>
+      <span class="lg-badge" data-lang="en">One radial allowed</span>
+      <span class="lg-badge" data-lang="ru">Один радиальный градиент</span>
+      <span class="lg-badge" data-lang="en">Reduced-motion aware</span>
+      <span class="lg-badge" data-lang="ru">Учитывает reduced-motion</span>
+    </div>
+
+    <div class="lang-switch" role="group" aria-label="Language / Язык">
+      <button type="button" data-lang-btn="en" class="is-active">English</button>
+      <button type="button" data-lang-btn="ru">Русский</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════ NAV ══════════════════ -->
+  <nav class="doc-nav">
+    <a href="#install" data-lang="en">Install</a>
+    <a href="#install" data-lang="ru">Установка</a>
+
+    <a href="#tokens" data-lang="en">Tokens</a>
+    <a href="#tokens" data-lang="ru">Токены</a>
+
+    <a href="#specular" data-lang="en">Specular</a>
+    <a href="#specular" data-lang="ru">Спекуляр</a>
+
+    <a href="#buttons" data-lang="en">Buttons</a>
+    <a href="#buttons" data-lang="ru">Кнопки</a>
+
+    <a href="#panels" data-lang="en">Panels</a>
+    <a href="#panels" data-lang="ru">Панели</a>
+
+    <a href="#inputs" data-lang="en">Inputs</a>
+    <a href="#inputs" data-lang="ru">Поля</a>
+
+    <a href="#toggle" data-lang="en">Toggle</a>
+    <a href="#toggle" data-lang="ru">Переключатель</a>
+
+    <a href="#modal" data-lang="en">Modal</a>
+    <a href="#modal" data-lang="ru">Модальные окна</a>
+
+    <a href="#misc" data-lang="en">Badge · Avatar · Progress</a>
+    <a href="#misc" data-lang="ru">Бейдж · Аватар · Прогресс</a>
+
+    <a href="#layout" data-lang="en">Layout</a>
+    <a href="#layout" data-lang="ru">Макет</a>
+
+    <a href="#a11y" data-lang="en">A11y</a>
+    <a href="#a11y" data-lang="ru">Доступность</a>
+  </nav>
+
+  <!-- ══════════════════ INSTALL ══════════════════ -->
+  <section class="doc-section" id="install">
+    <h2 data-lang="en">Installation</h2>
+    <h2 data-lang="ru">Установка</h2>
+
+    <p data-lang="en">Link the stylesheet, load the typeface, and place your UI on a pure black canvas. That's the material's natural environment.</p>
+    <p data-lang="ru">Подключите stylesheet, загрузите шрифт и разместите интерфейс на чистом чёрном фоне. Это естественная среда материала.</p>
+
+    <pre><code>&lt;!-- 1. Elegant typeface (one family) --&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&amp;display=swap" rel="stylesheet"&gt;
+
+&lt;!-- 2. Liquid CSS --&gt;
+&lt;link rel="stylesheet" href="main.css"&gt;
+
+&lt;!-- 3. Pure black canvas --&gt;
+&lt;style&gt;
+  body {
+    background: #000;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+  }
+&lt;/style&gt;</code></pre>
+  </section>
+
+  <!-- ══════════════════ TOKENS ══════════════════ -->
+  <section class="doc-section" id="tokens">
+    <h2 data-lang="en">Design tokens</h2>
+    <h2 data-lang="ru">Токены дизайна</h2>
+
+    <p data-lang="en">Every material property is driven by CSS custom properties. Override them at <code>:root</code> or on any parent to re-theme a subtree.</p>
+    <p data-lang="ru">Все свойства материала задаются CSS-переменными. Переопределяйте их на <code>:root</code> или на любом родителе, чтобы переоформить поддерево.</p>
+
+    <h3 data-lang="en">Surfaces</h3>
+    <h3 data-lang="ru">Поверхности</h3>
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th data-lang="en">Value</th>
+          <th data-lang="ru">Значение</th>
+          <th data-lang="en">Use</th>
+          <th data-lang="ru">Использование</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--glass-fill-primary</code></td><td><span class="swatch" style="background:rgba(255,255,255,0.035)"></span>rgba(255,255,255,0.035)</td><td data-lang="en">Default button &amp; panel fill</td><td data-lang="ru">Заливка кнопок и панелей по умолчанию</td></tr>
+        <tr><td><code>--glass-fill-ghost</code></td><td><span class="swatch" style="background:rgba(255,255,255,0.02)"></span>rgba(255,255,255,0.02)</td><td data-lang="en">Ghost variant</td><td data-lang="ru">Призрачный вариант</td></tr>
+        <tr><td><code>--glass-fill-raised</code></td><td><span class="swatch" style="background:rgba(255,255,255,0.05)"></span>rgba(255,255,255,0.05)</td><td data-lang="en">Hover / raised</td><td data-lang="ru">Наведение / приподнятое</td></tr>
+        <tr><td><code>--glass-fill-sunken</code></td><td><span class="swatch" style="background:rgba(255,255,255,0.015)"></span>rgba(255,255,255,0.015)</td><td data-lang="en">Inputs, tracks</td><td data-lang="ru">Поля ввода, дорожки</td></tr>
+        <tr><td><code>--glass-fill-overlay</code></td><td><span class="swatch" style="background:rgba(255,255,255,0.07)"></span>rgba(255,255,255,0.07)</td><td data-lang="en">Modals, tooltips</td><td data-lang="ru">Модалки, тултипы</td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-lang="en">Borders</h3>
+    <h3 data-lang="ru">Границы</h3>
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th data-lang="en">Value</th>
+          <th data-lang="ru">Значение</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--glass-border-primary</code></td><td>rgba(255,255,255,0.14)</td></tr>
+        <tr><td><code>--glass-border-ghost</code></td><td>rgba(255,255,255,0.08)</td></tr>
+        <tr><td><code>--glass-border-strong</code></td><td>rgba(255,255,255,0.22)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-lang="en">Text</h3>
+    <h3 data-lang="ru">Текст</h3>
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th data-lang="en">Use</th>
+          <th data-lang="ru">Использование</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--text-primary</code></td><td data-lang="en">rgba(255,255,255,0.92) — headings &amp; labels</td><td data-lang="ru">rgba(255,255,255,0.92) — заголовки и метки</td></tr>
+        <tr><td><code>--text-secondary</code></td><td data-lang="en">rgba(255,255,255,0.6) — body copy</td><td data-lang="ru">rgba(255,255,255,0.6) — основной текст</td></tr>
+        <tr><td><code>--text-tertiary</code></td><td data-lang="en">rgba(255,255,255,0.4) — hints</td><td data-lang="ru">rgba(255,255,255,0.4) — подсказки</td></tr>
+        <tr><td><code>--text-disabled</code></td><td>rgba(255,255,255,0.28)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 data-lang="en">Blur · radii · spacing · motion</h3>
+    <h3 data-lang="ru">Размытие · радиусы · отступы · анимация</h3>
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th data-lang="en">Value</th>
+          <th data-lang="ru">Значение</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--blur-sm</code></td><td>blur(16px) saturate(160%)</td></tr>
+        <tr><td><code>--blur-md</code></td><td>blur(28px) saturate(160%)</td></tr>
+        <tr><td><code>--blur-lg</code></td><td>blur(32px) saturate(160%)</td></tr>
+        <tr><td><code>--blur-xl</code></td><td>blur(40px) saturate(170%)</td></tr>
+        <tr><td><code>--radius-pill / -lg / -md / -sm / -xs</code></td><td>100px / 22px / 16px / 10px / 6px</td></tr>
+        <tr><td><code>--space-1 … --space-8</code></td><td>4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 px</td></tr>
+        <tr><td><code>--ease-glass</code></td><td>cubic-bezier(0.32, 0.72, 0, 1)</td></tr>
+        <tr><td><code>--dur-fast / -base / -slow</code></td><td>180ms / 280ms / 420ms</td></tr>
+        <tr><td><code>--font-sans</code></td><td>Inter Tight → system stack</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══════════════════ SPECULAR ══════════════════ -->
+  <section class="doc-section" id="specular">
+    <h2 data-lang="en">Specular highlight</h2>
+    <h2 data-lang="ru">Спекулярный блик</h2>
+
+    <p data-lang="en">The only radial gradient in the library. Add <code>.lg-specular</code> to any glass element and update <code>--lg-x</code> / <code>--lg-y</code> on <code>mousemove</code> to make the highlight follow the cursor.</p>
+    <p data-lang="ru">Единственный радиальный градиент в библиотеке. Добавьте <code>.lg-specular</code> к любому стеклянному элементу и обновляйте <code>--lg-x</code> / <code>--lg-y</code> на <code>mousemove</code>, чтобы блик следовал за курсором.</p>
+
+    <pre><code>&lt;button class="lg-btn lg-btn--md lg-specular"&gt;Continue&lt;/button&gt;
+
+&lt;script&gt;
+  document.querySelectorAll('.lg-specular').forEach(el =&gt; {
+    el.addEventListener('mousemove', e =&gt; {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--lg-x', ((e.clientX - r.left) / r.width) * 100 + '%');
+      el.style.setProperty('--lg-y', ((e.clientY - r.top) / r.height) * 100 + '%');
+    });
+    el.addEventListener('mouseleave', () =&gt; {
+      el.style.setProperty('--lg-x', '50%');
+      el.style.setProperty('--lg-y', '50%');
+    });
+  });
+&lt;/script&gt;</code></pre>
+
+    <div class="example">
+      <span class="example__label" data-lang="en">Live — move your cursor over the buttons</span>
+      <span class="example__label" data-lang="ru">Живой пример — подвигайте курсором по кнопкам</span>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md lg-specular" data-specular>Continue</button>
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--md lg-specular" data-specular>Learn more</button>
+    </div>
+  </section>
+
+  <!-- ══════════════════ BUTTONS ══════════════════ -->
+  <section class="doc-section" id="buttons">
+    <h2 data-lang="en">Buttons</h2>
+    <h2 data-lang="ru">Кнопки</h2>
+
+    <p data-lang="en">Base class <code>.lg-btn</code>. Always pair with a variant and a size.</p>
+    <p data-lang="ru">Базовый класс <code>.lg-btn</code>. Всегда сочетайте с вариантом и размером.</p>
+
+    <h3 data-lang="en">Variants</h3>
+    <h3 data-lang="ru">Варианты</h3>
+    <div class="example">
+      <span class="example__label">Primary · Ghost · Raised · Tinted</span>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md lg-specular" data-specular>Primary</button>
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--md lg-specular" data-specular>Ghost</button>
+      <button type="button" class="lg-btn lg-btn--raised lg-btn--md lg-specular" data-specular>Raised</button>
+      <button type="button" class="lg-btn lg-btn--tinted lg-btn--md lg-specular" data-specular>Tinted</button>
+    </div>
+
+    <h3 data-lang="en">Sizes</h3>
+    <h3 data-lang="ru">Размеры</h3>
+    <div class="example">
+      <span class="example__label">xs · sm · md · lg · xl</span>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--xs">xs</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--sm">sm</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md">md</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--lg">lg</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--xl">xl</button>
+    </div>
+
+    <h3 data-lang="en">States</h3>
+    <h3 data-lang="ru">Состояния</h3>
+    <div class="example">
+      <span class="example__label" data-lang="en">Default · Disabled · Block</span>
+      <span class="example__label" data-lang="ru">Обычная · Отключённая · На всю ширину</span>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md">Default</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md" disabled>Disabled</button>
+    </div>
+    <div class="example example--column">
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--md lg-btn--block">Block (full width)</button>
+    </div>
+  </section>
+
+  <!-- ══════════════════ PANELS ══════════════════ -->
+  <section class="doc-section" id="panels">
+    <h2 data-lang="en">Panels</h2>
+    <h2 data-lang="ru">Панели</h2>
+
+    <p data-lang="en">Base class <code>.lg-panel</code>. Compose headers, bodies and footers with BEM-style children.</p>
+    <p data-lang="ru">Базовый класс <code>.lg-panel</code>. Собирайте из заголовка, тела и подвала по BEM.</p>
+
+    <div class="example example--column">
+      <span class="example__label" data-lang="en">Panel with header, body, footer</span>
+      <span class="example__label" data-lang="ru">Панель с заголовком, телом и подвалом</span>
+      <div class="lg-panel" style="max-width:100%;">
+        <div class="lg-panel__header">
+          <div>
+            <h3 class="lg-panel__title" data-lang="en">Glass card</h3>
+            <h3 class="lg-panel__title" data-lang="ru">Стеклянная карточка</h3>
+            <p class="lg-panel__subtitle" data-lang="en">Subtitle / caption</p>
+            <p class="lg-panel__subtitle" data-lang="ru">Подзаголовок / подпись</p>
+          </div>
+          <span class="lg-badge" data-lang="en">New</span>
+          <span class="lg-badge" data-lang="ru">Новое</span>
+        </div>
+        <div class="lg-panel__body">
+          <span data-lang="en">Panels inherit the same frosted material as buttons. Content stays perfectly legible thanks to the 1px glass lip and the deep outer shadow.</span>
+          <span data-lang="ru">Панели наследуют тот же матовый материал, что и кнопки. Контент остаётся идеально читаемым благодаря 1px стеклянной кромке и глубокой внешней тени.</span>
+        </div>
+        <div class="lg-panel__footer">
+          <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-lang="en">Cancel</button>
+          <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-lang="ru">Отмена</button>
+          <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-lang="en">Confirm</button>
+          <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-lang="ru">Подтвердить</button>
+        </div>
+      </div>
+    </div>
+
+    <h3 data-lang="en">Modifiers</h3>
+    <h3 data-lang="ru">Модификаторы</h3>
+    <ul>
+      <li><code>.lg-panel--ghost</code> <span data-lang="en">— lighter fill, softer border</span><span data-lang="ru">— более прозрачная заливка, мягкая граница</span></li>
+      <li><code>.lg-panel--overlay</code> <span data-lang="en">— heavier fill, stronger border, <code>--blur-xl</code> (modals &amp; popovers)</span><span data-lang="ru">— плотнее заливка, сильнее граница, <code>--blur-xl</code> (модалки и поповеры)</span></li>
+      <li><code>.lg-panel--sm</code> / <code>.lg-panel--lg</code> <span data-lang="en">— tighter / roomier padding</span><span data-lang="ru">— плотнее / просторнее отступы</span></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════ INPUTS ══════════════════ -->
+  <section class="doc-section" id="inputs">
+    <h2 data-lang="en">Inputs</h2>
+    <h2 data-lang="ru">Поля ввода</h2>
+
+    <div class="example example--column">
+      <span class="example__label" data-lang="en">Field · textarea · select</span>
+      <span class="example__label" data-lang="ru">Поле · текстовая область · селект</span>
+
+      <div class="lg-field">
+        <label class="lg-label" for="doc-email" data-lang="en">Email</label>
+        <label class="lg-label" for="doc-email" data-lang="ru">Эл. почта</label>
+        <input id="doc-email" class="lg-input" type="email" placeholder="you@example.com">
+        <span class="lg-hint" data-lang="en">We never share your address.</span>
+        <span class="lg-hint" data-lang="ru">Мы не передаём ваш адрес третьим лицам.</span>
+      </div>
+
+      <div class="lg-field">
+        <label class="lg-label" for="doc-notes" data-lang="en">Notes</label>
+        <label class="lg-label" for="doc-notes" data-lang="ru">Заметки</label>
+        <textarea id="doc-notes" class="lg-textarea" placeholder="Anything else…"></textarea>
+      </div>
+
+      <div class="lg-field">
+        <label class="lg-label" for="doc-plan" data-lang="en">Plan</label>
+        <label class="lg-label" for="doc-plan" data-lang="ru">Тариф</label>
+        <div class="lg-select-wrap">
+          <select id="doc-plan" class="lg-select">
+            <option data-lang="en">Free</option>
+            <option data-lang="ru">Бесплатный</option>
+            <option data-lang="en">Pro</option>
+            <option data-lang="ru">Про</option>
+            <option data-lang="en">Team</option>
+            <option data-lang="ru">Команда</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ TOGGLE ══════════════════ -->
+  <section class="doc-section" id="toggle">
+    <h2 data-lang="en">Toggle</h2>
+    <h2 data-lang="ru">Переключатель</h2>
+
+    <p data-lang="en">Pure CSS switch driven by <code>:checked</code>. Works with a native checkbox for accessibility.</p>
+    <p data-lang="ru">Переключатель на чистом CSS через <code>:checked</code>. Работает с нативным чекбоксом для доступности.</p>
+
+    <div class="example">
+      <span class="example__label" data-lang="en">Switch</span>
+      <span class="example__label" data-lang="ru">Свитч</span>
+      <label class="lg-toggle">
+        <input type="checkbox" class="lg-toggle__input" checked>
+        <span class="lg-toggle__track"><span class="lg-toggle__thumb"></span></span>
+        <span class="lg-toggle__label" data-lang="en">Notifications</span>
+        <span class="lg-toggle__label" data-lang="ru">Уведомления</span>
+      </label>
+      <label class="lg-toggle">
+        <input type="checkbox" class="lg-toggle__input">
+        <span class="lg-toggle__track"><span class="lg-toggle__thumb"></span></span>
+        <span class="lg-toggle__label" data-lang="en">Auto-update</span>
+        <span class="lg-toggle__label" data-lang="ru">Автообновление</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- ══════════════════ MODAL ══════════════════ -->
+  <section class="doc-section" id="modal">
+    <h2 data-lang="en">Modals</h2>
+    <h2 data-lang="ru">Модальные окна</h2>
+
+    <p data-lang="en">Glass modal built on top of <code>.lg-panel--overlay</code>. Open/close with the <code>.is-open</code> class.</p>
+    <p data-lang="ru">Стеклянная модалка построена поверх <code>.lg-panel--overlay</code>. Открытие/закрытие через класс <code>.is-open</code>.</p>
+
+    <div class="example example--column">
+      <span class="example__label" data-lang="en">Live — open a modal</span>
+      <span class="example__label" data-lang="ru">Живой пример — откройте модалку</span>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;">
+        <button type="button" class="lg-btn lg-btn--primary lg-btn--md lg-specular" data-specular data-open-modal="modal-basic">
+          <span data-lang="en">Open modal</span>
+          <span data-lang="ru">Открыть модалку</span>
+        </button>
+        <button type="button" class="lg-btn lg-btn--ghost lg-btn--md lg-specular" data-specular data-open-modal="modal-danger">
+          <span data-lang="en">Destructive modal</span>
+          <span data-lang="ru">Опасное действие</span>
+        </button>
+      </div>
+    </div>
+
+    <pre><code>&lt;div class="lg-modal is-open" id="modal" role="dialog" aria-modal="true"&gt;
+  &lt;div class="lg-modal__backdrop" data-close-modal&gt;&lt;/div&gt;
+  &lt;div class="lg-modal__dialog lg-panel lg-panel--overlay"&gt;
+    &lt;div class="lg-panel__header"&gt;
+      &lt;div&gt;
+        &lt;h3 class="lg-panel__title"&gt;Title&lt;/h3&gt;
+        &lt;p class="lg-panel__subtitle"&gt;Optional subtitle&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;button class="lg-modal__close" data-close-modal aria-label="Close"&gt;×&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="lg-panel__body"&gt;Content&lt;/div&gt;
+    &lt;div class="lg-panel__footer"&gt;
+      &lt;button class="lg-btn lg-btn--ghost lg-btn--sm" data-close-modal&gt;Cancel&lt;/button&gt;
+      &lt;button class="lg-btn lg-btn--primary lg-btn--sm"&gt;Confirm&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 data-lang="en">Variants</h3>
+    <h3 data-lang="ru">Варианты</h3>
+    <ul>
+      <li><code>.lg-modal</code> — <span data-lang="en">fullscreen overlay with fade-in</span><span data-lang="ru">оверлей на весь экран с плавным появлением</span></li>
+      <li><code>.lg-modal__backdrop</code> — <span data-lang="en">dim + blur layer behind dialog</span><span data-lang="ru">затемнение + размытие под диалогом</span></li>
+      <li><code>.lg-modal__dialog</code> — <span data-lang="en">glass dialog (pair with <code>.lg-panel--overlay</code>)</span><span data-lang="ru">стеклянный диалог (используйте с <code>.lg-panel--overlay</code>)</span></li>
+      <li><code>.lg-modal__close</code> — <span data-lang="en">round close button in the corner</span><span data-lang="ru">круглая кнопка закрытия в углу</span></li>
+      <li><code>data-close-modal</code> — <span data-lang="en">click to close (backdrop, × button, cancel)</span><span data-lang="ru">клик для закрытия (фон, ×, отмена)</span></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════ MISC ══════════════════ -->
+  <section class="doc-section" id="misc">
+    <h2 data-lang="en">Badge · Avatar · Progress · Segmented</h2>
+    <h2 data-lang="ru">Бейдж · Аватар · Прогресс · Сегменты</h2>
+
+    <h3 data-lang="en">Badge</h3>
+    <h3 data-lang="ru">Бейдж</h3>
+    <div class="example">
+      <span class="lg-badge" data-lang="en">Default</span>
+      <span class="lg-badge" data-lang="ru">Обычный</span>
+      <span class="lg-badge lg-badge--solid" data-lang="en">Solid</span>
+      <span class="lg-badge lg-badge--solid" data-lang="ru">Плотный</span>
+    </div>
+
+    <h3 data-lang="en">Avatar</h3>
+    <h3 data-lang="ru">Аватар</h3>
+    <div class="example">
+      <span class="lg-avatar lg-avatar--sm">A</span>
+      <span class="lg-avatar">B</span>
+      <span class="lg-avatar lg-avatar--lg">C</span>
+    </div>
+
+    <h3 data-lang="en">Progress</h3>
+    <h3 data-lang="ru">Прогресс</h3>
+    <div class="example example--column">
+      <div class="lg-progress"><div class="lg-progress__fill" style="width:62%"></div></div>
+    </div>
+
+    <h3 data-lang="en">Segmented control</h3>
+    <h3 data-lang="ru">Сегментированный контрол</h3>
+    <div class="example">
+      <div class="lg-segmented" role="tablist">
+        <button type="button" class="lg-segmented__item is-active" role="tab" aria-selected="true" data-lang="en">Day</button>
+        <button type="button" class="lg-segmented__item is-active" role="tab" aria-selected="true" data-lang="ru">День</button>
+        <button type="button" class="lg-segmented__item" role="tab" aria-selected="false" data-lang="en">Week</button>
+        <button type="button" class="lg-segmented__item" role="tab" aria-selected="false" data-lang="ru">Неделя</button>
+        <button type="button" class="lg-segmented__item" role="tab" aria-selected="false" data-lang="en">Month</button>
+        <button type="button" class="lg-segmented__item" role="tab" aria-selected="false" data-lang="ru">Месяц</button>
+      </div>
+    </div>
+
+    <h3 data-lang="en">Tooltip</h3>
+    <h3 data-lang="ru">Тултип</h3>
+    <div class="example">
+      <span class="lg-tooltip">
+        <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-lang="en">Hover me</button>
+        <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-lang="ru">Наведи</button>
+        <span class="lg-tooltip__content" role="tooltip" data-lang="en">Frosted tooltip</span>
+        <span class="lg-tooltip__content" role="tooltip" data-lang="ru">Матовый тултип</span>
+      </span>
+    </div>
+  </section>
+
+  <!-- ══════════════════ LAYOUT ══════════════════ -->
+  <section class="doc-section" id="layout">
+    <h2 data-lang="en">Layout &amp; typography helpers</h2>
+    <h2 data-lang="ru">Помощники макета и типографики</h2>
+
+    <h3 data-lang="en">Typography</h3>
+    <h3 data-lang="ru">Типографика</h3>
+    <div class="example example--column">
+      <div class="lg-eyebrow" data-lang="en">Eyebrow label</div>
+      <div class="lg-eyebrow" data-lang="ru">Надзаголовок</div>
+      <h3 class="lg-heading" data-lang="en">Heading — .lg-heading</h3>
+      <h3 class="lg-heading" data-lang="ru">Заголовок — .lg-heading</h3>
+      <p class="lg-text" data-lang="en">Body copy — <code>.lg-text</code>. Secondary color, comfortable line-height.</p>
+      <p class="lg-text" data-lang="ru">Основной текст — <code>.lg-text</code>. Вторичный цвет, удобная высота строки.</p>
+      <p class="lg-text lg-text--sm lg-text--tertiary" data-lang="en">Tertiary small text — .lg-text--sm .lg-text--tertiary</p>
+      <p class="lg-text lg-text--sm lg-text--tertiary" data-lang="ru">Третичный мелкий текст — .lg-text--sm .lg-text--tertiary</p>
+    </div>
+
+    <h3 data-lang="en">Stack · Row · Grid</h3>
+    <h3 data-lang="ru">Стопка · Ряд · Сетка</h3>
+    <pre><code>&lt;div class="lg-stack"&gt;…&lt;/div&gt;    &lt;!-- column, gap --&gt;
+&lt;div class="lg-row"&gt;…&lt;/div&gt;      &lt;!-- row, wraps --&gt;
+&lt;div class="lg-row lg-row--between"&gt;…&lt;/div&gt;
+&lt;div class="lg-grid"&gt;…&lt;/div&gt;     &lt;!-- auto-fill 220px --&gt;</code></pre>
+
+    <h3 data-lang="en">Spacing helpers</h3>
+    <h3 data-lang="ru">Помощники отступов</h3>
+    <p data-lang="en"><code>.lg-mt-1 … .lg-mt-6</code> and <code>.lg-mb-1 … .lg-mb-6</code> map to the spacing scale.</p>
+    <p data-lang="ru"><code>.lg-mt-1 … .lg-mt-6</code> и <code>.lg-mb-1 … .lg-mb-6</code> соответствуют шкале отступов.</p>
+
+    <h3 data-lang="en">Divider</h3>
+    <h3 data-lang="ru">Разделитель</h3>
+    <hr class="lg-divider">
+  </section>
+
+  <!-- ══════════════════ A11Y ══════════════════ -->
+  <section class="doc-section" id="a11y">
+    <h2 data-lang="en">Accessibility</h2>
+    <h2 data-lang="ru">Доступность</h2>
+
+    <ul data-lang="en">
+      <li><strong>Focus-visible</strong> — buttons and inputs show a 1px white outline at 3px offset. Never removed.</li>
+      <li><strong>Reduced motion</strong> — under <code>prefers-reduced-motion: reduce</code>, transforms and the cursor specular are disabled; transitions collapse to ~0ms.</li>
+      <li><strong>Native semantics</strong> — use <code>&lt;button type="button"&gt;</code>, <code>&lt;label&gt;</code> for inputs, and <code>&lt;input type="checkbox"&gt;</code> behind the toggle.</li>
+      <li><strong>Contrast</strong> — body text uses <code>rgba(255,255,255,0.6)</code> on pure black (≈ 8.5:1), headings <code>0.92</code>. Keep disabled states out of critical flows.</li>
+      <li><strong>Modals</strong> — <code>role="dialog"</code>, <code>aria-modal="true"</code>, focus trap via JS (optional) and Esc to close.</li>
+    </ul>
+    <ul data-lang="ru">
+      <li><strong>Focus-visible</strong> — кнопки и поля показывают белый контур 1px со смещением 3px. Он никогда не убирается.</li>
+      <li><strong>Reduced motion</strong> — при <code>prefers-reduced-motion: reduce</code> трансформации и курсорный спекуляр отключаются; переходы сжимаются до ~0мс.</li>
+      <li><strong>Нативная семантика</strong> — используйте <code>&lt;button type="button"&gt;</code>, <code>&lt;label&gt;</code> для полей и <code>&lt;input type="checkbox"&gt;</code> под переключателем.</li>
+      <li><strong>Контраст</strong> — основной текст <code>rgba(255,255,255,0.6)</code> на чистом чёрном (≈ 8.5:1), заголовки <code>0.92</code>. Не выводите отключённые состояния в критичных сценариях.</li>
+      <li><strong>Модалки</strong> — <code>role="dialog"</code>, <code>aria-modal="true"</code>, опциональный фокус-трап на JS и закрытие по Esc.</li>
+    </ul>
+
+    <h3 data-lang="en">Browser support</h3>
+    <h3 data-lang="ru">Поддержка браузеров</h3>
+    <ul data-lang="en">
+      <li>Modern Chrome, Edge, Safari, Firefox — <code>backdrop-filter</code> ships everywhere.</li>
+      <li>For older Safari use the <code>-webkit-backdrop-filter</code> fallback (already included).</li>
+      <li>If <code>backdrop-filter</code> is unsupported, the translucent fill and inner shadows still read as glass — the material degrades gracefully.</li>
+    </ul>
+    <ul data-lang="ru">
+      <li>Современные Chrome, Edge, Safari, Firefox — <code>backdrop-filter</code> поддерживается везде.</li>
+      <li>Для старых Safari используется fallback <code>-webkit-backdrop-filter</code> (уже включён).</li>
+      <li>Если <code>backdrop-filter</code> не поддерживается, полупрозрачная заливка и внутренние тени всё равно читаются как стекло — материал деградирует изящно.</li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════ FOOTER ══════════════════ -->
+  <footer class="doc-footer">
+    <span data-lang="en">Liquid CSS · v1.1.0 · MIT · Pure black, white light, no gradients on the surface.</span>
+    <span data-lang="ru">Liquid CSS · v1.1.0 · MIT · Чистый чёрный, белый свет, никаких градиентов на поверхности.</span>
+  </footer>
+
+</div>
+
+<!-- ══════════════════ MODALS (in DOM, hidden by default) ══════════════════ -->
+<div class="lg-modal" id="modal-basic" role="dialog" aria-modal="true" aria-labelledby="modal-basic-title">
+  <div class="lg-modal__backdrop" data-close-modal></div>
+  <div class="lg-modal__dialog lg-panel lg-panel--overlay">
+    <div class="lg-panel__header">
+      <div>
+        <h3 class="lg-panel__title" id="modal-basic-title" data-lang="en">Glass dialog</h3>
+        <h3 class="lg-panel__title" id="modal-basic-title-ru" data-lang="ru">Стеклянный диалог</h3>
+        <p class="lg-panel__subtitle" data-lang="en">Built with .lg-panel--overlay</p>
+        <p class="lg-panel__subtitle" data-lang="ru">Построен на .lg-panel--overlay</p>
+      </div>
+      <button type="button" class="lg-modal__close" data-close-modal aria-label="Close">×</button>
+    </div>
+    <div class="lg-panel__body">
+      <span data-lang="en">This dialog uses the same frosted glass recipe as buttons and panels. The backdrop dims and blurs the page behind it.</span>
+      <span data-lang="ru">Этот диалог использует тот же рецепт матового стекла, что кнопки и панели. Фон затемняется и размывается позади него.</span>
+    </div>
+    <div class="lg-panel__footer">
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-close-modal data-lang="en">Cancel</button>
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-close-modal data-lang="ru">Отмена</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-close-modal data-lang="en">Confirm</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-close-modal data-lang="ru">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<div class="lg-modal" id="modal-danger" role="dialog" aria-modal="true" aria-labelledby="modal-danger-title">
+  <div class="lg-modal__backdrop" data-close-modal></div>
+  <div class="lg-modal__dialog lg-panel lg-panel--overlay">
+    <div class="lg-panel__header">
+      <div>
+        <h3 class="lg-panel__title" id="modal-danger-title" data-lang="en">Delete item?</h3>
+        <h3 class="lg-panel__title" id="modal-danger-title-ru" data-lang="ru">Удалить элемент?</h3>
+        <p class="lg-panel__subtitle" data-lang="en">This action cannot be undone</p>
+        <p class="lg-panel__subtitle" data-lang="ru">Это действие нельзя отменить</p>
+      </div>
+      <button type="button" class="lg-modal__close" data-close-modal aria-label="Close">×</button>
+    </div>
+    <div class="lg-panel__body">
+      <span data-lang="en">The selected item will be permanently removed from your account.</span>
+      <span data-lang="ru">Выбранный элемент будет безвозвратно удалён из вашей учётной записи.</span>
+    </div>
+    <div class="lg-panel__footer">
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-close-modal data-lang="en">Cancel</button>
+      <button type="button" class="lg-btn lg-btn--ghost lg-btn--sm" data-close-modal data-lang="ru">Отмена</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-close-modal data-lang="en">Delete</button>
+      <button type="button" class="lg-btn lg-btn--primary lg-btn--sm lg-specular" data-specular data-close-modal data-lang="ru">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ JS: specular + modals + i18n ══════════════════ -->
+<script>
+  (function () {
+    'use strict';
+
+    // ────────────────────────────────────────────────────────
+    // 1. LANGUAGE SWITCH
+    //    html[data-active-lang="en|ru"] controls visibility of [data-lang]
+    // ────────────────────────────────────────────────────────
+    var html = document.documentElement;
+    var langButtons = document.querySelectorAll('[data-lang-btn]');
+
+    function setLang(lang) {
+      html.setAttribute('data-active-lang', lang);
+      langButtons.forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-lang-btn') === lang);
+      });
+      document.documentElement.lang = lang;
+    }
+
+    langButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setLang(btn.getAttribute('data-lang-btn'));
+      });
+    });
+
+    // default language = English
+    setLang('en');
+
+    // ────────────────────────────────────────────────────────
+    // 2. SPECULAR (cursor-follow highlight)
+    // ────────────────────────────────────────────────────────
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function bindSpecular(el) {
+      if (reducedMotion || el.disabled) return;
+      el.addEventListener('mousemove', function (e) {
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--lg-x', ((e.clientX - r.left) / r.width) * 100 + '%');
+        el.style.setProperty('--lg-y', ((e.clientY - r.top) / r.height) * 100 + '%');
+      });
+      el.addEventListener('mouseleave', function () {
+        el.style.setProperty('--lg-x', '50%');
+        el.style.setProperty('--lg-y', '50%');
+      });
+    }
+
+    document.querySelectorAll('[data-specular]').forEach(bindSpecular);
+
+    // ────────────────────────────────────────────────────────
+    // 3. MODALS
+    //    - open:  [data-open-modal="id"]
+    //    - close: [data-close-modal] inside the modal, or Esc
+    // ────────────────────────────────────────────────────────
+    function openModal(id) {
+      var modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      // focus first focusable element
+      var focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable) focusable.focus();
+    }
+
+    function closeModal(modal) {
+      if (!modal) return;
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-open-modal]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openModal(btn.getAttribute('data-open-modal'));
+      });
+    });
+
+    document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        closeModal(btn.closest('.lg-modal'));
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.lg-modal.is-open').forEach(closeModal);
+      }
+    });
+
+    // close on backdrop click
+    document.querySelectorAll('.lg-modal__backdrop').forEach(function (bd) {
+      bd.addEventListener('click', function () {
+        closeModal(bd.closest('.lg-modal'));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
