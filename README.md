@@ -50,7 +50,7 @@ A premium, dependency-free CSS library for building frosted-glass interfaces on 
 ### 1. Link the stylesheet
 
 ```html
-<link rel="stylesheet" href="https://raw.githubusercontent.com/kl6388760-prog/liquid-css/refs/heads/main/main.css">
+<link rel="stylesheet" href="https://kl6388760-prog.github.io/liquid-css/main.css">
 ```
 
 ### 2. (Optional) Load the typeface
