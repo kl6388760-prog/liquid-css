@@ -3,608 +3,1156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>NFT Market</title>
+<meta name="theme-color" content="#000000">
+<title>Liquid · NFT Market</title>
 
-<!-- Telegram WebApp -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Typeface -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- Liquid CSS -->
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://kl6388760-prog.github.io/liquid-css/main.css">
 
 <style>
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-
   html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-    background: #000;
-    color: var(--text-primary);
+    margin: 0; padding: 0; min-height: 100%;
+    background: #000; color: var(--text-primary);
     font-family: var(--font-sans);
     overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
   }
-
   body {
-    padding: 16px 16px calc(96px + env(safe-area-inset-bottom));
-    max-width: 640px;
+    padding: 0 0 calc(100px + env(safe-area-inset-bottom));
+    max-width: 720px;
     margin: 0 auto;
+    position: relative;
   }
+  body.locked { overflow: hidden; }
 
-  /* ---------- Header ---------- */
-  .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.72) 60%, rgba(0,0,0,0) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
-  .app-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: -0.02em;
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 17px; letter-spacing: -0.03em;
   }
-  .app-logo__mark {
-    width: 32px; height: 32px;
-    border-radius: 10px;
-    background: var(--glass-fill-raised);
-    border: 1px solid var(--glass-border-primary);
+  .brand__mark {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: linear-gradient(135deg, #fff 0%, #b8b8b8 100%);
     display: grid; place-items: center;
-    font-size: 16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    font-size: 16px; color: #000; font-weight: 700;
+    box-shadow: 0 4px 14px rgba(255,255,255,0.15);
   }
-  .wallet-chip {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: var(--radius-pill);
+  .topbar__actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 12px;
     background: var(--glass-fill-primary);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-glass);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+    display: grid; place-items: center;
+    color: var(--text-primary); cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-glass);
+    position: relative;
   }
-  .wallet-chip:active { background: var(--glass-fill-raised); }
-  .wallet-dot {
-    width: 6px; height: 6px; border-radius: 50%;
+  .icon-btn:active { transform: scale(0.92); background: var(--glass-fill-raised); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn .dot {
+    position: absolute; top: 8px; right: 8px;
+    width: 7px; height: 7px; border-radius: 50%;
     background: #4ade80;
     box-shadow: 0 0 8px #4ade80;
+    border: 1.5px solid #000;
+  }
+  .wallet-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border-radius: var(--radius-pill);
+    background: var(--glass-fill-primary);
+    border: 1px solid var(--glass-border-primary);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+    font-size: 12px; font-weight: 600;
+    color: var(--text-primary); cursor: pointer;
+    font-family: inherit; letter-spacing: -0.01em;
+    transition: all var(--dur-fast) var(--ease-glass);
+  }
+  .wallet-chip:active { transform: scale(0.95); background: var(--glass-fill-raised); }
+  .wallet-chip .ball {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80; box-shadow: 0 0 8px #4ade80;
   }
 
-  /* ---------- Hero / Featured ---------- */
+  /* ============ SECTION HEADER ============ */
+  .section {
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+  .section-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px;
+  }
+  .section-title {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.03em;
+    margin: 0; line-height: 1.15;
+  }
+  .section-sub {
+    font-size: 13px; color: var(--text-tertiary);
+    margin: 4px 0 0; font-weight: 400;
+  }
+  .section-link {
+    font-size: 13px; color: var(--text-secondary);
+    background: none; border: none; padding: 4px;
+    cursor: pointer; font-family: inherit; font-weight: 500;
+    transition: color var(--dur-fast) var(--ease-glass);
+    flex-shrink: 0;
+  }
+  .section-link:active { color: var(--text-primary); }
+
+  /* ============ HERO ============ */
+  .hero-wrap { padding: 0 20px; margin-bottom: 32px; }
   .hero {
     position: relative;
-    border-radius: var(--radius-lg);
+    border-radius: 24px;
     overflow: hidden;
-    margin-bottom: 28px;
     border: 1px solid var(--glass-border-primary);
     background: var(--glass-fill-primary);
-    backdrop-filter: var(--blur-md);
-    -webkit-backdrop-filter: var(--blur-md);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.06),
-      0 20px 40px -20px rgba(0,0,0,0.9);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 30px 60px -30px rgba(0,0,0,1);
     cursor: pointer;
     transition: transform var(--dur-base) var(--ease-glass);
   }
   .hero:active { transform: scale(0.985); }
   .hero__art {
-    aspect-ratio: 16 / 10;
-    width: 100%;
-    background:
-      radial-gradient(circle at 30% 30%, #2a2a2a 0%, #0a0a0a 70%),
-      #111;
-    display: grid;
-    place-items: center;
-    font-size: 56px;
+    aspect-ratio: 1.45 / 1;
     position: relative;
+    display: grid; place-items: center;
+    font-size: 96px;
+    overflow: hidden;
+  }
+  .hero__art::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(255,255,255,0.02) 0%, transparent 40%);
+    pointer-events: none;
   }
   .hero__art::after {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.85) 100%);
+    background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.92) 100%);
+    pointer-events: none;
+  }
+  .hero__glow {
+    position: absolute;
+    width: 60%; aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(10px, -10px); }
+  }
+  .hero__badges {
+    position: absolute; top: 14px; left: 14px;
+    z-index: 3; display: flex; gap: 6px;
   }
   .hero__badge {
-    position: absolute;
-    top: 12px; left: 12px;
-    z-index: 2;
-    padding: 5px 10px;
-    border-radius: var(--radius-pill);
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
+    padding: 6px 11px; border-radius: var(--radius-pill);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
     border: 1px solid var(--glass-border-primary);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-primary);
+  }
+  .hero__badge.live { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+  .hero__badge.live::before {
+    content: ''; display: inline-block;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #4ade80; box-shadow: 0 0 6px #4ade80;
+    margin-right: 5px; vertical-align: middle;
   }
   .hero__info {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    z-index: 2;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 12px;
+    position: absolute; bottom: 0; left: 0; right: 0;
+    z-index: 3; padding: 20px;
+  }
+  .hero__collection {
+    font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 500; margin-bottom: 6px;
   }
   .hero__title {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin: 0 0 4px;
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -0.03em; line-height: 1.1;
+    margin: 0 0 6px;
   }
-  .hero__author {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin: 0;
+  .hero__by {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-secondary);
+    margin-bottom: 16px;
   }
-  .hero__price {
-    text-align: right;
-    flex-shrink: 0;
+  .hero__by-avatar {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: linear-gradient(135deg, #444, #222);
+    display: grid; place-items: center;
+    font-size: 10px; border: 1px solid var(--glass-border-primary);
   }
+  .hero__bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 12px; padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .hero__price-block { }
   .hero__price-label {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 2px;
+    font-size: 10px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 3px; font-weight: 500;
   }
   .hero__price-value {
-    font-size: 17px;
-    font-weight: 600;
+    font-size: 22px; font-weight: 700;
     letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .hero__price-fiat {
+    font-size: 12px; color: var(--text-tertiary); font-weight: 500;
+  }
+  .hero__cta {
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    background: #fff; color: #000;
+    border: none; font-family: inherit;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; letter-spacing: -0.01em;
+    transition: transform var(--dur-fast) var(--ease-glass), box-shadow var(--dur-fast) var(--ease-glass);
+    box-shadow: 0 4px 20px rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .hero__cta:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(255,255,255,0.15); }
+
+  /* ============ STATS STRIP ============ */
+  .stats {
+    padding: 0 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 32px;
+  }
+  .stat {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    text-align: center;
+  }
+  .stat__v {
+    font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .stat__l {
+    font-size: 10px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 500;
   }
 
-  /* ---------- Section header ---------- */
-  .section-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .section-title {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 0;
-  }
-  .section-link {
-    font-size: 13px;
-    color: var(--text-secondary);
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    font-family: inherit;
-  }
-
-  /* ---------- Category pills ---------- */
+  /* ============ CATS ============ */
   .cats {
-    display: flex;
-    gap: 8px;
+    display: flex; gap: 8px;
     overflow-x: auto;
-    padding-bottom: 14px;
-    margin-bottom: 10px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: 0 20px 16px;
+    margin-bottom: 8px;
+    scrollbar-width: none; -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
   }
   .cats::-webkit-scrollbar { display: none; }
   .cat {
     flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
+    padding: 9px 16px; border-radius: var(--radius-pill);
     background: var(--glass-fill-ghost);
     border: 1px solid var(--glass-border-ghost);
     color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
     transition: all var(--dur-fast) var(--ease-glass);
     white-space: nowrap;
+    scroll-snap-align: start;
+    display: flex; align-items: center; gap: 6px;
   }
+  .cat span { font-size: 14px; }
   .cat.active {
-    background: var(--glass-fill-raised);
-    border-color: var(--glass-border-strong);
-    color: var(--text-primary);
+    background: #fff;
+    border-color: #fff;
+    color: #000;
+    font-weight: 600;
   }
-  .cat:active { transform: scale(0.95); }
+  .cat:active { transform: scale(0.94); }
 
-  /* ---------- NFT grid ---------- */
-  .nft-grid {
+  /* ============ TABS (Main Navigation) ============ */
+  .tabs {
+    padding: 0 20px;
+    display: flex; gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border-ghost);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 10px 14px;
+    background: none; border: none;
+    color: var(--text-tertiary);
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease-glass);
+  }
+  .tab.active { color: var(--text-primary); font-weight: 600; }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    left: 14px; right: 14px; bottom: -1px;
+    height: 2px; background: #fff;
+    border-radius: 2px;
+  }
+
+  /* ============ NFT GRID ============ */
+  .grid {
+    padding: 0 20px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-  @media (min-width: 480px) {
-    .nft-grid { grid-template-columns: repeat(3, 1fr); }
+  @media (min-width: 560px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
   }
 
-  .nft-card {
+  .card {
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 1px solid var(--glass-border-primary);
     background: var(--glass-fill-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 24px -16px rgba(0,0,0,0.9);
     cursor: pointer;
-    transition: transform var(--dur-base) var(--ease-glass), background var(--dur-base) var(--ease-glass);
+    transition: transform var(--dur-base) var(--ease-glass), border-color var(--dur-base) var(--ease-glass);
+    position: relative;
+    animation: fadeInUp 0.5s var(--ease-glass) backwards;
   }
-  .nft-card:active {
-    transform: scale(0.97);
-    background: var(--glass-fill-raised);
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .nft-card__art {
+  .card:active { transform: scale(0.97); border-color: var(--glass-border-strong); }
+  .card__art {
     aspect-ratio: 1;
-    display: grid;
-    place-items: center;
-    font-size: 44px;
+    display: grid; place-items: center;
+    font-size: 52px;
     position: relative;
     overflow: hidden;
   }
-  .nft-card__art::after {
+  .card__art::after {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(180deg, transparent 65%, rgba(0,0,0,0.6) 100%);
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.5) 100%);
     pointer-events: none;
   }
-  .nft-card__info {
-    padding: 10px 12px 12px;
+  .card__rank {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    padding: 4px 8px; border-radius: var(--radius-sm);
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border-ghost);
   }
-  .nft-card__name {
-    font-size: 13px;
-    font-weight: 600;
+  .card__rank.mythic { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+  .card__rank.legendary { color: #f472b6; border-color: rgba(244,114,182,0.3); }
+  .card__rank.epic { color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+  .card__fav {
+    position: absolute; top: 8px; right: 8px; z-index: 2;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border-ghost);
+    display: grid; place-items: center;
+    cursor: pointer; padding: 0;
+    transition: all var(--dur-fast) var(--ease-glass);
+  }
+  .card__fav svg { width: 13px; height: 13px; fill: none; stroke: var(--text-secondary); stroke-width: 2; }
+  .card__fav:active { transform: scale(0.88); }
+  .card__fav.on svg { fill: #f472b6; stroke: #f472b6; }
+  .card__info {
+    padding: 11px 12px 13px;
+  }
+  .card__coll {
+    font-size: 9px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600; margin-bottom: 3px;
+  }
+  .card__name {
+    font-size: 13px; font-weight: 600;
     letter-spacing: -0.01em;
-    margin: 0 0 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .nft-card__author {
-    font-size: 11px;
-    color: var(--text-tertiary);
     margin: 0 0 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .nft-card__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+  .card__row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--glass-border-ghost);
   }
-  .nft-card__price-label {
-    font-size: 10px;
+  .card__price-label {
+    font-size: 9px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 1px;
+  }
+  .card__price {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 3px;
+  }
+  .card__price small {
+    font-size: 10px; font-weight: 500;
     color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
-  .nft-card__price {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+  .card__trend {
+    font-size: 10px; font-weight: 600;
+    padding: 3px 6px; border-radius: 6px;
   }
+  .card__trend.up { color: #4ade80; background: rgba(74,222,128,0.1); }
+  .card__trend.down { color: #f87171; background: rgba(248,113,113,0.1); }
 
-  /* ---------- Bottom nav ---------- */
-  .bottom-nav {
+  /* ============ BOTTOM NAV ============ */
+  .nav {
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    width: min(calc(100% - 32px), 608px);
+    left: 50%; transform: translateX(-50%);
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: min(calc(100% - 32px), 688px);
     display: flex;
-    justify-content: space-around;
     padding: 8px;
-    border-radius: var(--radius-pill);
-    background: var(--glass-fill-overlay);
+    border-radius: 26px;
+    background: rgba(20,20,20,0.82);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-lg);
-    -webkit-backdrop-filter: var(--blur-lg);
+    backdrop-filter: var(--blur-lg) saturate(180%);
+    -webkit-backdrop-filter: var(--blur-lg) saturate(180%);
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.08),
-      0 20px 40px -10px rgba(0,0,0,0.8);
+      0 24px 48px -12px rgba(0,0,0,0.95);
     z-index: 100;
+    gap: 2px;
   }
   .nav-btn {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 0;
-    border: none;
-    background: none;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px;
+    padding: 9px 0;
+    border: none; background: none;
     color: var(--text-tertiary);
-    font-family: inherit;
-    font-size: 10px;
-    font-weight: 500;
+    font-family: inherit; font-size: 10px; font-weight: 600;
     cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: color var(--dur-fast) var(--ease-glass);
+    border-radius: 18px;
+    transition: all var(--dur-fast) var(--ease-glass);
+    letter-spacing: -0.01em;
+    position: relative;
   }
-  .nav-btn svg { width: 22px; height: 22px; }
-  .nav-btn.active { color: var(--text-primary); }
-  .nav-btn:active { transform: scale(0.92); }
+  .nav-btn svg { width: 21px; height: 21px; transition: transform var(--dur-fast) var(--ease-glass); }
+  .nav-btn.active {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+  .nav-btn.active svg { transform: scale(1.08); }
+  .nav-btn:active { transform: scale(0.94); }
 
-  /* ---------- Modal content ---------- */
-  .detail-art {
+  /* ============ MODAL ============ */
+  .modal {
+    position: fixed; inset: 0; z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal.is-open { display: flex; animation: fadeIn 0.25s var(--ease-glass); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal__backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fadeIn 0.3s var(--ease-glass);
+  }
+  .modal__sheet {
+    position: relative;
     width: 100%;
-    aspect-ratio: 1;
-    border-radius: var(--radius-md);
-    display: grid;
-    place-items: center;
-    font-size: 80px;
-    margin-bottom: 16px;
+    max-width: 640px;
+    max-height: 92vh;
+    overflow-y: auto;
+    border-radius: 28px 28px 0 0;
+    background: rgba(22,22,22,0.94);
+    border-top: 1px solid var(--glass-border-strong);
+    backdrop-filter: var(--blur-xl) saturate(180%);
+    -webkit-backdrop-filter: var(--blur-xl) saturate(180%);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.9);
+    animation: slideUp 0.4s var(--ease-glass);
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal__handle {
+    width: 40px; height: 4px;
+    background: var(--glass-border-strong);
+    border-radius: 2px;
+    margin: 10px auto 0;
+  }
+  .modal__close {
+    position: absolute; top: 16px; right: 16px; z-index: 5;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--glass-fill-raised);
+    border: 1px solid var(--glass-border-primary);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+    display: grid; place-items: center;
+    cursor: pointer; color: var(--text-primary);
+    font-size: 18px; font-family: inherit;
+    transition: all var(--dur-fast) var(--ease-glass);
+  }
+  .modal__close:active { transform: scale(0.9); }
+
+  .sheet__art {
+    width: 100%; aspect-ratio: 1.1;
+    display: grid; place-items: center;
+    font-size: 120px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--glass-border-ghost);
+  }
+  .sheet__art::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(22,22,22,1) 100%);
+  }
+  .sheet__body { padding: 4px 20px 20px; }
+
+  .sheet__coll-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .sheet__coll {
+    font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .sheet__verified {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #4ade80; display: grid; place-items: center;
+    font-size: 8px; color: #000; font-weight: 900;
+  }
+  .sheet__title {
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 6px; line-height: 1.15;
+  }
+  .sheet__by {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+  .sheet__by strong { color: var(--text-primary); font-weight: 600; }
+  .sheet__avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #444, #1a1a1a);
+    display: grid; place-items: center;
+    font-size: 10px;
     border: 1px solid var(--glass-border-primary);
   }
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--glass-border-ghost);
-    font-size: 13px;
-  }
-  .detail-row:last-child { border-bottom: none; }
-  .detail-row span:first-child { color: var(--text-secondary); }
-  .detail-row span:last-child { font-weight: 500; }
 
-  /* Toast */
+  .sheet__price-box {
+    padding: 18px;
+    border-radius: var(--radius-md);
+    background: var(--glass-fill-sunken);
+    border: 1px solid var(--glass-border-primary);
+    margin-bottom: 16px;
+  }
+  .sheet__price-labels {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 12px;
+  }
+  .sheet__price-big {
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -0.03em;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .sheet__price-big small {
+    font-size: 14px; color: var(--text-tertiary); font-weight: 500;
+  }
+  .sheet__price-fiat {
+    font-size: 13px; color: var(--text-tertiary);
+    margin-top: 4px;
+  }
+  .sheet__price-trend {
+    text-align: right;
+    padding: 6px 10px; border-radius: 8px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(74,222,128,0.1);
+    color: #4ade80;
+  }
+  .sheet__price-trend small { display: block; font-size: 9px; opacity: 0.7; margin-top: 1px; }
+
+  .sheet__stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 20px;
+  }
+  .sheet__stat {
+    padding: 12px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    text-align: center;
+  }
+  .sheet__stat-v { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
+  .sheet__stat-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; font-weight: 500; }
+
+  .sheet__desc {
+    font-size: 13px; line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+  }
+
+  .sheet__actions {
+    display: flex; gap: 8px; margin-bottom: 8px;
+  }
+  .btn-primary {
+    flex: 1;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: #fff; color: #000;
+    border: none; font-family: inherit;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: -0.01em; cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease-glass);
+    box-shadow: 0 8px 24px rgba(255,255,255,0.15);
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-secondary {
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    background: var(--glass-fill-raised);
+    border: 1px solid var(--glass-border-primary);
+    color: var(--text-primary);
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all var(--dur-fast) var(--ease-glass);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-secondary:active { transform: scale(0.97); background: var(--glass-fill-overlay); }
+  .btn-secondary svg { width: 16px; height: 16px; }
+  .btn-secondary.on svg { fill: #f472b6; stroke: #f472b6; }
+
+  /* ============ SKELETON ============ */
+  .skeleton {
+    animation: pulse 1.6s ease-in-out infinite;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+    background-size: 200% 100%;
+  }
+  @keyframes pulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ============ TOAST ============ */
+  .toast-wrap {
+    position: fixed; top: calc(20px + env(safe-area-inset-top));
+    left: 50%; transform: translateX(-50%);
+    z-index: 300; pointer-events: none;
+    display: flex; flex-direction: column; gap: 8px;
+    width: calc(100% - 40px); max-width: 400px;
+  }
   .toast {
-    position: fixed;
-    left: 50%;
-    bottom: calc(100px + env(safe-area-inset-bottom));
-    transform: translateX(-50%) translateY(20px);
-    padding: 12px 20px;
-    border-radius: var(--radius-pill);
-    background: var(--glass-fill-overlay);
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(30,30,30,0.95);
     border: 1px solid var(--glass-border-strong);
-    backdrop-filter: var(--blur-lg);
-    -webkit-backdrop-filter: var(--blur-lg);
-    font-size: 13px;
-    font-weight: 500;
+    backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg);
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    transform: translateY(-20px);
     opacity: 0;
-    pointer-events: none;
-    transition: all var(--dur-base) var(--ease-glass);
-    z-index: 200;
-    white-space: nowrap;
+    transition: all 0.3s var(--ease-glass);
+    display: flex; align-items: center; gap: 10px;
   }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast__icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 900;
+    flex-shrink: 0;
   }
+  .toast__icon.success { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .toast__icon.info { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .toast__icon.warn { background: rgba(251,191,36,0.15); color: #fbbf24; }
 
-  /* Modal tweaks for mobile */
-  .lg-modal__dialog { width: min(100%, 480px); margin: 16px; max-height: 90vh; overflow-y: auto; }
+  /* ============ EMPTY ============ */
+  .empty {
+    text-align: center; padding: 60px 20px;
+    grid-column: 1 / -1;
+  }
+  .empty__icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .empty__text { font-size: 14px; color: var(--text-tertiary); }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="app-header">
-  <div class="app-logo">
-    <div class="app-logo__mark">◈</div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand__mark">◈</div>
     <span>Liquid</span>
   </div>
-  <button class="wallet-chip" id="walletBtn">
-    <span class="wallet-dot"></span>
-    <span>0x7a…3f2e</span>
-  </button>
-</header>
-
-<!-- HERO -->
-<section class="hero" id="heroCard">
-  <div class="hero__art">
-    🌌
-    <div class="hero__badge">Featured</div>
-    <div class="hero__info">
-      <div>
-        <h2 class="hero__title">Cosmic Drift #042</h2>
-        <p class="hero__author">by voidwalker</p>
-      </div>
-      <div class="hero__price">
-        <div class="hero__price-label">Price</div>
-        <div class="hero__price-value">2.4 ETH</div>
-      </div>
-    </div>
+  <div class="topbar__actions">
+    <button class="icon-btn" id="searchBtn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </button>
+    <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span class="dot"></span>
+    </button>
+    <button class="wallet-chip" id="walletBtn">
+      <span class="ball"></span>
+      <span>0x7a…3f2e</span>
+    </button>
   </div>
-</section>
-
-<!-- CATEGORIES -->
-<div class="cats" id="cats">
-  <button class="cat active" data-cat="all">All</button>
-  <button class="cat" data-cat="art">Art</button>
-  <button class="cat" data-cat="pixel">Pixel</button>
-  <button class="cat" data-cat="3d">3D</button>
-  <button class="cat" data-cat="photo">Photo</button>
-  <button class="cat" data-cat="abstract">Abstract</button>
 </div>
 
-<!-- SECTION HEAD -->
-<div class="section-head">
-  <h2 class="section-title">Trending now</h2>
-  <button class="section-link">See all →</button>
+<!-- HERO -->
+<div class="hero-wrap">
+  <article class="hero" id="heroCard">
+    <div class="hero__art" style="background: radial-gradient(circle at 30% 30%, #1a1a2e 0%, #0a0a14 70%);">
+      <div class="hero__glow"></div>
+      🌌
+      <div class="hero__badges">
+        <span class="hero__badge live">Live auction</span>
+      </div>
+      <div class="hero__info">
+        <div class="hero__collection">Cosmos Collection · #042</div>
+        <h2 class="hero__title">Cosmic Drift</h2>
+        <div class="hero__by">
+          <div class="hero__by-avatar">V</div>
+          <span>by <strong style="color:var(--text-primary)">voidwalker</strong></span>
+          <span style="color:var(--text-tertiary)">· verified</span>
+        </div>
+        <div class="hero__bottom">
+          <div class="hero__price-block">
+            <div class="hero__price-label">Current bid</div>
+            <div class="hero__price-value">2.4 ETH <span class="hero__price-fiat">$6,180</span></div>
+          </div>
+          <button class="hero__cta" id="heroBid">Bid now</button>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat__v">12.4K</div><div class="stat__l">Items</div></div>
+  <div class="stat"><div class="stat__v">3.8K</div><div class="stat__l">Owners</div></div>
+  <div class="stat"><div class="stat__v">142 Ξ</div><div class="stat__l">Volume</div></div>
+</div>
+
+<!-- CATS -->
+<div class="cats" id="cats">
+  <button class="cat active" data-cat="all"><span>✦</span> All</button>
+  <button class="cat" data-cat="art"><span>🎨</span> Art</button>
+  <button class="cat" data-cat="pixel"><span>👾</span> Pixel</button>
+  <button class="cat" data-cat="3d"><span>🧊</span> 3D</button>
+  <button class="cat" data-cat="photo"><span>📷</span> Photo</button>
+  <button class="cat" data-cat="abstract"><span>🌀</span> Abstract</button>
+  <button class="cat" data-cat="audio"><span>🎵</span> Audio</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" data-tab="trending">Trending</button>
+  <button class="tab" data-tab="new">New</button>
+  <button class="tab" data-tab="top">Top</button>
+  <button class="tab" data-tab="ending">Ending soon</button>
 </div>
 
 <!-- GRID -->
-<div class="nft-grid" id="grid"></div>
+<div class="grid" id="grid"></div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-btn active">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+<nav class="nav">
+  <button class="nav-btn active" data-nav="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9v8a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>
     <span>Home</span>
   </button>
-  <button class="nav-btn" id="exploreBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+  <button class="nav-btn" data-nav="explore">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <span>Explore</span>
   </button>
-  <button class="nav-btn" id="createBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+  <button class="nav-btn" data-nav="create">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
     <span>Create</span>
   </button>
-  <button class="nav-btn" id="profileBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+  <button class="nav-btn" data-nav="activity">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+    <span>Activity</span>
+  </button>
+  <button class="nav-btn" data-nav="profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
     <span>Profile</span>
   </button>
 </nav>
 
-<!-- DETAIL MODAL -->
-<div class="lg-modal" id="detailModal" role="dialog" aria-modal="true">
-  <div class="lg-modal__backdrop" data-close-modal></div>
-  <div class="lg-modal__dialog lg-panel lg-panel--overlay">
-    <div class="lg-panel__header">
-      <div>
-        <h3 class="lg-panel__title" id="mTitle">NFT</h3>
-        <p class="lg-panel__subtitle" id="mAuthor">by —</p>
+<!-- MODAL -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__sheet">
+    <div class="modal__handle"></div>
+    <button class="modal__close" data-close aria-label="Close">×</button>
+    <div class="sheet__art" id="mArt">🌌</div>
+    <div class="sheet__body">
+      <div class="sheet__coll-row">
+        <span class="sheet__coll" id="mColl">—</span>
+        <span class="sheet__verified">✓</span>
       </div>
-      <button class="lg-modal__close" data-close-modal aria-label="Close">×</button>
-    </div>
-    <div class="lg-panel__body">
-      <div class="detail-art" id="mArt">🌌</div>
-      <div class="detail-row"><span>Collection</span><span id="mColl">—</span></div>
-      <div class="detail-row"><span>Rarity</span><span id="mRarity">—</span></div>
-      <div class="detail-row"><span>Floor price</span><span id="mPrice">—</span></div>
-    </div>
-    <div class="lg-panel__footer" style="display:flex; gap:8px;">
-      <button class="lg-btn lg-btn--ghost lg-btn--md" style="flex:1" data-close-modal>Cancel</button>
-      <button class="lg-btn lg-btn--primary lg-btn--md lg-specular" style="flex:1" id="buyBtn">Buy now</button>
+      <h2 class="sheet__title" id="mTitle">—</h2>
+      <div class="sheet__by">
+        <div class="sheet__avatar" id="mAvatar">A</div>
+        <span>by <strong id="mAuthor">—</strong></span>
+        <span style="color:var(--text-tertiary)" id="mRarity">· —</span>
+      </div>
+
+      <div class="sheet__price-box">
+        <div class="sheet__price-labels">
+          <div>
+            <div class="sheet__price-big" id="mPrice">— <small>ETH</small></div>
+            <div class="sheet__price-fiat" id="mFiat">≈ $0</div>
+          </div>
+          <div class="sheet__price-trend" id="mTrend">+0%<small>24h</small></div>
+        </div>
+      </div>
+
+      <div class="sheet__stats">
+        <div class="sheet__stat"><div class="sheet__stat-v" id="mFloor">—</div><div class="sheet__stat-l">Floor</div></div>
+        <div class="sheet__stat"><div class="sheet__stat-v" id="mOwners">—</div><div class="sheet__stat-l">Owners</div></div>
+        <div class="sheet__stat"><div class="sheet__stat-v" id="mVolume">—</div><div class="sheet__stat-l">Volume</div></div>
+      </div>
+
+      <p class="sheet__desc" id="mDesc">—</p>
+
+      <div class="sheet__actions">
+        <button class="btn-secondary" id="mFavBtn" aria-label="Favorite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        </button>
+        <button class="btn-primary lg-specular" id="mBuy" style="flex:1">Buy now</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-  // ---- Telegram ----
+  // ==================== TELEGRAM ====================
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
     tg.expand();
     tg.setHeaderColor('#000000');
     tg.setBackgroundColor('#000000');
+    try { tg.disableVerticalSwipes?.(); } catch(e) {}
   }
 
-  // ---- Data ----
+  const haptic = (type = 'light') => {
+    try { tg?.HapticFeedback?.impactOccurred(type); } catch(e) {}
+  };
+  const notify = (type = 'success') => {
+    try { tg?.HapticFeedback?.notificationOccurred(type); } catch(e) {}
+  };
+
+  // ==================== DATA ====================
+  const COLLECTIONS = {
+    Cosmos:   { verified: true, floor: '2.1', owners: '1.2K', volume: '24 Ξ' },
+    Ronin:    { verified: true, floor: '1.4', owners: '890', volume: '18 Ξ' },
+    PixelPaws:{ verified: true, floor: '0.3', owners: '2.4K', volume: '9 Ξ' },
+    Chrome:   { verified: true, floor: '2.8', owners: '640', volume: '31 Ξ' },
+    Wasteland:{ verified: false, floor: '0.8', owners: '410', volume: '5 Ξ' },
+    Liquid:   { verified: true, floor: '1.1', owners: '720', volume: '12 Ξ' },
+  };
+
   const NFTS = [
-    { id: 1, name: 'Cosmic Drift #042', author: 'voidwalker', emoji: '🌌', cat: 'abstract', price: '2.4', coll: 'Cosmos', rarity: 'Legendary', bg: 'radial-gradient(circle at 30% 30%, #1a1a2e, #0a0a14)' },
-    { id: 2, name: 'Neon Samurai', author: 'kuro.eth', emoji: '⚔️', cat: 'art', price: '1.8', coll: 'Ronin', rarity: 'Epic', bg: 'radial-gradient(circle at 70% 30%, #2a1a1a, #0a0a0a)' },
-    { id: 3, name: 'Pixel Cat #12', author: 'pixelfiend', emoji: '🐱', cat: 'pixel', price: '0.35', coll: 'Pixel Paws', rarity: 'Rare', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a, #0a0a0a)' },
-    { id: 4, name: 'Chrome Sphere', author: 'matter.form', emoji: '⚪', cat: '3d', price: '3.1', coll: 'Chrome', rarity: 'Legendary', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a, #0a0a0a)' },
-    { id: 5, name: 'Desert Ghost', author: 'lens.eth', emoji: '🏜️', cat: 'photo', price: '0.9', coll: 'Wasteland', rarity: 'Rare', bg: 'radial-gradient(circle at 60% 40%, #2a201a, #0a0a0a)' },
-    { id: 6, name: 'Liquid Form #7', author: 'flowstate', emoji: '💧', cat: 'abstract', price: '1.2', coll: 'Liquid', rarity: 'Epic', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a, #0a0a0a)' },
-    { id: 7, name: 'Oni Mask', author: 'kuro.eth', emoji: '👹', cat: 'art', price: '2.0', coll: 'Ronin', rarity: 'Epic', bg: 'radial-gradient(circle at 50% 40%, #2a1a1a, #0a0a0a)' },
-    { id: 8, name: 'Void Cube', author: 'matter.form', emoji: '◼️', cat: '3d', price: '4.5', coll: 'Chrome', rarity: 'Mythic', bg: 'radial-gradient(circle at 50% 50%, #1a1a1a, #000)' },
-    { id: 9, name: 'Pixel Ape #88', author: 'pixelfiend', emoji: '🦍', cat: 'pixel', price: '0.75', coll: 'Pixel Paws', rarity: 'Rare', bg: 'radial-gradient(circle at 40% 60%, #1a2a1a, #0a0a0a)' },
+    { id: 1, name: 'Cosmic Drift #042', author: 'voidwalker', emoji: '🌌', cat: 'abstract', coll: 'Cosmos', rarity: 'Legendary', price: 2.4, trend: 12, rank: 'legendary', desc: 'A rare fragment from the outer rim of the Cosmic Drift collection. Each piece captures a unique stellar configuration frozen at the moment of its minting.', bg: 'radial-gradient(circle at 30% 30%, #1a1a2e 0%, #0a0a14 70%)' },
+    { id: 2, name: 'Neon Samurai', author: 'kuro.eth', emoji: '⚔️', cat: 'art', coll: 'Ronin', rarity: 'Epic', price: 1.8, trend: 8, rank: 'epic', desc: 'Hand-painted digital artwork with a cyberpunk aesthetic. The Samurai series explores identity in a hyper-digital world.', bg: 'radial-gradient(circle at 70% 30%, #2a1a1a 0%, #0a0a0a 70%)' },
+    { id: 3, name: 'Pixel Cat #12', author: 'pixelfiend', emoji: '🐱', cat: 'pixel', coll: 'PixelPaws', rarity: 'Rare', price: 0.35, trend: -3, rank: null, desc: 'Part of a limited 100-piece pixel collection. Each cat has procedurally generated accessories.', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)' },
+    { id: 4, name: 'Chrome Sphere', author: 'matter.form', emoji: '⚪', cat: '3d', coll: 'Chrome', rarity: 'Legendary', price: 3.1, trend: 24, rank: 'legendary', desc: 'Physically-based rendering of a perfect chrome sphere. Rendered at 8K resolution with ray-traced reflections.', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)' },
+    { id: 5, name: 'Desert Ghost', author: 'lens.eth', emoji: '🏜️', cat: 'photo', coll: 'Wasteland', rarity: 'Rare', price: 0.9, trend: 5, rank: null, desc: 'An original photograph from a 2019 expedition across the Atacama. Processed with custom film emulation.', bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)' },
+    { id: 6, name: 'Liquid Form #7', author: 'flowstate', emoji: '💧', cat: 'abstract', coll: 'Liquid', rarity: 'Epic', price: 1.2, trend: 15, rank: 'epic', desc: 'Generative fluid dynamics simulation captured as static art. One of 50 unique forms.', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)' },
+    { id: 7, name: 'Oni Mask', author: 'kuro.eth', emoji: '👹', cat: 'art', coll: 'Ronin', rarity: 'Epic', price: 2.0, trend: 7, rank: 'epic', desc: 'Japanese folklore reinterpreted through a glitch-art lens. Each mask has hidden metadata.', bg: 'radial-gradient(circle at 50% 40%, #2a1a1a 0%, #0a0a0a 70%)' },
+    { id: 8, name: 'Void Cube', author: 'matter.form', emoji: '◼️', cat: '3d', coll: 'Chrome', rarity: 'Mythic', price: 4.5, trend: 32, rank: 'mythic', desc: 'The rarest piece in the Chrome collection — a black cube that absorbs all light. Only 10 exist.', bg: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 70%)' },
+    { id: 9, name: 'Pixel Ape #88', author: 'pixelfiend', emoji: '🦍', cat: 'pixel', coll: 'PixelPaws', rarity: 'Rare', price: 0.75, trend: -8, rank: null, desc: 'From the iconic Pixel Ape series. This one comes with a golden crown trait.', bg: 'radial-gradient(circle at 40% 60%, #1a2a1a 0%, #0a0a0a 70%)' },
+    { id: 10, name: 'Gradient Wave', author: 'flowstate', emoji: '🌊', cat: 'abstract', coll: 'Liquid', rarity: 'Epic', price: 1.6, trend: 11, rank: 'epic', desc: 'A study in smooth color transitions. The piece reacts to on-chain activity.', bg: 'radial-gradient(circle at 70% 60%, #1a1a2a 0%, #0a0a0a 70%)' },
+    { id: 11, name: 'Sky Temple', author: 'lens.eth', emoji: '⛩️', cat: 'photo', coll: 'Wasteland', rarity: 'Rare', price: 1.1, trend: 4, rank: null, desc: 'Aerial photograph of a remote temple in the Himalayas. Shot at sunrise, edited for high dynamic range.', bg: 'radial-gradient(circle at 50% 50%, #2a1a2a 0%, #0a0a0a 70%)' },
+    { id: 12, name: 'Neon Grid', author: 'pixelfiend', emoji: '🟪', cat: 'pixel', coll: 'PixelPaws', rarity: 'Epic', price: 1.05, trend: 19, rank: 'epic', desc: 'A pixel-art reimagining of a synthwave landscape. Includes original soundtrack NFT.', bg: 'radial-gradient(circle at 60% 40%, #2a1a2a 0%, #0a0a0a 70%)' },
   ];
 
-  const grid = document.getElementById('grid');
-  const cats = document.getElementById('cats');
+  const ETH_PRICE = 2575;
 
-  // ---- Render grid ----
-  function render(list) {
-    grid.innerHTML = list.map(n => `
-      <article class="nft-card" data-id="${n.id}">
-        <div class="nft-card__art" style="background:${n.bg}">${n.emoji}</div>
-        <div class="nft-card__info">
-          <h3 class="nft-card__name">${n.name}</h3>
-          <p class="nft-card__author">by ${n.author}</p>
-          <div class="nft-card__row">
+  // ==================== STATE ====================
+  let state = {
+    cat: 'all',
+    tab: 'trending',
+    favorites: new Set(),
+    currentItem: null,
+  };
+
+  // ==================== TOAST ====================
+  const toastWrap = document.getElementById('toastWrap');
+  function showToast(msg, type = 'success', duration = 2200) {
+    const icon = type === 'success' ? '✓' : type === 'warn' ? '!' : 'i';
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = `<div class="toast__icon ${type}">${icon}</div><span>${msg}</span>`;
+    toastWrap.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 300);
+    }, duration);
+  }
+
+  // ==================== FORMAT ====================
+  const fiat = (eth) => '$' + Math.round(eth * ETH_PRICE).toLocaleString();
+  const fmt = (n) => n.toLocaleString('en-US');
+
+  // ==================== RENDER GRID ====================
+  const grid = document.getElementById('grid');
+
+  function getFilteredList() {
+    let list = [...NFTS];
+    if (state.cat !== 'all') list = list.filter(n => n.cat === state.cat);
+    if (state.tab === 'trending') list.sort((a, b) => b.trend - a.trend);
+    else if (state.tab === 'new') list.sort((a, b) => b.id - a.id);
+    else if (state.tab === 'top') list.sort((a, b) => b.price - a.price);
+    else if (state.tab === 'ending') list.sort((a, b) => a.price - b.price);
+    return list;
+  }
+
+  function renderGrid() {
+    const list = getFilteredList();
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="empty"><div class="empty__icon">🔍</div><div class="empty__text">Nothing here yet</div></div>`;
+      return;
+    }
+
+    list.forEach((n, i) => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 25}ms`;
+      card.dataset.id = n.id;
+      const coll = COLLECTIONS[n.coll];
+      const isFav = state.favorites.has(n.id);
+
+      card.innerHTML = `
+        <div class="card__art" style="background:${n.bg}">
+          ${n.rank ? `<div class="card__rank ${n.rank}">${n.rarity}</div>` : ''}
+          <button class="card__fav ${isFav ? 'on' : ''}" data-fav="${n.id}" aria-label="Favorite">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+          </button>
+          ${n.emoji}
+        </div>
+        <div class="card__info">
+          <div class="card__coll">${n.coll} ${coll.verified ? '✓' : ''}</div>
+          <h3 class="card__name">${n.name}</h3>
+          <div class="card__row">
             <div>
-              <div class="nft-card__price-label">Price</div>
-              <div class="nft-card__price">${n.price} ETH</div>
+              <div class="card__price-label">Price</div>
+              <div class="card__price">${n.price} <small>ETH</small></div>
             </div>
+            <div class="card__trend ${n.trend >= 0 ? 'up' : 'down'}">${n.trend >= 0 ? '+' : ''}${n.trend}%</div>
           </div>
         </div>
-      </article>
-    `).join('');
-  }
-  render(NFTS);
+      `;
 
-  // ---- Category filter ----
-  let activeCat = 'all';
-  cats.addEventListener('click', (e) => {
-    const btn = e.target.closest('.cat');
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-fav]')) return;
+        openDetail(n.id);
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  // ==================== FAVORITES ====================
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-fav]');
     if (!btn) return;
-    cats.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    activeCat = btn.dataset.cat;
-    render(activeCat === 'all' ? NFTS : NFTS.filter(n => n.cat === activeCat));
-    if (tg) tg.HapticFeedback?.impactOccurred('light');
+    e.stopPropagation();
+    const id = Number(btn.dataset.fav);
+    if (state.favorites.has(id)) {
+      state.favorites.delete(id);
+      btn.classList.remove('on');
+      showToast('Removed from favorites', 'info', 1500);
+    } else {
+      state.favorites.add(id);
+      btn.classList.add('on');
+      showToast('Added to favorites', 'success', 1500);
+    }
+    haptic('light');
+    if (state.currentItem?.id === id) syncModalFav(id);
   });
 
-  // ---- Detail modal ----
-  const modal = document.getElementById('detailModal');
+  function syncModalFav(id) {
+    const favBtn = document.getElementById('mFavBtn');
+    favBtn.classList.toggle('on', state.favorites.has(id));
+  }
+
+  // ==================== CATS ====================
+  document.getElementById('cats').addEventListener('click', (e) => {
+    const btn = e.target.closest('.cat');
+    if (!btn) return;
+    document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    state.cat = btn.dataset.cat;
+    haptic('light');
+    renderGrid();
+  });
+
+  // ==================== TABS ====================
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.tab = tab.dataset.tab;
+      haptic('light');
+      renderGrid();
+    });
+  });
+
+  // ==================== NAV ====================
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      haptic('light');
+      const nav = btn.dataset.nav;
+      if (nav === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (nav === 'profile') {
+        showToast('Profile — coming soon', 'info');
+      } else if (nav === 'create') {
+        showToast('Create NFT — coming soon', 'info');
+      } else if (nav === 'activity') {
+        showToast('Activity feed — coming soon', 'info');
+      } else if (nav === 'explore') {
+        showToast('Explore collections', 'info');
+      }
+    });
+  });
+
+  // ==================== MODAL ====================
+  const modal = document.getElementById('modal');
+
   function openDetail(id) {
     const n = NFTS.find(x => x.id === id);
     if (!n) return;
-    document.getElementById('mTitle').textContent = n.name;
-    document.getElementById('mAuthor').textContent = 'by ' + n.author;
-    document.getElementById('mArt').textContent = n.emoji;
+    state.currentItem = n;
+    const coll = COLLECTIONS[n.coll];
+
     document.getElementById('mArt').style.background = n.bg;
+    document.getElementById('mArt').textContent = n.emoji;
     document.getElementById('mColl').textContent = n.coll;
-    document.getElementById('mRarity').textContent = n.rarity;
-    document.getElementById('mPrice').textContent = n.price + ' ETH';
+    document.getElementById('mTitle').textContent = n.name;
+    document.getElementById('mAvatar').textContent = n.author[0].toUpperCase();
+    document.getElementById('mAuthor').textContent = n.author;
+    document.getElementById('mRarity').textContent = '· ' + n.rarity;
+    document.getElementById('mPrice').innerHTML = `${n.price} <small>ETH</small>`;
+    document.getElementById('mFiat').textContent = '≈ ' + fiat(n.price);
+    const trendEl = document.getElementById('mTrend');
+    trendEl.innerHTML = `${n.trend >= 0 ? '+' : ''}${n.trend}%<small>24h</small>`;
+    trendEl.style.background = n.trend >= 0 ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)';
+    trendEl.style.color = n.trend >= 0 ? '#4ade80' : '#f87171';
+    document.getElementById('mFloor').textContent = coll.floor + ' Ξ';
+    document.getElementById('mOwners').textContent = coll.owners;
+    document.getElementById('mVolume').textContent = coll.volume;
+    document.getElementById('mDesc').textContent = n.desc;
+
+    syncModalFav(n.id);
     modal.classList.add('is-open');
-    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+    document.body.classList.add('locked');
+    haptic('medium');
   }
-  function closeDetail() { modal.classList.remove('is-open'); }
 
-  grid.addEventListener('click', (e) => {
-    const card = e.target.closest('.nft-card');
-    if (card) openDetail(Number(card.dataset.id));
+  function closeModal() {
+    modal.classList.remove('is-open');
+    document.body.classList.remove('locked');
+    haptic('light');
+  }
+
+  modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // Buy action
+  document.getElementById('mBuy').addEventListener('click', () => {
+    notify('success');
+    closeModal();
+    setTimeout(() => showToast('Purchase confirmed ✓', 'success'), 250);
   });
+
+  // Fav in modal
+  document.getElementById('mFavBtn').addEventListener('click', () => {
+    if (!state.currentItem) return;
+    const id = state.currentItem.id;
+    const btn = document.getElementById('mFavBtn');
+    if (state.favorites.has(id)) {
+      state.favorites.delete(id);
+      btn.classList.remove('on');
+      showToast('Removed from favorites', 'info', 1500);
+    } else {
+      state.favorites.add(id);
+      btn.classList.add('on');
+      showToast('Added to favorites', 'success', 1500);
+    }
+    haptic('light');
+    renderGrid();
+  });
+
+  // ==================== HERO ====================
   document.getElementById('heroCard').addEventListener('click', () => openDetail(1));
-
-  modal.querySelectorAll('[data-close-modal]').forEach(el => {
-    el.addEventListener('click', closeDetail);
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeDetail();
+  document.getElementById('heroBid').addEventListener('click', (e) => {
+    e.stopPropagation();
+    notify('success');
+    showToast('Bid placed: 2.4 ETH', 'success');
   });
 
-  // ---- Toast ----
-  const toast = document.getElementById('toast');
-  let toastTimer;
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
-  }
-
-  // ---- Actions ----
-  document.getElementById('buyBtn').addEventListener('click', () => {
-    closeDetail();
-    showToast('✓ Purchase confirmed');
-    if (tg) tg.HapticFeedback?.notificationOccurred('success');
-  });
+  // ==================== TOPBAR ====================
   document.getElementById('walletBtn').addEventListener('click', () => {
-    showToast('Wallet connected');
-    if (tg) tg.HapticFeedback?.impactOccurred('light');
+    haptic('medium');
+    showToast('Wallet connected · 0x7a…3f2e', 'success');
   });
-  document.getElementById('exploreBtn').addEventListener('click', () => showToast('Explore — coming soon'));
-  document.getElementById('createBtn').addEventListener('click', () => showToast('Create — coming soon'));
-  document.getElementById('profileBtn').addEventListener('click', () => showToast('Profile — coming soon'));
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    showToast('Search — coming soon', 'info');
+  });
+  document.getElementById('notifBtn').addEventListener('click', () => {
+    showToast('3 new notifications', 'info');
+    document.querySelector('#notifBtn .dot')?.remove();
+  });
 
-  // ---- Specular on primary buttons ----
+  // ==================== SPECULAR ====================
   document.querySelectorAll('.lg-specular').forEach(el => {
     el.addEventListener('mousemove', e => {
       const r = el.getBoundingClientRect();
@@ -616,6 +1164,9 @@
       el.style.setProperty('--lg-y', '50%');
     });
   });
+
+  // ==================== INIT ====================
+  renderGrid();
 </script>
 </body>
 </html>
