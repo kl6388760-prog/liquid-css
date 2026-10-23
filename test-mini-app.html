@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>NFT Market</title>
+
+<!-- Telegram WebApp -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Typeface -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Liquid CSS -->
+<link rel="stylesheet" href="https://kl6388760-prog.github.io/liquid-css/main.css">
+
+<style>
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #000;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overscroll-behavior: none;
+  }
+
+  body {
+    padding: 16px 16px calc(96px + env(safe-area-inset-bottom));
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .app-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .app-logo__mark {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: var(--glass-fill-raised);
+    border: 1px solid var(--glass-border-primary);
+    display: grid; place-items: center;
+    font-size: 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .wallet-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--glass-fill-primary);
+    border: 1px solid var(--glass-border-primary);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-glass);
+  }
+  .wallet-chip:active { background: var(--glass-fill-raised); }
+  .wallet-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+  }
+
+  /* ---------- Hero / Featured ---------- */
+  .hero {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 28px;
+    border: 1px solid var(--glass-border-primary);
+    background: var(--glass-fill-primary);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 20px 40px -20px rgba(0,0,0,0.9);
+    cursor: pointer;
+    transition: transform var(--dur-base) var(--ease-glass);
+  }
+  .hero:active { transform: scale(0.985); }
+  .hero__art {
+    aspect-ratio: 16 / 10;
+    width: 100%;
+    background:
+      radial-gradient(circle at 30% 30%, #2a2a2a 0%, #0a0a0a 70%),
+      #111;
+    display: grid;
+    place-items: center;
+    font-size: 56px;
+    position: relative;
+  }
+  .hero__art::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.85) 100%);
+  }
+  .hero__badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    z-index: 2;
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    border: 1px solid var(--glass-border-primary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .hero__info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 2;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .hero__title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+  }
+  .hero__author {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .hero__price {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .hero__price-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .hero__price-value {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- Section header ---------- */
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .section-link {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* ---------- Category pills ---------- */
+  .cats {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    margin-bottom: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-glass);
+    white-space: nowrap;
+  }
+  .cat.active {
+    background: var(--glass-fill-raised);
+    border-color: var(--glass-border-strong);
+    color: var(--text-primary);
+  }
+  .cat:active { transform: scale(0.95); }
+
+  /* ---------- NFT grid ---------- */
+  .nft-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (min-width: 480px) {
+    .nft-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .nft-card {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--glass-border-primary);
+    background: var(--glass-fill-primary);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 24px -16px rgba(0,0,0,0.9);
+    cursor: pointer;
+    transition: transform var(--dur-base) var(--ease-glass), background var(--dur-base) var(--ease-glass);
+  }
+  .nft-card:active {
+    transform: scale(0.97);
+    background: var(--glass-fill-raised);
+  }
+  .nft-card__art {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-size: 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .nft-card__art::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 65%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+  .nft-card__info {
+    padding: 10px 12px 12px;
+  }
+  .nft-card__name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nft-card__author {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin: 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nft-card__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .nft-card__price-label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .nft-card__price {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    width: min(calc(100% - 32px), 608px);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--glass-fill-overlay);
+    border: 1px solid var(--glass-border-primary);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 20px 40px -10px rgba(0,0,0,0.8);
+    z-index: 100;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 0;
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: color var(--dur-fast) var(--ease-glass);
+  }
+  .nav-btn svg { width: 22px; height: 22px; }
+  .nav-btn.active { color: var(--text-primary); }
+  .nav-btn:active { transform: scale(0.92); }
+
+  /* ---------- Modal content ---------- */
+  .detail-art {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-items: center;
+    font-size: 80px;
+    margin-bottom: 16px;
+    border: 1px solid var(--glass-border-primary);
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--glass-border-ghost);
+    font-size: 13px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row span:first-child { color: var(--text-secondary); }
+  .detail-row span:last-child { font-weight: 500; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 20px;
+    border-radius: var(--radius-pill);
+    background: var(--glass-fill-overlay);
+    border: 1px solid var(--glass-border-strong);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: all var(--dur-base) var(--ease-glass);
+    z-index: 200;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Modal tweaks for mobile */
+  .lg-modal__dialog { width: min(100%, 480px); margin: 16px; max-height: 90vh; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-logo">
+    <div class="app-logo__mark">◈</div>
+    <span>Liquid</span>
+  </div>
+  <button class="wallet-chip" id="walletBtn">
+    <span class="wallet-dot"></span>
+    <span>0x7a…3f2e</span>
+  </button>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="heroCard">
+  <div class="hero__art">
+    🌌
+    <div class="hero__badge">Featured</div>
+    <div class="hero__info">
+      <div>
+        <h2 class="hero__title">Cosmic Drift #042</h2>
+        <p class="hero__author">by voidwalker</p>
+      </div>
+      <div class="hero__price">
+        <div class="hero__price-label">Price</div>
+        <div class="hero__price-value">2.4 ETH</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="cats" id="cats">
+  <button class="cat active" data-cat="all">All</button>
+  <button class="cat" data-cat="art">Art</button>
+  <button class="cat" data-cat="pixel">Pixel</button>
+  <button class="cat" data-cat="3d">3D</button>
+  <button class="cat" data-cat="photo">Photo</button>
+  <button class="cat" data-cat="abstract">Abstract</button>
+</div>
+
+<!-- SECTION HEAD -->
+<div class="section-head">
+  <h2 class="section-title">Trending now</h2>
+  <button class="section-link">See all →</button>
+</div>
+
+<!-- GRID -->
+<div class="nft-grid" id="grid"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="nav-btn" id="exploreBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <span>Explore</span>
+  </button>
+  <button class="nav-btn" id="createBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    <span>Create</span>
+  </button>
+  <button class="nav-btn" id="profileBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+    <span>Profile</span>
+  </button>
+</nav>
+
+<!-- DETAIL MODAL -->
+<div class="lg-modal" id="detailModal" role="dialog" aria-modal="true">
+  <div class="lg-modal__backdrop" data-close-modal></div>
+  <div class="lg-modal__dialog lg-panel lg-panel--overlay">
+    <div class="lg-panel__header">
+      <div>
+        <h3 class="lg-panel__title" id="mTitle">NFT</h3>
+        <p class="lg-panel__subtitle" id="mAuthor">by —</p>
+      </div>
+      <button class="lg-modal__close" data-close-modal aria-label="Close">×</button>
+    </div>
+    <div class="lg-panel__body">
+      <div class="detail-art" id="mArt">🌌</div>
+      <div class="detail-row"><span>Collection</span><span id="mColl">—</span></div>
+      <div class="detail-row"><span>Rarity</span><span id="mRarity">—</span></div>
+      <div class="detail-row"><span>Floor price</span><span id="mPrice">—</span></div>
+    </div>
+    <div class="lg-panel__footer" style="display:flex; gap:8px;">
+      <button class="lg-btn lg-btn--ghost lg-btn--md" style="flex:1" data-close-modal>Cancel</button>
+      <button class="lg-btn lg-btn--primary lg-btn--md lg-specular" style="flex:1" id="buyBtn">Buy now</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---- Telegram ----
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#000000');
+    tg.setBackgroundColor('#000000');
+  }
+
+  // ---- Data ----
+  const NFTS = [
+    { id: 1, name: 'Cosmic Drift #042', author: 'voidwalker', emoji: '🌌', cat: 'abstract', price: '2.4', coll: 'Cosmos', rarity: 'Legendary', bg: 'radial-gradient(circle at 30% 30%, #1a1a2e, #0a0a14)' },
+    { id: 2, name: 'Neon Samurai', author: 'kuro.eth', emoji: '⚔️', cat: 'art', price: '1.8', coll: 'Ronin', rarity: 'Epic', bg: 'radial-gradient(circle at 70% 30%, #2a1a1a, #0a0a0a)' },
+    { id: 3, name: 'Pixel Cat #12', author: 'pixelfiend', emoji: '🐱', cat: 'pixel', price: '0.35', coll: 'Pixel Paws', rarity: 'Rare', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a, #0a0a0a)' },
+    { id: 4, name: 'Chrome Sphere', author: 'matter.form', emoji: '⚪', cat: '3d', price: '3.1', coll: 'Chrome', rarity: 'Legendary', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a, #0a0a0a)' },
+    { id: 5, name: 'Desert Ghost', author: 'lens.eth', emoji: '🏜️', cat: 'photo', price: '0.9', coll: 'Wasteland', rarity: 'Rare', bg: 'radial-gradient(circle at 60% 40%, #2a201a, #0a0a0a)' },
+    { id: 6, name: 'Liquid Form #7', author: 'flowstate', emoji: '💧', cat: 'abstract', price: '1.2', coll: 'Liquid', rarity: 'Epic', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a, #0a0a0a)' },
+    { id: 7, name: 'Oni Mask', author: 'kuro.eth', emoji: '👹', cat: 'art', price: '2.0', coll: 'Ronin', rarity: 'Epic', bg: 'radial-gradient(circle at 50% 40%, #2a1a1a, #0a0a0a)' },
+    { id: 8, name: 'Void Cube', author: 'matter.form', emoji: '◼️', cat: '3d', price: '4.5', coll: 'Chrome', rarity: 'Mythic', bg: 'radial-gradient(circle at 50% 50%, #1a1a1a, #000)' },
+    { id: 9, name: 'Pixel Ape #88', author: 'pixelfiend', emoji: '🦍', cat: 'pixel', price: '0.75', coll: 'Pixel Paws', rarity: 'Rare', bg: 'radial-gradient(circle at 40% 60%, #1a2a1a, #0a0a0a)' },
+  ];
+
+  const grid = document.getElementById('grid');
+  const cats = document.getElementById('cats');
+
+  // ---- Render grid ----
+  function render(list) {
+    grid.innerHTML = list.map(n => `
+      <article class="nft-card" data-id="${n.id}">
+        <div class="nft-card__art" style="background:${n.bg}">${n.emoji}</div>
+        <div class="nft-card__info">
+          <h3 class="nft-card__name">${n.name}</h3>
+          <p class="nft-card__author">by ${n.author}</p>
+          <div class="nft-card__row">
+            <div>
+              <div class="nft-card__price-label">Price</div>
+              <div class="nft-card__price">${n.price} ETH</div>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
+  render(NFTS);
+
+  // ---- Category filter ----
+  let activeCat = 'all';
+  cats.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cat');
+    if (!btn) return;
+    cats.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    render(activeCat === 'all' ? NFTS : NFTS.filter(n => n.cat === activeCat));
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+
+  // ---- Detail modal ----
+  const modal = document.getElementById('detailModal');
+  function openDetail(id) {
+    const n = NFTS.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('mTitle').textContent = n.name;
+    document.getElementById('mAuthor').textContent = 'by ' + n.author;
+    document.getElementById('mArt').textContent = n.emoji;
+    document.getElementById('mArt').style.background = n.bg;
+    document.getElementById('mColl').textContent = n.coll;
+    document.getElementById('mRarity').textContent = n.rarity;
+    document.getElementById('mPrice').textContent = n.price + ' ETH';
+    modal.classList.add('is-open');
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+  }
+  function closeDetail() { modal.classList.remove('is-open'); }
+
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.nft-card');
+    if (card) openDetail(Number(card.dataset.id));
+  });
+  document.getElementById('heroCard').addEventListener('click', () => openDetail(1));
+
+  modal.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', closeDetail);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDetail();
+  });
+
+  // ---- Toast ----
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // ---- Actions ----
+  document.getElementById('buyBtn').addEventListener('click', () => {
+    closeDetail();
+    showToast('✓ Purchase confirmed');
+    if (tg) tg.HapticFeedback?.notificationOccurred('success');
+  });
+  document.getElementById('walletBtn').addEventListener('click', () => {
+    showToast('Wallet connected');
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+  document.getElementById('exploreBtn').addEventListener('click', () => showToast('Explore — coming soon'));
+  document.getElementById('createBtn').addEventListener('click', () => showToast('Create — coming soon'));
+  document.getElementById('profileBtn').addEventListener('click', () => showToast('Profile — coming soon'));
+
+  // ---- Specular on primary buttons ----
+  document.querySelectorAll('.lg-specular').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--lg-x', ((e.clientX - r.left) / r.width) * 100 + '%');
+      el.style.setProperty('--lg-y', ((e.clientY - r.top) / r.height) * 100 + '%');
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.setProperty('--lg-x', '50%');
+      el.style.setProperty('--lg-y', '50%');
+    });
+  });
+</script>
+</body>
+</html>
