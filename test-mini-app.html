@@ -27,82 +27,57 @@
     max-width: 720px; margin: 0 auto; position: relative;
   }
   body.locked { overflow: hidden; }
-  button { font-family: inherit; }
+  button, input, select, textarea { font-family: inherit; }
 
-  /* ============ BUTTONS (fixed) ============ */
+  /* ============ BUTTONS ============ */
   .btn {
     display: inline-flex; align-items: center; justify-content: center;
     gap: 8px;
     border: none; cursor: pointer;
     font-weight: 700; letter-spacing: -0.01em;
     white-space: nowrap;
-    transition:
-      transform 0.15s cubic-bezier(0.32,0.72,0,1),
-      background 0.18s cubic-bezier(0.32,0.72,0,1),
-      box-shadow 0.18s cubic-bezier(0.32,0.72,0,1),
-      opacity 0.18s;
+    transition: transform 0.15s cubic-bezier(0.32,0.72,0,1), background 0.18s, box-shadow 0.18s, opacity 0.18s;
     position: relative; overflow: hidden;
     user-select: none;
   }
   .btn:active { transform: scale(0.96); }
   .btn:disabled { opacity: 0.4; pointer-events: none; }
   .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-  /* Primary = solid white (max contrast) */
   .btn--primary {
     background: #fff; color: #000;
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.9) inset,
-      0 8px 24px rgba(255,255,255,0.15),
-      0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 24px rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.4);
   }
-  .btn--primary:hover { background: #f2f2f2; box-shadow: 0 8px 32px rgba(255,255,255,0.25), 0 2px 8px rgba(0,0,0,0.4); }
-  .btn--primary:active { box-shadow: 0 4px 16px rgba(255,255,255,0.15), 0 1px 4px rgba(0,0,0,0.4); }
-
-  /* Secondary = glass */
+  .btn--primary:hover { background: #f2f2f2; }
   .btn--secondary {
     background: var(--glass-fill-raised);
     color: var(--text-primary);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.4);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .btn--secondary:hover { background: var(--glass-fill-overlay); border-color: var(--glass-border-strong); }
-
-  /* Ghost = subtle */
   .btn--ghost {
-    background: transparent;
-    color: var(--text-secondary);
+    background: transparent; color: var(--text-secondary);
     border: 1px solid var(--glass-border-ghost);
   }
   .btn--ghost:hover { background: var(--glass-fill-ghost); color: var(--text-primary); }
-
-  /* Danger */
   .btn--danger {
-    background: rgba(248,113,113,0.12);
-    color: #f87171;
+    background: rgba(248,113,113,0.12); color: #f87171;
     border: 1px solid rgba(248,113,113,0.25);
   }
-
-  /* Sizes */
   .btn--sm { height: 36px; padding: 0 14px; font-size: 13px; border-radius: 12px; }
   .btn--md { height: 46px; padding: 0 20px; font-size: 14px; border-radius: 14px; }
   .btn--lg { height: 54px; padding: 0 26px; font-size: 15px; border-radius: 16px; }
   .btn--block { width: 100%; }
   .btn--round { border-radius: 50%; padding: 0; aspect-ratio: 1; }
 
-  /* Icon-only button */
   .icon-btn {
-    width: 40px; height: 40px;
-    border-radius: 12px;
+    width: 40px; height: 40px; border-radius: 12px;
     background: var(--glass-fill-primary);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
     display: grid; place-items: center;
-    color: var(--text-primary);
-    cursor: pointer;
+    color: var(--text-primary); cursor: pointer;
     transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
     position: relative;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
@@ -129,13 +104,14 @@
   .brand {
     display: flex; align-items: center; gap: 10px;
     font-weight: 700; font-size: 17px; letter-spacing: -0.03em;
+    cursor: pointer;
   }
   .brand__mark {
     width: 34px; height: 34px; border-radius: 11px;
     background: linear-gradient(135deg, #fff 0%, #a8a8a8 100%);
     display: grid; place-items: center;
     color: #000;
-    box-shadow: 0 4px 14px rgba(255,255,255,0.12), 0 0 0 1px rgba(255,255,255,0.1) inset;
+    box-shadow: 0 4px 14px rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.1);
   }
   .brand__mark svg { width: 18px; height: 18px; }
   .topbar__actions { display: flex; gap: 8px; align-items: center; }
@@ -144,8 +120,7 @@
     padding: 10px 14px; border-radius: var(--radius-pill);
     background: var(--glass-fill-primary);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
     font-size: 12px; font-weight: 600;
     color: var(--text-primary); cursor: pointer;
     letter-spacing: -0.01em;
@@ -154,23 +129,24 @@
   }
   .wallet-chip:hover { background: var(--glass-fill-raised); }
   .wallet-chip:active { transform: scale(0.95); }
-  .wallet-chip .ball {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #4ade80; box-shadow: 0 0 8px #4ade80;
+  .wallet-chip .ball { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+
+  /* ============ SCREENS ============ */
+  .screen { display: none; }
+  .screen.active { display: block; animation: screen-in 0.35s cubic-bezier(0.32,0.72,0,1); }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ============ HERO ============ */
+  /* ============ HOME ============ */
   .hero-wrap { padding: 0 20px; margin-bottom: 28px; }
   .hero {
     position: relative;
-    border-radius: 26px;
-    overflow: hidden;
+    border-radius: 26px; overflow: hidden;
     border: 1px solid var(--glass-border-primary);
     background: #0a0a0a;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.1),
-      0 30px 60px -20px rgba(0,0,0,1),
-      0 0 0 1px rgba(255,255,255,0.02);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 30px 60px -20px rgba(0,0,0,1);
     cursor: pointer;
     transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
   }
@@ -188,16 +164,12 @@
     background: linear-gradient(180deg, transparent 25%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.95) 100%);
     pointer-events: none; z-index: 2;
   }
-  .hero__badges {
-    position: absolute; top: 16px; left: 16px;
-    z-index: 4; display: flex; gap: 6px;
-  }
+  .hero__badges { position: absolute; top: 16px; left: 16px; z-index: 4; display: flex; gap: 6px; }
   .badge {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 6px 11px; border-radius: var(--radius-pill);
     background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border-primary);
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase;
@@ -209,14 +181,8 @@
     background: #4ade80; box-shadow: 0 0 6px #4ade80;
     animation: pulse-dot 1.8s ease-in-out infinite;
   }
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  .hero__info {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    z-index: 4; padding: 20px 20px 22px;
-  }
+  @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .hero__info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 4; padding: 20px 20px 22px; }
   .hero__coll {
     font-size: 11px; color: var(--text-tertiary);
     text-transform: uppercase; letter-spacing: 0.1em;
@@ -241,19 +207,18 @@
   }
   .avatar {
     width: 22px; height: 22px; border-radius: 50%;
-    background: linear-gradient(135deg, #555, #222);
     display: grid; place-items: center;
     font-size: 10px; font-weight: 700; color: #fff;
     border: 1px solid var(--glass-border-primary);
     flex-shrink: 0;
   }
   .avatar.lg { width: 28px; height: 28px; font-size: 12px; }
+  .avatar.xl { width: 64px; height: 64px; font-size: 24px; border-radius: 50%; }
   .hero__bottom {
     display: flex; align-items: flex-end; justify-content: space-between;
     gap: 12px; padding-top: 18px;
     border-top: 1px solid rgba(255,255,255,0.1);
   }
-  .price-block { }
   .price-label {
     font-size: 10px; color: var(--text-tertiary);
     text-transform: uppercase; letter-spacing: 0.08em;
@@ -264,12 +229,9 @@
     letter-spacing: -0.025em;
     display: flex; align-items: baseline; gap: 8px;
   }
-  .price-fiat {
-    font-size: 13px; color: var(--text-tertiary);
-    font-weight: 500;
-  }
+  .price-fiat { font-size: 13px; color: var(--text-tertiary); font-weight: 500; }
 
-  /* ============ STATS STRIP ============ */
+  /* Stats */
   .stats {
     padding: 0 20px;
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -283,18 +245,10 @@
     text-align: center;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
   }
-  .stat__v {
-    font-size: 18px; font-weight: 800;
-    letter-spacing: -0.025em;
-    margin-bottom: 3px;
-  }
-  .stat__l {
-    font-size: 10px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    font-weight: 600;
-  }
+  .stat__v { font-size: 18px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 3px; }
+  .stat__l { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 
-  /* ============ CATS ============ */
+  /* Cats */
   .cats {
     display: flex; gap: 8px;
     overflow-x: auto;
@@ -318,20 +272,15 @@
   }
   .cat svg { width: 14px; height: 14px; }
   .cat:hover { color: var(--text-primary); background: var(--glass-fill-primary); }
-  .cat.active {
-    background: #fff; border-color: #fff; color: #000;
-    box-shadow: 0 4px 14px rgba(255,255,255,0.15);
-  }
+  .cat.active { background: #fff; border-color: #fff; color: #000; box-shadow: 0 4px 14px rgba(255,255,255,0.15); }
   .cat:active { transform: scale(0.94); }
 
-  /* ============ TABS ============ */
+  /* Tabs */
   .tabs {
-    padding: 0 20px;
-    display: flex; gap: 4px;
+    padding: 0 20px; display: flex; gap: 4px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--glass-border-ghost);
-    overflow-x: auto;
-    scrollbar-width: none;
+    overflow-x: auto; scrollbar-width: none;
   }
   .tabs::-webkit-scrollbar { display: none; }
   .tab {
@@ -339,23 +288,19 @@
     background: none; border: none;
     color: var(--text-tertiary);
     font-size: 14px; font-weight: 600;
-    cursor: pointer;
-    position: relative;
-    white-space: nowrap;
-    transition: color 0.15s;
+    cursor: pointer; position: relative;
+    white-space: nowrap; transition: color 0.15s;
     letter-spacing: -0.01em;
   }
   .tab:hover { color: var(--text-secondary); }
   .tab.active { color: var(--text-primary); }
   .tab.active::after {
-    content: '';
-    position: absolute;
+    content: ''; position: absolute;
     left: 12px; right: 12px; bottom: -1px;
-    height: 2px; background: #fff;
-    border-radius: 2px;
+    height: 2px; background: #fff; border-radius: 2px;
   }
 
-  /* ============ GRID ============ */
+  /* Grid */
   .grid {
     padding: 0 20px;
     display: grid;
@@ -365,8 +310,7 @@
   @media (min-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 
   .card {
-    border-radius: 18px;
-    overflow: hidden;
+    border-radius: 18px; overflow: hidden;
     border: 1px solid var(--glass-border-primary);
     background: var(--glass-fill-primary);
     cursor: pointer;
@@ -375,23 +319,18 @@
     animation: fadeInUp 0.5s cubic-bezier(0.32,0.72,0,1) backwards;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px -12px rgba(0,0,0,0.8);
   }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   .card:hover { border-color: var(--glass-border-strong); }
   .card:active { transform: scale(0.97); }
   .card__art {
     aspect-ratio: 1;
     display: grid; place-items: center;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .card__art svg { width: 65%; height: 65%; transition: transform 0.4s cubic-bezier(0.32,0.72,0,1); }
   .card:hover .card__art svg { transform: scale(1.06); }
   .card__art::after {
-    content: '';
-    position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.35) 100%);
     pointer-events: none;
   }
@@ -399,12 +338,10 @@
     position: absolute; top: 8px; left: 8px; z-index: 2;
     padding: 4px 8px; border-radius: 7px;
     background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     font-size: 9px; font-weight: 800;
     letter-spacing: 0.05em; text-transform: uppercase;
-    color: #fff;
-    border: 1px solid var(--glass-border-ghost);
+    color: #fff; border: 1px solid var(--glass-border-ghost);
   }
   .card__rank.mythic { color: #fbbf24; border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.08); }
   .card__rank.legendary { color: #f472b6; border-color: rgba(244,114,182,0.4); background: rgba(244,114,182,0.08); }
@@ -413,8 +350,7 @@
     position: absolute; top: 8px; right: 8px; z-index: 2;
     width: 30px; height: 30px; border-radius: 9px;
     background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border-ghost);
     display: grid; place-items: center;
     cursor: pointer; padding: 0;
@@ -435,8 +371,7 @@
   .card__coll .verified svg { width: 6px; height: 6px; }
   .card__name {
     font-size: 13px; font-weight: 700;
-    letter-spacing: -0.015em;
-    margin: 0 0 9px;
+    letter-spacing: -0.015em; margin: 0 0 9px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .card__row {
@@ -464,16 +399,246 @@
   .card__trend.up { color: #4ade80; background: rgba(74,222,128,0.1); }
   .card__trend.down { color: #f87171; background: rgba(248,113,113,0.1); }
 
-  /* ============ SKELETON ============ */
-  .skeleton {
-    animation: pulse 1.6s ease-in-out infinite;
-    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
-    background-size: 200% 100%;
-    border-radius: 8px;
+  /* Section header */
+  .section-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 20px; margin-bottom: 14px; gap: 12px;
   }
-  @keyframes pulse {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+  .section-title {
+    font-size: 20px; font-weight: 800;
+    letter-spacing: -0.03em; margin: 0; line-height: 1.15;
+  }
+  .section-sub { font-size: 13px; color: var(--text-tertiary); margin: 4px 0 0; font-weight: 500; }
+  .section-link {
+    font-size: 13px; color: var(--text-secondary);
+    background: none; border: none; padding: 4px;
+    cursor: pointer; font-weight: 600;
+    transition: color 0.15s; flex-shrink: 0;
+  }
+  .section-link:active { color: var(--text-primary); }
+
+  /* ============ EXPLORE ============ */
+  .explore-section { margin-bottom: 28px; }
+  .coll-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+  .coll-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    border-radius: 18px;
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
+  }
+  .coll-row:hover { background: var(--glass-fill-primary); border-color: var(--glass-border-primary); }
+  .coll-row:active { transform: scale(0.98); }
+  .coll-row__rank { font-size: 14px; font-weight: 800; color: var(--text-tertiary); width: 24px; text-align: center; flex-shrink: 0; }
+  .coll-row__art {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: grid; place-items: center;
+    flex-shrink: 0; overflow: hidden;
+    border: 1px solid var(--glass-border-primary);
+  }
+  .coll-row__art svg { width: 80%; height: 80%; }
+  .coll-row__info { flex: 1; min-width: 0; }
+  .coll-row__name {
+    font-size: 14px; font-weight: 700;
+    letter-spacing: -0.015em; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .coll-row__name .verified { width: 12px; height: 12px; }
+  .coll-row__name .verified svg { width: 7px; height: 7px; }
+  .coll-row__meta { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+  .coll-row__stat { text-align: right; flex-shrink: 0; }
+  .coll-row__stat-v { font-size: 14px; font-weight: 800; letter-spacing: -0.02em; }
+  .coll-row__stat-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; font-weight: 600; }
+
+  .creators-scroll {
+    display: flex; gap: 14px;
+    overflow-x: auto; padding: 0 20px 8px;
+    scrollbar-width: none;
+  }
+  .creators-scroll::-webkit-scrollbar { display: none; }
+  .creator {
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .creator:active { transform: scale(0.94); }
+  .creator__art {
+    width: 68px; height: 68px; border-radius: 50%;
+    display: grid; place-items: center;
+    border: 2px solid var(--glass-border-primary);
+    overflow: hidden;
+  }
+  .creator__art svg { width: 70%; height: 70%; }
+  .creator__name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+  /* ============ CREATE ============ */
+  .create-wrap { padding: 0 20px; }
+  .create-card {
+    padding: 20px;
+    border-radius: 22px;
+    background: var(--glass-fill-primary);
+    border: 1px solid var(--glass-border-primary);
+    backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    margin-bottom: 16px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-tertiary); margin-bottom: 8px;
+  }
+  .form-input, .form-textarea, .form-select {
+    width: 100%; padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--glass-fill-sunken);
+    border: 1px solid var(--glass-border-primary);
+    color: var(--text-primary); font-size: 14px; font-weight: 500;
+    outline: none;
+    transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    background: var(--glass-fill-primary);
+    border-color: var(--glass-border-strong);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; line-height: 1.5; font-family: inherit; }
+  .form-select { appearance: none; cursor: pointer; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 18px; }
+  .form-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; font-weight: 500; }
+
+  .art-picker {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 8px;
+  }
+  .art-option {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    border: 2px solid var(--glass-border-ghost);
+    background: var(--glass-fill-ghost);
+    display: grid; place-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
+    padding: 4px;
+  }
+  .art-option svg { width: 100%; height: 100%; }
+  .art-option:hover { border-color: var(--glass-border-primary); }
+  .art-option.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
+  }
+
+  .create-preview {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--glass-fill-sunken);
+    border: 1px solid var(--glass-border-primary);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .create-preview__art {
+    width: 64px; height: 64px; border-radius: 14px;
+    display: grid; place-items: center;
+    border: 1px solid var(--glass-border-primary);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .create-preview__art svg { width: 80%; height: 80%; }
+  .create-preview__info { flex: 1; min-width: 0; }
+  .create-preview__name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .create-preview__meta { font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
+
+  /* ============ ACTIVITY ============ */
+  .activity-list { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; }
+  .activity-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .activity-item:hover { background: var(--glass-fill-primary); border-color: var(--glass-border-primary); }
+  .activity-item__art {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center;
+    overflow: hidden; flex-shrink: 0;
+    border: 1px solid var(--glass-border-primary);
+  }
+  .activity-item__art svg { width: 75%; height: 75%; }
+  .activity-item__info { flex: 1; min-width: 0; }
+  .activity-item__action { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 2px; }
+  .activity-item__action .accent { color: var(--text-tertiary); font-weight: 500; }
+  .activity-item__time { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
+  .activity-item__price { text-align: right; flex-shrink: 0; }
+  .activity-item__price-v { font-size: 13px; font-weight: 800; letter-spacing: -0.02em; }
+  .activity-item__price-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 2px; }
+  .activity-item__icon {
+    width: 24px; height: 24px; border-radius: 8px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .activity-item__icon svg { width: 13px; height: 13px; }
+  .activity-item__icon.buy { background: rgba(74,222,128,0.12); color: #4ade80; }
+  .activity-item__icon.sell { background: rgba(96,165,250,0.12); color: #60a5fa; }
+  .activity-item__icon.bid { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .activity-item__icon.mint { background: rgba(167,139,250,0.12); color: #a78bfa; }
+  .activity-item__icon.transfer { background: rgba(244,114,182,0.12); color: #f472b6; }
+
+  /* ============ PROFILE ============ */
+  .profile-hero { padding: 0 20px; margin-bottom: 24px; text-align: center; }
+  .profile-avatar {
+    width: 88px; height: 88px; border-radius: 50%;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, #4a4a8a, #1a1a2e);
+    display: grid; place-items: center;
+    font-size: 36px; font-weight: 800;
+    border: 3px solid var(--glass-border-primary);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+  }
+  .profile-name { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 4px; }
+  .profile-addr { font-size: 13px; color: var(--text-tertiary); font-weight: 600; margin-bottom: 14px; font-family: monospace; }
+  .profile-bio { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 18px; }
+
+  .profile-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 18px;
+  }
+  .profile-stat {
+    padding: 14px 8px;
+    border-radius: 14px;
+    background: var(--glass-fill-ghost);
+    border: 1px solid var(--glass-border-ghost);
+    text-align: center;
+  }
+  .profile-stat__v { font-size: 17px; font-weight: 800; letter-spacing: -0.025em; }
+  .profile-stat__l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 600; }
+
+  .profile-tabs {
+    padding: 0 20px;
+    display: flex; gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border-ghost);
+  }
+  .profile-tab {
+    flex: 1;
+    padding: 12px 4px;
+    background: none; border: none;
+    color: var(--text-tertiary);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; position: relative;
+    transition: color 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .profile-tab.active { color: var(--text-primary); }
+  .profile-tab.active::after {
+    content: ''; position: absolute;
+    left: 4px; right: 4px; bottom: -1px;
+    height: 2px; background: #fff; border-radius: 2px;
   }
 
   /* ============ BOTTOM NAV ============ */
@@ -489,10 +654,7 @@
     border: 1px solid var(--glass-border-primary);
     backdrop-filter: var(--blur-lg) saturate(180%);
     -webkit-backdrop-filter: var(--blur-lg) saturate(180%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.1),
-      0 24px 48px -12px rgba(0,0,0,0.95),
-      0 0 0 1px rgba(255,255,255,0.03);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 24px 48px -12px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.03);
     z-index: 100;
     gap: 2px;
   }
@@ -512,34 +674,26 @@
   }
   .nav-btn svg { width: 21px; height: 21px; transition: transform 0.15s cubic-bezier(0.32,0.72,0,1); }
   .nav-btn:hover { color: var(--text-secondary); }
-  .nav-btn.active {
-    color: #fff;
-    background: rgba(255,255,255,0.1);
-  }
+  .nav-btn.active { color: #fff; background: rgba(255,255,255,0.1); }
   .nav-btn.active svg { transform: scale(1.06); }
   .nav-btn:active { transform: scale(0.94); }
 
-  /* ============ MODAL (bottom sheet) ============ */
+  /* ============ MODAL ============ */
   .modal {
     position: fixed; inset: 0; z-index: 200;
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
+    display: none; align-items: flex-end; justify-content: center;
   }
   .modal.is-open { display: flex; }
   .modal__backdrop {
     position: absolute; inset: 0;
     background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     animation: fadeIn 0.25s cubic-bezier(0.32,0.72,0,1);
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal__sheet {
     position: relative;
-    width: 100%;
-    max-width: 640px;
-    max-height: 92vh;
+    width: 100%; max-width: 640px; max-height: 92vh;
     overflow-y: auto;
     border-radius: 28px 28px 0 0;
     background: rgba(18,18,18,0.97);
@@ -552,23 +706,14 @@
     scrollbar-width: none;
   }
   .modal__sheet::-webkit-scrollbar { display: none; }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-  .modal__handle {
-    width: 40px; height: 4px;
-    background: var(--glass-border-strong);
-    border-radius: 2px;
-    margin: 10px auto 0;
-  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal__handle { width: 40px; height: 4px; background: var(--glass-border-strong); border-radius: 2px; margin: 10px auto 0; }
   .modal__close {
     position: absolute; top: 16px; right: 16px; z-index: 5;
     width: 36px; height: 36px; border-radius: 50%;
     background: var(--glass-fill-raised);
     border: 1px solid var(--glass-border-primary);
-    backdrop-filter: var(--blur-sm);
-    -webkit-backdrop-filter: var(--blur-sm);
+    backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
     display: grid; place-items: center;
     cursor: pointer; color: var(--text-primary);
     transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
@@ -581,102 +726,54 @@
   .sheet__art {
     width: 100%; aspect-ratio: 1.05;
     display: grid; place-items: center;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
     border-bottom: 1px solid var(--glass-border-ghost);
   }
   .sheet__art svg { width: 65%; height: 65%; position: relative; z-index: 1; }
   .sheet__art::after {
-    content: '';
-    position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: linear-gradient(180deg, transparent 55%, rgba(18,18,18,1) 100%);
     pointer-events: none; z-index: 2;
   }
   .sheet__body { padding: 4px 20px 20px; position: relative; z-index: 3; }
-  .sheet__coll-row {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 8px;
-  }
-  .sheet__coll {
-    font-size: 11px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    font-weight: 700;
-  }
-  .sheet__title {
-    font-size: 26px; font-weight: 800;
-    letter-spacing: -0.03em;
-    margin: 0 0 8px; line-height: 1.15;
-  }
-  .sheet__by {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--text-secondary);
-    margin-bottom: 20px;
-  }
+  .sheet__coll-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .sheet__coll { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .sheet__title { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 8px; line-height: 1.15; }
+  .sheet__by { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
   .sheet__by strong { color: var(--text-primary); font-weight: 700; }
   .sheet__price-box {
-    padding: 18px;
-    border-radius: 16px;
+    padding: 18px; border-radius: 16px;
     background: var(--glass-fill-sunken);
     border: 1px solid var(--glass-border-primary);
     margin-bottom: 16px;
   }
-  .sheet__price-labels {
-    display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 12px;
-  }
-  .sheet__price-big {
-    font-size: 28px; font-weight: 800;
-    letter-spacing: -0.03em;
-    display: flex; align-items: baseline; gap: 8px;
-  }
+  .sheet__price-labels { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .sheet__price-big { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; display: flex; align-items: baseline; gap: 8px; }
   .sheet__price-big small { font-size: 14px; color: var(--text-tertiary); font-weight: 600; }
   .sheet__price-fiat { font-size: 13px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; }
-  .sheet__price-trend {
-    text-align: right;
-    padding: 6px 10px; border-radius: 10px;
-    font-size: 12px; font-weight: 700;
-  }
+  .sheet__price-trend { text-align: right; padding: 6px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
   .sheet__price-trend small { display: block; font-size: 9px; opacity: 0.7; margin-top: 1px; font-weight: 600; }
-  .sheet__stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 8px; margin-bottom: 20px;
-  }
+  .sheet__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
   .sheet__stat {
-    padding: 12px 8px;
-    border-radius: 12px;
+    padding: 12px 8px; border-radius: 12px;
     background: var(--glass-fill-ghost);
     border: 1px solid var(--glass-border-ghost);
     text-align: center;
   }
   .sheet__stat-v { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
   .sheet__stat-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 600; }
-  .sheet__section-title {
-    font-size: 12px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-tertiary);
-    margin: 0 0 10px;
-  }
-  .sheet__desc {
-    font-size: 13px; line-height: 1.55;
-    color: var(--text-secondary);
-    margin: 0 0 20px;
-  }
-  .sheet__traits {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin-bottom: 20px;
-  }
+  .sheet__section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin: 0 0 10px; }
+  .sheet__desc { font-size: 13px; line-height: 1.55; color: var(--text-secondary); margin: 0 0 20px; }
+  .sheet__traits { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
   .trait {
-    padding: 8px 12px;
-    border-radius: 10px;
+    padding: 8px 12px; border-radius: 10px;
     background: var(--glass-fill-ghost);
     border: 1px solid var(--glass-border-ghost);
     font-size: 11px;
   }
   .trait strong { display: block; font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; font-weight: 700; }
   .trait span { font-weight: 700; letter-spacing: -0.01em; }
-  .sheet__actions {
-    display: flex; gap: 8px;
-  }
+  .sheet__actions { display: flex; gap: 8px; }
   .sheet__actions .btn--primary { flex: 1; }
 
   /* ============ TOAST ============ */
@@ -688,124 +785,79 @@
     width: calc(100% - 40px); max-width: 400px;
   }
   .toast {
-    padding: 13px 16px;
-    border-radius: 16px;
+    padding: 13px 16px; border-radius: 16px;
     background: rgba(24,24,24,0.97);
     border: 1px solid var(--glass-border-strong);
-    backdrop-filter: var(--blur-lg);
-    -webkit-backdrop-filter: var(--blur-lg);
+    backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg);
     font-size: 13px; font-weight: 600;
     box-shadow: 0 12px 32px rgba(0,0,0,0.7);
-    transform: translateY(-20px);
-    opacity: 0;
+    transform: translateY(-20px); opacity: 0;
     transition: all 0.3s cubic-bezier(0.32,0.72,0,1);
     display: flex; align-items: center; gap: 11px;
     letter-spacing: -0.01em;
   }
   .toast.show { transform: translateY(0); opacity: 1; }
-  .toast__icon {
-    width: 24px; height: 24px; border-radius: 50%;
-    display: grid; place-items: center;
-    flex-shrink: 0;
-  }
+  .toast__icon { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
   .toast__icon svg { width: 12px; height: 12px; }
   .toast__icon.success { background: rgba(74,222,128,0.18); color: #4ade80; }
   .toast__icon.info { background: rgba(96,165,250,0.18); color: #60a5fa; }
   .toast__icon.warn { background: rgba(251,191,36,0.18); color: #fbbf24; }
   .toast__icon.error { background: rgba(248,113,113,0.18); color: #f87171; }
 
-  /* ============ SEARCH OVERLAY ============ */
+  /* ============ SEARCH ============ */
   .search-overlay {
     position: fixed; inset: 0; z-index: 250;
-    display: none;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    display: none; background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   }
   .search-overlay.is-open { display: block; animation: fadeIn 0.2s; }
-  .search-panel {
-    padding: calc(16px + env(safe-area-inset-top)) 20px 20px;
-    max-width: 720px; margin: 0 auto;
-  }
+  .search-panel { padding: calc(16px + env(safe-area-inset-top)) 20px 20px; max-width: 720px; margin: 0 auto; }
   .search-input-wrap {
     display: flex; align-items: center; gap: 10px;
-    padding: 0 16px;
-    height: 52px;
+    padding: 0 16px; height: 52px;
     border-radius: 16px;
     background: var(--glass-fill-raised);
     border: 1px solid var(--glass-border-strong);
-    backdrop-filter: var(--blur-md);
-    -webkit-backdrop-filter: var(--blur-md);
+    backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md);
     margin-bottom: 16px;
   }
   .search-input-wrap svg { width: 18px; height: 18px; color: var(--text-tertiary); flex-shrink: 0; }
-  .search-input {
-    flex: 1; background: none; border: none;
-    color: var(--text-primary); font-family: inherit;
-    font-size: 16px; font-weight: 500;
-    outline: none;
-  }
+  .search-input { flex: 1; background: none; border: none; color: var(--text-primary); font-size: 16px; font-weight: 500; outline: none; }
   .search-input::placeholder { color: var(--text-tertiary); }
-  .search-cancel {
-    background: none; border: none;
-    color: var(--text-secondary);
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; padding: 8px;
-  }
+  .search-cancel { background: none; border: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; }
   .search-results { display: flex; flex-direction: column; gap: 8px; }
   .search-item {
     display: flex; align-items: center; gap: 12px;
-    padding: 10px;
-    border-radius: 14px;
+    padding: 10px; border-radius: 14px;
     background: var(--glass-fill-ghost);
     border: 1px solid var(--glass-border-ghost);
-    cursor: pointer;
-    transition: all 0.15s;
+    cursor: pointer; transition: all 0.15s;
   }
   .search-item:hover { background: var(--glass-fill-primary); border-color: var(--glass-border-primary); }
-  .search-item__art {
-    width: 48px; height: 48px; border-radius: 10px;
-    display: grid; place-items: center;
-    flex-shrink: 0;
-  }
+  .search-item__art { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; }
   .search-item__art svg { width: 70%; height: 70%; }
   .search-item__info { flex: 1; min-width: 0; }
-  .search-item__name {
-    font-size: 14px; font-weight: 700;
-    letter-spacing: -0.015em;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-bottom: 2px;
-  }
+  .search-item__name { font-size: 14px; font-weight: 700; letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
   .search-item__price { font-size: 12px; color: var(--text-tertiary); font-weight: 600; }
-  .search-empty {
-    text-align: center; padding: 40px 20px;
-    color: var(--text-tertiary);
-    font-size: 14px;
-  }
+  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-tertiary); font-size: 14px; }
 
   /* ============ EMPTY ============ */
-  .empty { text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
+  .empty { text-align: center; padding: 60px 20px; }
   .empty__icon {
     width: 60px; height: 60px; border-radius: 50%;
     background: var(--glass-fill-ghost);
     border: 1px solid var(--glass-border-ghost);
     display: grid; place-items: center;
-    margin: 0 auto 16px;
-    color: var(--text-tertiary);
+    margin: 0 auto 16px; color: var(--text-tertiary);
   }
   .empty__icon svg { width: 24px; height: 24px; }
   .empty__title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .empty__text { font-size: 13px; color: var(--text-tertiary); }
 
   /* ============ CONFETTI ============ */
-  .confetti {
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 999;
-    overflow: hidden;
-  }
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
   .confetti-piece {
-    position: absolute;
-    width: 8px; height: 8px;
+    position: absolute; width: 8px; height: 8px;
     opacity: 0;
     animation: confetti-fall 1.8s cubic-bezier(0.32,0.72,0,1) forwards;
   }
@@ -814,18 +866,8 @@
     100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
   }
 
-  /* ============ SWIPE HINT ============ */
-  .swipe-hint {
-    text-align: center; padding: 8px 0 0;
-    font-size: 11px; color: var(--text-tertiary);
-    font-weight: 500;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 </style>
 </head>
@@ -833,7 +875,7 @@
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="brand">
+  <div class="brand" id="brandHome">
     <div class="brand__mark">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 8v8l8 6 8-6V8z"/><path d="M12 22V12M4 8l8 4 8-4"/></svg>
     </div>
@@ -854,87 +896,192 @@
   </div>
 </div>
 
-<!-- HERO -->
-<div class="hero-wrap">
-  <article class="hero" id="heroCard">
-    <div class="hero__art" style="background: radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%);" id="heroArt"></div>
-    <div class="hero__badges">
-      <span class="badge live"><span class="dot"></span> Live auction</span>
-      <span class="badge">#042</span>
-    </div>
-    <div class="hero__info">
-      <div class="hero__coll">
-        Cosmos Collection
-        <span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+<!-- ============ HOME ============ -->
+<div class="screen active" id="screen-home">
+  <div class="hero-wrap">
+    <article class="hero" id="heroCard">
+      <div class="hero__art" style="background: radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%);" id="heroArt"></div>
+      <div class="hero__badges">
+        <span class="badge live"><span class="dot"></span> Live auction</span>
+        <span class="badge">#042</span>
       </div>
-      <h2 class="hero__title">Cosmic Drift</h2>
-      <div class="hero__by">
-        <div class="avatar lg" style="background:linear-gradient(135deg,#4a4a8a,#1a1a2e)">V</div>
-        <span>by <strong style="color:var(--text-primary);font-weight:700">voidwalker</strong></span>
-      </div>
-      <div class="hero__bottom">
-        <div class="price-block">
-          <div class="price-label">Current bid</div>
-          <div class="price-value">2.4 ETH <span class="price-fiat">$6,180</span></div>
+      <div class="hero__info">
+        <div class="hero__coll">
+          Cosmos Collection
+          <span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
         </div>
-        <button class="btn btn--primary btn--lg" id="heroBid">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-6 6"/><path d="M20 10H8a4 4 0 0 0-4 4v0"/></svg>
-          Bid
-        </button>
+        <h2 class="hero__title">Cosmic Drift</h2>
+        <div class="hero__by">
+          <div class="avatar lg" style="background:linear-gradient(135deg,#4a4a8a,#1a1a2e)">V</div>
+          <span>by <strong style="color:var(--text-primary);font-weight:700">voidwalker</strong></span>
+        </div>
+        <div class="hero__bottom">
+          <div class="price-block">
+            <div class="price-label">Current bid</div>
+            <div class="price-value">2.4 ETH <span class="price-fiat">$6,180</span></div>
+          </div>
+          <button class="btn btn--primary btn--lg" id="heroBid">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-6 6"/><path d="M20 10H8a4 4 0 0 0-4 4v0"/></svg>
+            Bid
+          </button>
+        </div>
       </div>
+    </article>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat__v">12.4K</div><div class="stat__l">Items</div></div>
+    <div class="stat"><div class="stat__v">3.8K</div><div class="stat__l">Owners</div></div>
+    <div class="stat"><div class="stat__v">142 Ξ</div><div class="stat__l">Volume</div></div>
+  </div>
+
+  <div class="cats" id="cats">
+    <button class="cat active" data-cat="all">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>
+      All
+    </button>
+    <button class="cat" data-cat="art">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+      Art
+    </button>
+    <button class="cat" data-cat="pixel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Pixel
+    </button>
+    <button class="cat" data-cat="3d">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5M12 22V12"/></svg>
+      3D
+    </button>
+    <button class="cat" data-cat="photo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Photo
+    </button>
+    <button class="cat" data-cat="abstract">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9"/><path d="M12 3c-3 3-3 15 0 18"/></svg>
+      Abstract
+    </button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="trending">Trending</button>
+    <button class="tab" data-tab="new">New</button>
+    <button class="tab" data-tab="top">Top</button>
+    <button class="tab" data-tab="ending">Ending soon</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- ============ EXPLORE ============ -->
+<div class="screen" id="screen-explore">
+  <div class="section-head" style="margin-top:8px;">
+    <div>
+      <h2 class="section-title">Top creators</h2>
+      <p class="section-sub">Artists on Liquid right now</p>
     </div>
-  </article>
+  </div>
+  <div class="creators-scroll" id="creatorsScroll"></div>
+
+  <div class="section-head" style="margin-top:24px;">
+    <div>
+      <h2 class="section-title">Collections</h2>
+      <p class="section-sub">Ranked by 24h volume</p>
+    </div>
+  </div>
+  <div class="coll-list" id="collList"></div>
 </div>
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><div class="stat__v">12.4K</div><div class="stat__l">Items</div></div>
-  <div class="stat"><div class="stat__v">3.8K</div><div class="stat__l">Owners</div></div>
-  <div class="stat"><div class="stat__v">142 Ξ</div><div class="stat__l">Volume</div></div>
+<!-- ============ CREATE ============ -->
+<div class="screen" id="screen-create">
+  <div class="section-head" style="margin-top:8px;">
+    <div>
+      <h2 class="section-title">Create NFT</h2>
+      <p class="section-sub">Mint your artwork on-chain</p>
+    </div>
+  </div>
+  <div class="create-wrap">
+    <div class="create-card">
+      <div class="form-group">
+        <label class="form-label">Artwork</label>
+        <div class="art-picker" id="artPicker"></div>
+        <div class="form-hint">Choose a preview for your NFT</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-input" id="cName" placeholder="Cosmic Drift #043" maxlength="40">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="cDesc" placeholder="Tell collectors about your work…" maxlength="300"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Collection</label>
+        <select class="form-select" id="cColl">
+          <option value="Cosmos">Cosmos</option>
+          <option value="Ronin">Ronin</option>
+          <option value="PixelPaws">PixelPaws</option>
+          <option value="Chrome">Chrome</option>
+          <option value="Liquid">Liquid</option>
+          <option value="Wasteland">Wasteland</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Price (ETH)</label>
+        <input type="number" class="form-input" id="cPrice" placeholder="0.5" min="0.01" step="0.01" value="0.5">
+        <div class="form-hint" id="cFiat">≈ $1,288</div>
+      </div>
+
+      <div class="create-preview" id="cPreview">
+        <div class="create-preview__art" id="cPreviewArt"></div>
+        <div class="create-preview__info">
+          <div class="create-preview__name" id="cPreviewName">Untitled</div>
+          <div class="create-preview__meta" id="cPreviewMeta">Cosmos · 0.5 ETH</div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--lg btn--block" id="mintBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5"/></svg>
+        Mint NFT
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- CATS -->
-<div class="cats" id="cats">
-  <button class="cat active" data-cat="all">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>
-    All
-  </button>
-  <button class="cat" data-cat="art">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-    Art
-  </button>
-  <button class="cat" data-cat="pixel">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    Pixel
-  </button>
-  <button class="cat" data-cat="3d">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5M12 22V12"/></svg>
-    3D
-  </button>
-  <button class="cat" data-cat="photo">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-    Photo
-  </button>
-  <button class="cat" data-cat="abstract">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9"/><path d="M12 3c-3 3-3 15 0 18"/></svg>
-    Abstract
-  </button>
-  <button class="cat" data-cat="audio">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-    Audio
-  </button>
+<!-- ============ ACTIVITY ============ -->
+<div class="screen" id="screen-activity">
+  <div class="section-head" style="margin-top:8px;">
+    <div>
+      <h2 class="section-title">Activity</h2>
+      <p class="section-sub">Latest on-chain events</p>
+    </div>
+  </div>
+  <div class="activity-list" id="activityList"></div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" data-tab="trending">Trending</button>
-  <button class="tab" data-tab="new">New</button>
-  <button class="tab" data-tab="top">Top</button>
-  <button class="tab" data-tab="ending">Ending soon</button>
+<!-- ============ PROFILE ============ -->
+<div class="screen" id="screen-profile">
+  <div class="profile-hero">
+    <div class="profile-avatar" style="background:linear-gradient(135deg,#4a4a8a,#1a1a2e);">A</div>
+    <h2 class="profile-name">alex.eth</h2>
+    <div class="profile-addr">0x7a9f…3f2e</div>
+    <p class="profile-bio">Collector & creator on Liquid. Building the future of digital art.</p>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="profile-stat__v" id="pOwned">0</div><div class="profile-stat__l">Owned</div></div>
+      <div class="profile-stat"><div class="profile-stat__v" id="pFavs">0</div><div class="profile-stat__l">Favorites</div></div>
+      <div class="profile-stat"><div class="profile-stat__v">4.2 Ξ</div><div class="profile-stat__l">Volume</div></div>
+    </div>
+    <div class="profile-tabs">
+      <button class="profile-tab active" data-ptab="owned">Owned</button>
+      <button class="profile-tab" data-ptab="favorites">Favorites</button>
+      <button class="profile-tab" data-ptab="created">Created</button>
+    </div>
+  </div>
+  <div class="grid" id="profileGrid"></div>
 </div>
-
-<!-- GRID -->
-<div class="grid" id="grid"></div>
 
 <!-- BOTTOM NAV -->
 <nav class="nav">
@@ -980,7 +1127,6 @@
         <span>by <strong id="mAuthor">—</strong></span>
         <span style="color:var(--text-tertiary)" id="mRarity">· —</span>
       </div>
-
       <div class="sheet__price-box">
         <div class="sheet__price-labels">
           <div>
@@ -990,19 +1136,15 @@
           <div class="sheet__price-trend" id="mTrend">+0%<small>24h</small></div>
         </div>
       </div>
-
       <div class="sheet__stats">
         <div class="sheet__stat"><div class="sheet__stat-v" id="mFloor">—</div><div class="sheet__stat-l">Floor</div></div>
         <div class="sheet__stat"><div class="sheet__stat-v" id="mOwners">—</div><div class="sheet__stat-l">Owners</div></div>
         <div class="sheet__stat"><div class="sheet__stat-v" id="mVolume">—</div><div class="sheet__stat-l">Volume</div></div>
       </div>
-
       <h3 class="sheet__section-title">Properties</h3>
       <div class="sheet__traits" id="mTraits"></div>
-
       <h3 class="sheet__section-title">About</h3>
       <p class="sheet__desc" id="mDesc">—</p>
-
       <div class="sheet__actions">
         <button class="btn btn--secondary btn--md btn--round" id="mFavBtn" aria-label="Favorite" style="width:54px;height:54px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
@@ -1016,259 +1158,66 @@
   </div>
 </div>
 
-<!-- SEARCH OVERLAY -->
+<!-- SEARCH -->
 <div class="search-overlay" id="searchOverlay">
   <div class="search-panel">
     <div class="search-input-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="Search NFTs, collections…" autocomplete="off">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search NFTs, collections, creators…" autocomplete="off">
       <button class="search-cancel" id="searchCancel">Cancel</button>
     </div>
     <div class="search-results" id="searchResults"></div>
   </div>
 </div>
 
-<!-- TOASTS -->
+<!-- TOAST -->
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
   // ============ TELEGRAM ============
   const tg = window.Telegram?.WebApp;
   if (tg) {
-    tg.ready();
-    tg.expand();
-    tg.setHeaderColor('#000000');
-    tg.setBackgroundColor('#000000');
+    tg.ready(); tg.expand();
+    tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000');
     try { tg.disableVerticalSwipes?.(); } catch(e) {}
   }
   const haptic = (t = 'light') => { try { tg?.HapticFeedback?.impactOccurred(t); } catch(e){} };
   const notify = (t = 'success') => { try { tg?.HapticFeedback?.notificationOccurred(t); } catch(e){} };
 
-  // ============ SVG ART LIBRARY ============
+  // ============ SVG ARTS ============
   const SVG_ARTS = {
-    cosmic: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <radialGradient id="cg1" cx="30%" cy="30%" r="60%">
-          <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.9"/>
-          <stop offset="60%" stop-color="#6d28d9" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="cg2" cx="70%" cy="70%" r="50%">
-          <stop offset="0%" stop-color="#f472b6" stop-opacity="0.7"/>
-          <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="60" cy="60" r="80" fill="url(#cg1)"/>
-      <circle cx="140" cy="140" r="60" fill="url(#cg2)"/>
-      <circle cx="100" cy="100" r="45" fill="#0f0f1a" stroke="#a78bfa" stroke-opacity="0.3"/>
-      <ellipse cx="100" cy="100" rx="70" ry="18" stroke="#fff" stroke-opacity="0.15" stroke-width="1.5" transform="rotate(-20 100 100)"/>
-      <circle cx="100" cy="100" r="8" fill="#fff" opacity="0.9"/>
-      <circle cx="100" cy="100" r="4" fill="#a78bfa"/>
-      <circle cx="60" cy="60" r="2" fill="#fff" opacity="0.6"/>
-      <circle cx="150" cy="50" r="1.5" fill="#fff" opacity="0.5"/>
-      <circle cx="40" cy="130" r="1.5" fill="#fff" opacity="0.5"/>
-    </svg>`,
-    samurai: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f472b6"/>
-          <stop offset="100%" stop-color="#7c3aed"/>
-        </linearGradient>
-        <radialGradient id="sgbg" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.3"/>
-          <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="100" cy="90" r="80" fill="url(#sgbg)"/>
-      <path d="M60 120 L140 120 L130 180 L70 180 Z" fill="#1a1a1a" stroke="url(#sg1)" stroke-width="1.5"/>
-      <circle cx="100" cy="90" r="35" fill="#0a0a0a" stroke="url(#sg1)" stroke-width="1.5"/>
-      <path d="M75 85 Q100 60 125 85" stroke="url(#sg1)" stroke-width="2" fill="none"/>
-      <circle cx="88" cy="88" r="3" fill="#f472b6"/>
-      <circle cx="112" cy="88" r="3" fill="#f472b6"/>
-      <path d="M85 120 L115 120 L110 145 L90 145 Z" fill="#2a2a2a"/>
-      <path d="M30 40 L45 55 M170 40 L155 55 M30 160 L45 145 M170 160 L155 145" stroke="#f472b6" stroke-width="1.5" opacity="0.5"/>
-    </svg>`,
-    pixelcat: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges">
-      <defs>
-        <linearGradient id="pg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#4ade80"/>
-          <stop offset="100%" stop-color="#15803d"/>
-        </linearGradient>
-      </defs>
-      <rect x="60" y="60" width="80" height="80" fill="url(#pg1)" opacity="0.15"/>
-      <rect x="70" y="50" width="15" height="15" fill="#4ade80"/>
-      <rect x="115" y="50" width="15" height="15" fill="#4ade80"/>
-      <rect x="60" y="65" width="80" height="15" fill="#4ade80"/>
-      <rect x="60" y="80" width="15" height="50" fill="#4ade80"/>
-      <rect x="125" y="80" width="15" height="50" fill="#4ade80"/>
-      <rect x="75" y="80" width="50" height="50" fill="#22c55e"/>
-      <rect x="80" y="90" width="10" height="10" fill="#000"/>
-      <rect x="110" y="90" width="10" height="10" fill="#000"/>
-      <rect x="95" y="105" width="10" height="5" fill="#000"/>
-      <rect x="75" y="130" width="50" height="15" fill="#15803d"/>
-      <rect x="80" y="135" width="8" height="8" fill="#4ade80"/>
-      <rect x="112" y="135" width="8" height="8" fill="#4ade80"/>
-      <rect x="140" y="60" width="10" height="10" fill="#fbbf24"/>
-      <rect x="150" y="70" width="8" height="8" fill="#fbbf24"/>
-    </svg>`,
-    chrome: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <radialGradient id="cg3" cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stop-color="#ffffff"/>
-          <stop offset="30%" stop-color="#d1d5db"/>
-          <stop offset="60%" stop-color="#6b7280"/>
-          <stop offset="100%" stop-color="#1f2937"/>
-        </radialGradient>
-        <radialGradient id="cg4" cx="70%" cy="75%" r="50%">
-          <stop offset="0%" stop-color="#374151" stop-opacity="0.8"/>
-          <stop offset="100%" stop-color="#111827" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="100" cy="100" r="70" fill="url(#cg3)"/>
-      <circle cx="100" cy="100" r="70" fill="url(#cg4)"/>
-      <ellipse cx="75" cy="70" rx="30" ry="20" fill="#fff" opacity="0.5" transform="rotate(-30 75 70)"/>
-      <ellipse cx="130" cy="140" rx="15" ry="10" fill="#fff" opacity="0.15" transform="rotate(-30 130 140)"/>
-      <ellipse cx="100" cy="100" rx="70" ry="20" stroke="#fff" stroke-opacity="0.1" stroke-width="1" transform="rotate(-15 100 100)"/>
-    </svg>`,
-    desert: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="dg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.6"/>
-          <stop offset="60%" stop-color="#b45309" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#1c1917"/>
-        </linearGradient>
-        <linearGradient id="dg2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#1e1b4b"/>
-          <stop offset="100%" stop-color="#0c0a09"/>
-        </linearGradient>
-      </defs>
-      <rect width="200" height="200" fill="url(#dg2)"/>
-      <circle cx="150" cy="50" r="20" fill="#fbbf24" opacity="0.8"/>
-      <circle cx="150" cy="50" r="25" fill="#fbbf24" opacity="0.2"/>
-      <path d="M0 130 Q50 100 100 120 T200 110 L200 200 L0 200 Z" fill="url(#dg1)"/>
-      <path d="M0 150 Q60 130 120 145 T200 140 L200 200 L0 200 Z" fill="#7c2d12" opacity="0.7"/>
-      <path d="M0 165 Q80 150 140 160 T200 155 L200 200 L0 200 Z" fill="#431407"/>
-      <ellipse cx="100" cy="175" rx="30" ry="3" fill="#000" opacity="0.5"/>
-    </svg>`,
-    liquid: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#60a5fa"/>
-          <stop offset="50%" stop-color="#3b82f6"/>
-          <stop offset="100%" stop-color="#1e3a8a"/>
-        </linearGradient>
-        <radialGradient id="lg2" cx="30%" cy="30%" r="70%">
-          <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.8"/>
-          <stop offset="100%" stop-color="#1e40af" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="100" cy="100" r="75" fill="url(#lg2)"/>
-      <path d="M100 40 Q140 60 140 100 Q140 140 100 160 Q60 140 60 100 Q60 60 100 40 Z" fill="url(#lg1)" opacity="0.7"/>
-      <ellipse cx="85" cy="80" rx="15" ry="25" fill="#fff" opacity="0.4" transform="rotate(-20 85 80)"/>
-      <circle cx="130" cy="130" r="8" fill="#fff" opacity="0.5"/>
-      <circle cx="75" cy="140" r="4" fill="#fff" opacity="0.3"/>
-    </svg>`,
-    oni: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="og1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#dc2626"/>
-          <stop offset="100%" stop-color="#7f1d1d"/>
-        </linearGradient>
-      </defs>
-      <path d="M60 80 L50 40 L75 65 Z" fill="url(#og1)"/>
-      <path d="M140 80 L150 40 L125 65 Z" fill="url(#og1)"/>
-      <path d="M100 50 Q150 60 155 110 Q155 150 100 165 Q45 150 45 110 Q50 60 100 50 Z" fill="#1a1a1a" stroke="url(#og1)" stroke-width="2"/>
-      <path d="M70 95 L85 105 L70 115 Z" fill="#fbbf24"/>
-      <path d="M130 95 L115 105 L130 115 Z" fill="#fbbf24"/>
-      <path d="M80 135 L100 145 L120 135 L115 155 L85 155 Z" fill="#7f1d1d"/>
-      <path d="M85 150 L100 155 L115 150" stroke="#fbbf24" stroke-width="1.5" fill="none"/>
-    </svg>`,
-    voidcube: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="vg1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#374151"/>
-          <stop offset="100%" stop-color="#030712"/>
-        </linearGradient>
-      </defs>
-      <path d="M100 40 L160 75 L160 145 L100 180 L40 145 L40 75 Z" fill="url(#vg1)" stroke="#4b5563" stroke-width="1"/>
-      <path d="M100 40 L160 75 L100 110 L40 75 Z" fill="#1f2937"/>
-      <path d="M100 110 L160 75 L160 145 L100 180 Z" fill="#111827"/>
-      <path d="M100 110 L40 75 L40 145 L100 180 Z" fill="#0a0a0a"/>
-      <path d="M100 40 L160 75 L100 110 L40 75 Z" stroke="#6b7280" stroke-opacity="0.5" stroke-width="0.8" fill="none"/>
-      <path d="M100 110 L100 180" stroke="#6b7280" stroke-opacity="0.3" stroke-width="0.8"/>
-      <circle cx="100" cy="110" r="3" fill="#60a5fa" opacity="0.8"/>
-      <circle cx="100" cy="110" r="8" fill="#60a5fa" opacity="0.15"/>
-    </svg>`,
-    pixelape: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges">
-      <rect x="55" y="55" width="90" height="90" fill="#3b2f1e"/>
-      <rect x="55" y="55" width="90" height="90" fill="#78572e" opacity="0.6"/>
-      <rect x="60" y="60" width="30" height="10" fill="#fbbf24"/>
-      <rect x="110" y="60" width="30" height="10" fill="#fbbf24"/>
-      <rect x="55" y="75" width="90" height="55" fill="#8b6b3a"/>
-      <rect x="70" y="85" width="15" height="15" fill="#000"/>
-      <rect x="115" y="85" width="15" height="15" fill="#000"/>
-      <rect x="73" y="88" width="6" height="6" fill="#fff"/>
-      <rect x="118" y="88" width="6" height="6" fill="#fff"/>
-      <rect x="85" y="110" width="30" height="10" fill="#5a4523"/>
-      <rect x="65" y="130" width="70" height="15" fill="#3b2f1e"/>
-      <rect x="75" y="145" width="50" height="20" fill="#3b2f1e"/>
-      <rect x="55" y="55" width="8" height="8" fill="#fbbf24"/>
-    </svg>`,
-    gradient: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="gw1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#f472b6"/>
-          <stop offset="50%" stop-color="#a78bfa"/>
-          <stop offset="100%" stop-color="#60a5fa"/>
-        </linearGradient>
-      </defs>
-      <rect x="40" y="60" width="120" height="80" rx="8" fill="url(#gw1)" opacity="0.3"/>
-      <path d="M20 100 Q60 40 100 100 T180 100" stroke="url(#gw1)" stroke-width="3" fill="none"/>
-      <path d="M20 120 Q60 60 100 120 T180 120" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.6"/>
-      <path d="M20 140 Q60 80 100 140 T180 140" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.3"/>
-      <circle cx="100" cy="100" r="20" fill="url(#gw1)" opacity="0.8"/>
-    </svg>`,
-    temple: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
-          <stop offset="100%" stop-color="#0c0a09"/>
-        </linearGradient>
-      </defs>
-      <rect width="200" height="200" fill="#0a0a0a"/>
-      <circle cx="100" cy="60" r="25" fill="#fbbf24" opacity="0.6"/>
-      <path d="M50 180 L50 120 L100 80 L150 120 L150 180 Z" fill="#1a1a1a" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
-      <path d="M40 120 L100 70 L160 120" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-opacity="0.7"/>
-      <path d="M60 120 L60 180 M140 120 L140 180 M100 80 L100 180" stroke="#f59e0b" stroke-width="0.8" opacity="0.4"/>
-      <path d="M0 180 Q50 170 100 175 T200 170 L200 200 L0 200 Z" fill="url(#tg1)"/>
-    </svg>`,
-    neongrid: `<svg viewBox="0 0 200 200" fill="none">
-      <defs>
-        <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#a78bfa"/>
-          <stop offset="100%" stop-color="#f472b6"/>
-        </linearGradient>
-      </defs>
-      <rect width="200" height="200" fill="#0a0a14"/>
-      <circle cx="100" cy="80" r="35" fill="#a78bfa" opacity="0.15"/>
-      <circle cx="100" cy="80" r="25" fill="#f472b6" opacity="0.2"/>
-      <path d="M0 140 L200 140" stroke="#a78bfa" stroke-width="1" opacity="0.5"/>
-      <g opacity="0.7">
-        <path d="M0 150 L200 150 M0 165 L200 165 M0 185 L200 185" stroke="#a78bfa" stroke-width="0.7"/>
-        <path d="M100 140 L100 200 M70 140 L40 200 M130 140 L160 200 M40 140 L-20 200 M160 140 L220 200" stroke="#f472b6" stroke-width="0.7"/>
-      </g>
-    </svg>`,
+    cosmic: `<svg viewBox="0 0 200 200" fill="none"><defs><radialGradient id="cg1" cx="30%" cy="30%" r="60%"><stop offset="0%" stop-color="#a78bfa" stop-opacity="0.9"/><stop offset="60%" stop-color="#6d28d9" stop-opacity="0.4"/><stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/></radialGradient><radialGradient id="cg2" cx="70%" cy="70%" r="50%"><stop offset="0%" stop-color="#f472b6" stop-opacity="0.7"/><stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/></radialGradient></defs><circle cx="60" cy="60" r="80" fill="url(#cg1)"/><circle cx="140" cy="140" r="60" fill="url(#cg2)"/><circle cx="100" cy="100" r="45" fill="#0f0f1a" stroke="#a78bfa" stroke-opacity="0.3"/><ellipse cx="100" cy="100" rx="70" ry="18" stroke="#fff" stroke-opacity="0.15" stroke-width="1.5" transform="rotate(-20 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff" opacity="0.9"/><circle cx="100" cy="100" r="4" fill="#a78bfa"/><circle cx="60" cy="60" r="2" fill="#fff" opacity="0.6"/><circle cx="150" cy="50" r="1.5" fill="#fff" opacity="0.5"/><circle cx="40" cy="130" r="1.5" fill="#fff" opacity="0.5"/></svg>`,
+    samurai: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient><radialGradient id="sgbg" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#7c3aed" stop-opacity="0.3"/><stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="90" r="80" fill="url(#sgbg)"/><path d="M60 120 L140 120 L130 180 L70 180 Z" fill="#1a1a1a" stroke="url(#sg1)" stroke-width="1.5"/><circle cx="100" cy="90" r="35" fill="#0a0a0a" stroke="url(#sg1)" stroke-width="1.5"/><path d="M75 85 Q100 60 125 85" stroke="url(#sg1)" stroke-width="2" fill="none"/><circle cx="88" cy="88" r="3" fill="#f472b6"/><circle cx="112" cy="88" r="3" fill="#f472b6"/><path d="M85 120 L115 120 L110 145 L90 145 Z" fill="#2a2a2a"/><path d="M30 40 L45 55 M170 40 L155 55 M30 160 L45 145 M170 160 L155 145" stroke="#f472b6" stroke-width="1.5" opacity="0.5"/></svg>`,
+    pixelcat: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges"><rect x="60" y="60" width="80" height="80" fill="#4ade80" opacity="0.15"/><rect x="70" y="50" width="15" height="15" fill="#4ade80"/><rect x="115" y="50" width="15" height="15" fill="#4ade80"/><rect x="60" y="65" width="80" height="15" fill="#4ade80"/><rect x="60" y="80" width="15" height="50" fill="#4ade80"/><rect x="125" y="80" width="15" height="50" fill="#4ade80"/><rect x="75" y="80" width="50" height="50" fill="#22c55e"/><rect x="80" y="90" width="10" height="10" fill="#000"/><rect x="110" y="90" width="10" height="10" fill="#000"/><rect x="95" y="105" width="10" height="5" fill="#000"/><rect x="75" y="130" width="50" height="15" fill="#15803d"/><rect x="80" y="135" width="8" height="8" fill="#4ade80"/><rect x="112" y="135" width="8" height="8" fill="#4ade80"/><rect x="140" y="60" width="10" height="10" fill="#fbbf24"/><rect x="150" y="70" width="8" height="8" fill="#fbbf24"/></svg>`,
+    chrome: `<svg viewBox="0 0 200 200" fill="none"><defs><radialGradient id="cg3" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#d1d5db"/><stop offset="60%" stop-color="#6b7280"/><stop offset="100%" stop-color="#1f2937"/></radialGradient></defs><circle cx="100" cy="100" r="70" fill="url(#cg3)"/><ellipse cx="75" cy="70" rx="30" ry="20" fill="#fff" opacity="0.5" transform="rotate(-30 75 70)"/><ellipse cx="130" cy="140" rx="15" ry="10" fill="#fff" opacity="0.15" transform="rotate(-30 130 140)"/></svg>`,
+    desert: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="dg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.6"/><stop offset="60%" stop-color="#b45309" stop-opacity="0.4"/><stop offset="100%" stop-color="#1c1917"/></linearGradient><linearGradient id="dg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#0c0a09"/></linearGradient></defs><rect width="200" height="200" fill="url(#dg2)"/><circle cx="150" cy="50" r="20" fill="#fbbf24" opacity="0.8"/><circle cx="150" cy="50" r="25" fill="#fbbf24" opacity="0.2"/><path d="M0 130 Q50 100 100 120 T200 110 L200 200 L0 200 Z" fill="url(#dg1)"/><path d="M0 150 Q60 130 120 145 T200 140 L200 200 L0 200 Z" fill="#7c2d12" opacity="0.7"/><path d="M0 165 Q80 150 140 160 T200 155 L200 200 L0 200 Z" fill="#431407"/></svg>`,
+    liquid: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#60a5fa"/><stop offset="50%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient><radialGradient id="lg2" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#93c5fd" stop-opacity="0.8"/><stop offset="100%" stop-color="#1e40af" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="75" fill="url(#lg2)"/><path d="M100 40 Q140 60 140 100 Q140 140 100 160 Q60 140 60 100 Q60 60 100 40 Z" fill="url(#lg1)" opacity="0.7"/><ellipse cx="85" cy="80" rx="15" ry="25" fill="#fff" opacity="0.4" transform="rotate(-20 85 80)"/></svg>`,
+    oni: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="og1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs><path d="M60 80 L50 40 L75 65 Z" fill="url(#og1)"/><path d="M140 80 L150 40 L125 65 Z" fill="url(#og1)"/><path d="M100 50 Q150 60 155 110 Q155 150 100 165 Q45 150 45 110 Q50 60 100 50 Z" fill="#1a1a1a" stroke="url(#og1)" stroke-width="2"/><path d="M70 95 L85 105 L70 115 Z" fill="#fbbf24"/><path d="M130 95 L115 105 L130 115 Z" fill="#fbbf24"/><path d="M80 135 L100 145 L120 135 L115 155 L85 155 Z" fill="#7f1d1d"/></svg>`,
+    voidcube: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="vg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#374151"/><stop offset="100%" stop-color="#030712"/></linearGradient></defs><path d="M100 40 L160 75 L160 145 L100 180 L40 145 L40 75 Z" fill="url(#vg1)" stroke="#4b5563" stroke-width="1"/><path d="M100 40 L160 75 L100 110 L40 75 Z" fill="#1f2937"/><path d="M100 110 L160 75 L160 145 L100 180 Z" fill="#111827"/><path d="M100 110 L40 75 L40 145 L100 180 Z" fill="#0a0a0a"/><circle cx="100" cy="110" r="3" fill="#60a5fa" opacity="0.8"/><circle cx="100" cy="110" r="8" fill="#60a5fa" opacity="0.15"/></svg>`,
+    pixelape: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges"><rect x="55" y="55" width="90" height="90" fill="#3b2f1e"/><rect x="55" y="55" width="90" height="90" fill="#78572e" opacity="0.6"/><rect x="60" y="60" width="30" height="10" fill="#fbbf24"/><rect x="110" y="60" width="30" height="10" fill="#fbbf24"/><rect x="55" y="75" width="90" height="55" fill="#8b6b3a"/><rect x="70" y="85" width="15" height="15" fill="#000"/><rect x="115" y="85" width="15" height="15" fill="#000"/><rect x="73" y="88" width="6" height="6" fill="#fff"/><rect x="118" y="88" width="6" height="6" fill="#fff"/><rect x="85" y="110" width="30" height="10" fill="#5a4523"/><rect x="65" y="130" width="70" height="15" fill="#3b2f1e"/></svg>`,
+    gradient: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="gw1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="50%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#60a5fa"/></linearGradient></defs><rect x="40" y="60" width="120" height="80" rx="8" fill="url(#gw1)" opacity="0.3"/><path d="M20 100 Q60 40 100 100 T180 100" stroke="url(#gw1)" stroke-width="3" fill="none"/><path d="M20 120 Q60 60 100 120 T180 120" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.6"/><path d="M20 140 Q60 80 100 140 T180 140" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.3"/><circle cx="100" cy="100" r="20" fill="url(#gw1)" opacity="0.8"/></svg>`,
+    temple: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/><stop offset="100%" stop-color="#0c0a09"/></linearGradient></defs><rect width="200" height="200" fill="#0a0a0a"/><circle cx="100" cy="60" r="25" fill="#fbbf24" opacity="0.6"/><path d="M50 180 L50 120 L100 80 L150 120 L150 180 Z" fill="#1a1a1a" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/><path d="M40 120 L100 70 L160 120" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><path d="M0 180 Q50 170 100 175 T200 170 L200 200 L0 200 Z" fill="url(#tg1)"/></svg>`,
+    neongrid: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#f472b6"/></linearGradient></defs><rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="80" r="35" fill="#a78bfa" opacity="0.15"/><circle cx="100" cy="80" r="25" fill="#f472b6" opacity="0.2"/><path d="M0 140 L200 140" stroke="#a78bfa" stroke-width="1" opacity="0.5"/><g opacity="0.7"><path d="M0 150 L200 150 M0 165 L200 165 M0 185 L200 185" stroke="#a78bfa" stroke-width="0.7"/><path d="M100 140 L100 200 M70 140 L40 200 M130 140 L160 200 M40 140 L-20 200 M160 140 L220 200" stroke="#f472b6" stroke-width="0.7"/></g></svg>`,
   };
 
   // ============ DATA ============
   const COLLECTIONS = {
-    Cosmos:   { verified: true, floor: '2.1', owners: '1.2K', volume: '24 Ξ' },
-    Ronin:    { verified: true, floor: '1.4', owners: '890', volume: '18 Ξ' },
-    PixelPaws:{ verified: true, floor: '0.3', owners: '2.4K', volume: '9 Ξ' },
-    Chrome:   { verified: true, floor: '2.8', owners: '640', volume: '31 Ξ' },
-    Wasteland:{ verified: false, floor: '0.8', owners: '410', volume: '5 Ξ' },
-    Liquid:   { verified: true, floor: '1.1', owners: '720', volume: '12 Ξ' },
+    Cosmos:   { verified: true, floor: '2.1', owners: '1.2K', volume: '24 Ξ', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)', art: 'cosmic' },
+    Ronin:    { verified: true, floor: '1.4', owners: '890', volume: '18 Ξ', bg: 'radial-gradient(circle at 70% 30%, #2a1a2e 0%, #0a0a14 70%)', art: 'samurai' },
+    PixelPaws:{ verified: true, floor: '0.3', owners: '2.4K', volume: '9 Ξ', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)', art: 'pixelcat' },
+    Chrome:   { verified: true, floor: '2.8', owners: '640', volume: '31 Ξ', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)', art: 'chrome' },
+    Wasteland:{ verified: false, floor: '0.8', owners: '410', volume: '5 Ξ', bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)', art: 'desert' },
+    Liquid:   { verified: true, floor: '1.1', owners: '720', volume: '12 Ξ', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)', art: 'liquid' },
   };
+
+  const CREATORS = [
+    { name: 'voidwalker', coll: 'Cosmos', art: 'cosmic', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)' },
+    { name: 'kuro.eth', coll: 'Ronin', art: 'samurai', bg: 'radial-gradient(circle at 70% 30%, #2a1a2e 0%, #0a0a14 70%)' },
+    { name: 'pixelfiend', coll: 'PixelPaws', art: 'pixelcat', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)' },
+    { name: 'matter.form', coll: 'Chrome', art: 'chrome', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)' },
+    { name: 'lens.eth', coll: 'Wasteland', art: 'desert', bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)' },
+    { name: 'flowstate', coll: 'Liquid', art: 'liquid', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)' },
+  ];
 
   const NFTS = [
     { id: 1, name: 'Cosmic Drift #042', author: 'voidwalker', art: 'cosmic', cat: 'abstract', coll: 'Cosmos', rarity: 'Legendary', price: 2.4, trend: 12, rank: 'legendary', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)', desc: 'A rare fragment from the outer rim of the Cosmic Drift collection. Each piece captures a unique stellar configuration frozen at the moment of its minting.', traits: [{k:'Background',v:'Deep Space'},{k:'Rarity',v:'Legendary'},{k:'Aura',v:'Nebula'},{k:'Core',v:'Binary Star'}] },
@@ -1285,20 +1234,38 @@
     { id: 12, name: 'Neon Grid', author: 'pixelfiend', art: 'neongrid', cat: 'pixel', coll: 'PixelPaws', rarity: 'Epic', price: 1.05, trend: 19, rank: 'epic', bg: 'radial-gradient(circle at 60% 40%, #1a1a2a 0%, #0a0a0a 70%)', desc: 'A pixel-art reimagining of a synthwave landscape. Includes original soundtrack NFT.', traits: [{k:'Background',v:'Synthwave'},{k:'Rarity',v:'Epic'},{k:'Grid',v:'Neon'},{k:'Sun',v:'Violet'}] },
   ];
 
+  const ACTIVITY = [
+    { id: 1, type: 'buy', nftId: 1, from: 'voidwalker', to: 'alex.eth', price: 2.4, time: '2 min ago' },
+    { id: 2, type: 'bid', nftId: 4, from: 'cryptoqueen', to: 'alex.eth', price: 3.0, time: '8 min ago' },
+    { id: 3, type: 'sell', nftId: 2, from: 'alex.eth', to: 'kuro.eth', price: 1.75, time: '15 min ago' },
+    { id: 4, type: 'mint', nftId: 12, from: 'pixelfiend', to: 'pixelfiend', price: 0, time: '22 min ago' },
+    { id: 5, type: 'buy', nftId: 6, from: 'flowstate', to: 'nftwhale', price: 1.2, time: '34 min ago' },
+    { id: 6, type: 'transfer', nftId: 8, from: 'matter.form', to: 'alex.eth', price: 0, time: '1 hr ago' },
+    { id: 7, type: 'bid', nftId: 7, from: 'yuki.eth', to: 'kuro.eth', price: 1.95, time: '1 hr ago' },
+    { id: 8, type: 'buy', nftId: 11, from: 'lens.eth', to: 'traveler', price: 1.05, time: '2 hr ago' },
+    { id: 9, type: 'sell', nftId: 3, from: 'pixelfiend', to: 'catlover', price: 0.33, time: '3 hr ago' },
+    { id: 10, type: 'buy', nftId: 10, from: 'flowstate', to: 'artdealer', price: 1.55, time: '4 hr ago' },
+  ];
+
   const ETH_PRICE = 2575;
 
   // ============ STATE ============
   const state = {
     cat: 'all',
     tab: 'trending',
-    favorites: new Set(),
+    favorites: new Set([4, 8]),
+    owned: [1, 6, 11],
+    created: [2, 7],
     currentItem: null,
-    searchQuery: '',
+    profileTab: 'owned',
+    createArt: 'cosmic',
+    currentScreen: 'home',
   };
 
   // ============ HELPERS ============
   const fiat = (eth) => '$' + Math.round(eth * ETH_PRICE).toLocaleString();
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const VERIFIED_SVG = '<span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>';
 
   // ============ TOAST ============
   const toastWrap = document.getElementById('toastWrap');
@@ -1337,7 +1304,51 @@
     setTimeout(() => wrap.remove(), 2800);
   }
 
-  // ============ GRID ============
+  // ============ CARD RENDER ============
+  const TREND_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+  const TREND_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+
+  function cardHTML(n) {
+    const coll = COLLECTIONS[n.coll];
+    const isFav = state.favorites.has(n.id);
+    return `
+      <article class="card" data-id="${n.id}">
+        <div class="card__art" style="background:${n.bg}">
+          ${n.rank ? `<div class="card__rank ${n.rank}">${n.rarity}</div>` : ''}
+          <button class="card__fav ${isFav ? 'on' : ''}" data-fav="${n.id}" aria-label="Favorite">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+          </button>
+          ${SVG_ARTS[n.art]}
+        </div>
+        <div class="card__info">
+          <div class="card__coll">${n.coll}${coll.verified ? VERIFIED_SVG : ''}</div>
+          <h3 class="card__name">${esc(n.name)}</h3>
+          <div class="card__row">
+            <div>
+              <div class="card__price-label">Price</div>
+              <div class="card__price">${n.price} <small>ETH</small></div>
+            </div>
+            <div class="card__trend ${n.trend >= 0 ? 'up' : 'down'}">${n.trend >= 0 ? TREND_UP : TREND_DOWN}${Math.abs(n.trend)}%</div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function bindCards(container) {
+    container.addEventListener('click', (e) => {
+      const favBtn = e.target.closest('[data-fav]');
+      if (favBtn) {
+        e.stopPropagation();
+        toggleFav(Number(favBtn.dataset.fav));
+        return;
+      }
+      const card = e.target.closest('.card');
+      if (card) openDetail(Number(card.dataset.id));
+    });
+  }
+
+  // ============ HOME GRID ============
   const grid = document.getElementById('grid');
 
   function getFilteredList() {
@@ -1350,9 +1361,6 @@
     return list;
   }
 
-  const TREND_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
-  const TREND_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
-
   function renderGrid() {
     const list = getFilteredList();
     grid.innerHTML = '';
@@ -1361,57 +1369,16 @@
       return;
     }
     list.forEach((n, i) => {
-      const coll = COLLECTIONS[n.coll];
-      const isFav = state.favorites.has(n.id);
-      const card = document.createElement('article');
-      card.className = 'card';
+      const div = document.createElement('div');
+      div.innerHTML = cardHTML(n);
+      const card = div.firstElementChild;
       card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
-      card.dataset.id = n.id;
-      card.innerHTML = `
-        <div class="card__art" style="background:${n.bg}">
-          ${n.rank ? `<div class="card__rank ${n.rank}">${n.rarity}</div>` : ''}
-          <button class="card__fav ${isFav ? 'on' : ''}" data-fav="${n.id}" aria-label="Favorite">
-            <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
-          </button>
-          ${SVG_ARTS[n.art]}
-        </div>
-        <div class="card__info">
-          <div class="card__coll">
-            ${n.coll}
-            ${coll.verified ? '<span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
-          </div>
-          <h3 class="card__name">${esc(n.name)}</h3>
-          <div class="card__row">
-            <div>
-              <div class="card__price-label">Price</div>
-              <div class="card__price">${n.price} <small>ETH</small></div>
-            </div>
-            <div class="card__trend ${n.trend >= 0 ? 'up' : 'down'}">
-              ${n.trend >= 0 ? TREND_UP : TREND_DOWN}
-              ${Math.abs(n.trend)}%
-            </div>
-          </div>
-        </div>
-      `;
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('[data-fav]')) return;
-        openDetail(n.id);
-      });
       grid.appendChild(card);
     });
   }
+  bindCards(grid);
 
   // ============ FAVORITES ============
-  grid.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-fav]');
-    if (!btn) return;
-    e.stopPropagation();
-    const id = Number(btn.dataset.fav);
-    toggleFav(id);
-    btn.classList.toggle('on', state.favorites.has(id));
-    if (state.currentItem?.id === id) syncModalFav();
-  });
-
   function toggleFav(id) {
     if (state.favorites.has(id)) {
       state.favorites.delete(id);
@@ -1422,14 +1389,17 @@
     }
     haptic('light');
     renderGrid();
+    updateProfile();
+    if (state.currentItem?.id === id) syncModalFav();
   }
 
   function syncModalFav() {
     const btn = document.getElementById('mFavBtn');
     const isFav = state.currentItem && state.favorites.has(state.currentItem.id);
     btn.style.color = isFav ? '#f472b6' : '';
-    btn.querySelector('svg').style.fill = isFav ? '#f472b6' : 'none';
-    btn.querySelector('svg').style.stroke = isFav ? '#f472b6' : 'currentColor';
+    const svg = btn.querySelector('svg');
+    svg.style.fill = isFav ? '#f472b6' : 'none';
+    svg.style.stroke = isFav ? '#f472b6' : 'currentColor';
   }
 
   // ============ CATS ============
@@ -1454,21 +1424,235 @@
     });
   });
 
-  // ============ NAV ============
+  // ============ SCREEN SWITCHING ============
+  const screens = {
+    home: document.getElementById('screen-home'),
+    explore: document.getElementById('screen-explore'),
+    create: document.getElementById('screen-create'),
+    activity: document.getElementById('screen-activity'),
+    profile: document.getElementById('screen-profile'),
+  };
+
+  function switchScreen(name) {
+    if (!screens[name]) return;
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+    state.currentScreen = name;
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.nav === name);
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' in document.documentElement.style ? 'instant' : 'auto' });
+    haptic('light');
+    if (name === 'profile') updateProfile();
+    if (name === 'activity') renderActivity();
+    if (name === 'explore') renderExplore();
+  }
+
   document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    btn.addEventListener('click', () => switchScreen(btn.dataset.nav));
+  });
+
+  document.getElementById('brandHome').addEventListener('click', () => switchScreen('home'));
+
+  // ============ EXPLORE ============
+  function renderExplore() {
+    const creatorsScroll = document.getElementById('creatorsScroll');
+    creatorsScroll.innerHTML = CREATORS.map(c => `
+      <div class="creator" data-creator="${c.name}">
+        <div class="creator__art" style="background:${c.bg}">${SVG_ARTS[c.art]}</div>
+        <div class="creator__name">${c.name}</div>
+      </div>
+    `).join('');
+
+    const sorted = Object.entries(COLLECTIONS).sort((a, b) => parseFloat(b[1].volume) - parseFloat(a[1].volume));
+    const collList = document.getElementById('collList');
+    collList.innerHTML = sorted.map(([name, c], i) => `
+      <div class="coll-row" data-coll="${name}">
+        <div class="coll-row__rank">${i + 1}</div>
+        <div class="coll-row__art" style="background:${c.bg}">${SVG_ARTS[c.art]}</div>
+        <div class="coll-row__info">
+          <div class="coll-row__name">${name}${c.verified ? VERIFIED_SVG : ''}</div>
+          <div class="coll-row__meta">${c.owners} owners · ${c.floor} Ξ floor</div>
+        </div>
+        <div class="coll-row__stat">
+          <div class="coll-row__stat-v">${c.volume}</div>
+          <div class="coll-row__stat-l">Volume</div>
+        </div>
+      </div>
+    `).join('');
+
+    collList.querySelectorAll('.coll-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const coll = row.dataset.coll;
+        state.cat = 'all';
+        document.querySelectorAll('.cat').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+        switchScreen('home');
+        setTimeout(() => {
+          showToast(`Showing ${coll} items`, 'info', 1800);
+          // Filter by collection
+          const collItems = NFTS.filter(n => n.coll === coll);
+          grid.innerHTML = '';
+          collItems.forEach((n, i) => {
+            const div = document.createElement('div');
+            div.innerHTML = cardHTML(n);
+            const card = div.firstElementChild;
+            card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
+            grid.appendChild(card);
+          });
+        }, 350);
+      });
+    });
+
+    creatorsScroll.querySelectorAll('.creator').forEach(c => {
+      c.addEventListener('click', () => {
+        showToast(`@${c.dataset.creator} profile`, 'info');
+      });
+    });
+  }
+
+  // ============ CREATE ============
+  const artPicker = document.getElementById('artPicker');
+  const createArts = ['cosmic','samurai','pixelcat','chrome','desert','liquid','oni','voidcube','pixelape','gradient','temple','neongrid'];
+
+  function renderArtPicker() {
+    artPicker.innerHTML = createArts.map(a => `
+      <div class="art-option ${a === state.createArt ? 'selected' : ''}" data-art="${a}">${SVG_ARTS[a]}</div>
+    `).join('');
+    artPicker.querySelectorAll('.art-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        state.createArt = opt.dataset.art;
+        renderArtPicker();
+        updateCreatePreview();
+        haptic('light');
+      });
+    });
+  }
+
+  function updateCreatePreview() {
+    const name = document.getElementById('cName').value || 'Untitled';
+    const coll = document.getElementById('cColl').value;
+    const price = parseFloat(document.getElementById('cPrice').value) || 0;
+    const artBg = COLLECTIONS[coll]?.bg || COLLECTIONS.Cosmos.bg;
+    document.getElementById('cPreviewArt').style.background = artBg;
+    document.getElementById('cPreviewArt').innerHTML = SVG_ARTS[state.createArt];
+    document.getElementById('cPreviewName').textContent = name;
+    document.getElementById('cPreviewMeta').textContent = `${coll} · ${price} ETH`;
+    document.getElementById('cFiat').textContent = '≈ ' + fiat(price);
+  }
+
+  ['cName', 'cColl', 'cPrice'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateCreatePreview);
+    document.getElementById(id).addEventListener('change', updateCreatePreview);
+  });
+
+  document.getElementById('mintBtn').addEventListener('click', () => {
+    const name = document.getElementById('cName').value.trim();
+    const price = parseFloat(document.getElementById('cPrice').value);
+    if (!name) { showToast('Enter a name', 'warn'); haptic('medium'); return; }
+    if (!price || price <= 0) { showToast('Enter a valid price', 'warn'); haptic('medium'); return; }
+
+    const newNft = {
+      id: NFTS.length + 1,
+      name,
+      author: 'alex.eth',
+      art: state.createArt,
+      cat: 'abstract',
+      coll: document.getElementById('cColl').value,
+      rarity: 'Rare',
+      price,
+      trend: 0,
+      rank: null,
+      bg: COLLECTIONS[document.getElementById('cColl').value]?.bg || COLLECTIONS.Cosmos.bg,
+      desc: document.getElementById('cDesc').value || 'A new artwork minted on Liquid.',
+      traits: [{k:'Creator',v:'alex.eth'},{k:'Collection',v:document.getElementById('cColl').value},{k:'Minted',v:'Just now'}],
+    };
+    NFTS.unshift(newNft);
+    state.created.unshift(newNft.id);
+
+    fireConfetti();
+    notify('success');
+    showToast(`"${name}" minted!`, 'success', 3000);
+
+    // Reset form
+    document.getElementById('cName').value = '';
+    document.getElementById('cDesc').value = '';
+    document.getElementById('cPrice').value = '0.5';
+    updateCreatePreview();
+    renderGrid();
+
+    setTimeout(() => switchScreen('home'), 800);
+  });
+
+  // ============ ACTIVITY ============
+  const ACTIVITY_META = {
+    buy: { label: 'Bought', icon: 'buy', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>' },
+    sell: { label: 'Sold', icon: 'sell', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' },
+    bid: { label: 'Bid', icon: 'bid', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-6 6"/><path d="M20 10H8a4 4 0 0 0-4 4v0"/></svg>' },
+    mint: { label: 'Minted', icon: 'mint', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5"/></svg>' },
+    transfer: { label: 'Transferred', icon: 'transfer', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>' },
+  };
+
+  function renderActivity() {
+    const list = document.getElementById('activityList');
+    list.innerHTML = ACTIVITY.map(a => {
+      const nft = NFTS.find(n => n.id === a.nftId);
+      if (!nft) return '';
+      const meta = ACTIVITY_META[a.type];
+      return `
+        <div class="activity-item" data-id="${a.nftId}">
+          <div class="activity-item__icon ${meta.icon}">${meta.svg}</div>
+          <div class="activity-item__art" style="background:${nft.bg}">${SVG_ARTS[nft.art]}</div>
+          <div class="activity-item__info">
+            <div class="activity-item__action">${meta.label} <span class="accent">${esc(nft.name)}</span></div>
+            <div class="activity-item__time">${a.time}</div>
+          </div>
+          ${a.price > 0 ? `<div class="activity-item__price"><div class="activity-item__price-v">${a.price} Ξ</div><div class="activity-item__price-l">${fiat(a.price)}</div></div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    list.querySelectorAll('.activity-item').forEach(item => {
+      item.addEventListener('click', () => openDetail(Number(item.dataset.id)));
+    });
+  }
+
+  // ============ PROFILE ============
+  function updateProfile() {
+    document.getElementById('pOwned').textContent = state.owned.length;
+    document.getElementById('pFavs').textContent = state.favorites.size;
+    renderProfileGrid();
+  }
+
+  function renderProfileGrid() {
+    let list;
+    if (state.profileTab === 'owned') list = NFTS.filter(n => state.owned.includes(n.id));
+    else if (state.profileTab === 'favorites') list = NFTS.filter(n => state.favorites.has(n.id));
+    else list = NFTS.filter(n => state.created.includes(n.id));
+
+    const pGrid = document.getElementById('profileGrid');
+    pGrid.innerHTML = '';
+    if (list.length === 0) {
+      pGrid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14"/></svg></div><div class="empty__title">Nothing here yet</div><div class="empty__text">${state.profileTab === 'favorites' ? 'Tap the heart on any NFT' : 'Start collecting'}</div></div>`;
+      return;
+    }
+    list.forEach((n, i) => {
+      const div = document.createElement('div');
+      div.innerHTML = cardHTML(n);
+      const card = div.firstElementChild;
+      card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
+      pGrid.appendChild(card);
+    });
+  }
+
+  bindCards(document.getElementById('profileGrid'));
+
+  document.querySelectorAll('.profile-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.profileTab = tab.dataset.ptab;
       haptic('light');
-      const nav = btn.dataset.nav;
-      const msgs = {
-        home: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-        explore: () => showToast('Explore — coming soon', 'info'),
-        create: () => showToast('Create NFT — coming soon', 'info'),
-        activity: () => showToast('Activity feed — coming soon', 'info'),
-        profile: () => showToast('Profile — coming soon', 'info'),
-      };
-      (msgs[nav] || (() => {}))();
+      renderProfileGrid();
     });
   });
 
@@ -1481,7 +1665,7 @@
     if (!n) return;
     lastFocus = document.activeElement;
     state.currentItem = n;
-    const coll = COLLECTIONS[n.coll];
+    const coll = COLLECTIONS[n.coll] || { verified: false, floor: '—', owners: '—', volume: '—' };
 
     document.getElementById('mArt').style.background = n.bg;
     document.getElementById('mArt').innerHTML = SVG_ARTS[n.art];
@@ -1489,6 +1673,7 @@
     document.getElementById('mVerified').style.display = coll.verified ? 'grid' : 'none';
     document.getElementById('mTitle').textContent = n.name;
     document.getElementById('mAvatar').textContent = n.author[0].toUpperCase();
+    document.getElementById('mAvatar').style.background = n.bg;
     document.getElementById('mAuthor').textContent = n.author;
     document.getElementById('mRarity').textContent = '· ' + n.rarity;
     document.getElementById('mPrice').innerHTML = `${n.price} <small>ETH</small>`;
@@ -1497,7 +1682,7 @@
     trendEl.innerHTML = `${n.trend >= 0 ? '+' : ''}${n.trend}%<small>24h</small>`;
     trendEl.style.background = n.trend >= 0 ? 'rgba(74,222,128,0.1)' : 'rgba(248,113,113,0.1)';
     trendEl.style.color = n.trend >= 0 ? '#4ade80' : '#f87171';
-    document.getElementById('mFloor').textContent = coll.floor + ' Ξ';
+    document.getElementById('mFloor').textContent = coll.floor + (coll.floor !== '—' ? ' Ξ' : '');
     document.getElementById('mOwners').textContent = coll.owners;
     document.getElementById('mVolume').textContent = coll.volume;
     document.getElementById('mTraits').innerHTML = n.traits.map(t =>
@@ -1509,7 +1694,6 @@
     modal.classList.add('is-open');
     document.body.classList.add('locked');
     haptic('medium');
-    setTimeout(() => document.getElementById('mBuy').focus(), 100);
   }
 
   function closeModal() {
@@ -1520,18 +1704,19 @@
   }
 
   modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (modal.classList.contains('is-open')) closeModal();
-      if (searchOverlay.classList.contains('is-open')) closeSearch();
-    }
-  });
 
   document.getElementById('mBuy').addEventListener('click', () => {
+    if (!state.currentItem) return;
+    if (!state.owned.includes(state.currentItem.id)) {
+      state.owned.push(state.currentItem.id);
+    }
     notify('success');
     fireConfetti();
     closeModal();
-    setTimeout(() => showToast('Purchase confirmed ✓', 'success', 3000), 300);
+    setTimeout(() => {
+      showToast(`Purchased "${state.currentItem.name}"`, 'success', 3000);
+      updateProfile();
+    }, 300);
   });
 
   document.getElementById('mFavBtn').addEventListener('click', () => {
@@ -1542,17 +1727,13 @@
   document.getElementById('mShareBtn').addEventListener('click', async () => {
     const n = state.currentItem;
     if (!n) return;
-    const shareData = {
-      title: n.name,
-      text: `Check out "${n.name}" by ${n.author} on Liquid NFT Market`,
-      url: window.location.href,
-    };
+    const shareData = { title: n.name, text: `Check out "${n.name}" by ${n.author} on Liquid`, url: window.location.href };
     try {
-      if (navigator.share) { await navigator.share(shareData); }
-      else if (tg?.openTelegramLink) { tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`); }
+      if (navigator.share) await navigator.share(shareData);
+      else if (tg?.openTelegramLink) tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`);
       else { await navigator.clipboard.writeText(shareData.url); showToast('Link copied', 'success'); }
-      haptic('light');
-    } catch(err) { /* user cancelled */ }
+    } catch(err) {}
+    haptic('light');
   });
 
   // ============ HERO ============
@@ -1568,7 +1749,7 @@
   // ============ TOPBAR ============
   document.getElementById('walletBtn').addEventListener('click', () => {
     haptic('medium');
-    showToast('Wallet connected · 0x7a…3f2e', 'success');
+    showToast('Wallet · 0x7a…3f2e · 4.2 ETH', 'success');
   });
   document.getElementById('notifBtn').addEventListener('click', () => {
     document.querySelector('#notifBtn .dot')?.remove();
@@ -1620,14 +1801,20 @@
   searchInput.addEventListener('input', (e) => renderSearch(e.target.value));
   document.getElementById('searchBtn').addEventListener('click', openSearch);
   document.getElementById('searchCancel').addEventListener('click', closeSearch);
-  searchOverlay.addEventListener('click', (e) => {
-    if (e.target === searchOverlay) closeSearch();
-  });
+  searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
   searchResults.addEventListener('click', (e) => {
     const item = e.target.closest('.search-item');
     if (!item) return;
     closeSearch();
     setTimeout(() => openDetail(Number(item.dataset.id)), 150);
+  });
+
+  // ============ KEYBOARD ============
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modal.classList.contains('is-open')) closeModal();
+      if (searchOverlay.classList.contains('is-open')) closeSearch();
+    }
   });
 
   // ============ SPECULAR ============
@@ -1645,6 +1832,9 @@
 
   // ============ INIT ============
   renderGrid();
+  renderArtPicker();
+  updateCreatePreview();
+  updateProfile();
 </script>
 </body>
 </html>
