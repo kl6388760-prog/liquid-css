@@ -9,7 +9,6 @@
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
     :root {
-      /* Значения по умолчанию (Темная тема) */
       --bg: var(--tg-theme-bg-color, #000000);
       --text-main: var(--tg-theme-text-color, #ffffff);
       --text-muted: var(--tg-theme-hint-color, #8e8e93);
@@ -23,7 +22,6 @@
       --accent: #ffffff;
     }
 
-    /* Светлая тема */
     @media (prefers-color-scheme: light) {
       :root {
         --bg: var(--tg-theme-bg-color, #f2f2f7);
@@ -48,35 +46,59 @@
       font-family: 'Manrope', -apple-system, sans-serif;
     }
 
-    body {
+    html, body {
+      height: 100%;
+      overflow: hidden;
       background-color: var(--bg);
       color: var(--text-main);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* --- Контейнер чата --- */
+    /* Шапка */
+    .header {
+      flex-shrink: 0;
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    /* Контейнер чата — скроллится */
     .chat-container {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 16px;
-      padding-bottom: 220px; /* Место под нижнюю панель */
+      padding-bottom: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--glass-border) transparent;
     }
-    .chat-container::-webkit-scrollbar { display: none; }
 
-    /* --- Сообщения --- */
+    .chat-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    .chat-container::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 4px;
+    }
+
+    /* Сообщения */
     .message {
       display: flex;
       flex-direction: column;
       max-width: 85%;
       animation: fadeIn 0.3s ease-out;
+      flex-shrink: 0;
     }
 
     @keyframes fadeIn {
@@ -93,6 +115,8 @@
       font-size: 15px;
       line-height: 1.5;
       word-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
     }
 
     .message.user .bubble {
@@ -108,14 +132,37 @@
       border-bottom-left-radius: 4px;
     }
 
+    /* Картинка в сообщении */
     .message.ai .bubble img {
       max-width: 100%;
+      height: auto;
       border-radius: 12px;
       margin-top: 8px;
       display: block;
+      cursor: pointer;
     }
 
-    /* --- Индикатор загрузки --- */
+    .message.ai .bubble .img-link {
+      display: block;
+      margin-top: 8px;
+      color: var(--text-main);
+      font-size: 13px;
+      text-decoration: underline;
+      opacity: 0.8;
+      word-break: break-all;
+    }
+
+    .message.ai .bubble .img-error {
+      margin-top: 8px;
+      padding: 12px;
+      background: var(--input-bg);
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Индикатор загрузки */
     .loading-dots {
       display: flex;
       gap: 4px;
@@ -136,22 +183,19 @@
       40% { transform: scale(1); }
     }
 
-    /* --- Нижняя панель --- */
+    /* Нижняя панель */
     .bottom-ui {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      flex-shrink: 0;
+      padding: 12px 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
       display: flex;
       flex-direction: column;
       gap: 12px;
+      background: var(--bg);
+      border-top: 1px solid var(--glass-border);
       z-index: 10;
-      background: var(--bg); /* Чистый фон без градиента */
     }
 
-    /* Верхние капсулы */
     .top-bar {
       display: flex;
       align-items: center;
@@ -199,7 +243,6 @@
       border-color: var(--text-main);
     }
 
-    /* Карточка ввода */
     .input-card {
       border-radius: 32px;
       padding: 16px;
@@ -223,6 +266,7 @@
       font-size: 17px;
       color: var(--text-main);
       font-weight: 400;
+      min-width: 0;
     }
     .input-row input::placeholder { color: var(--text-muted); }
 
@@ -250,6 +294,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
 
     .action-group {
@@ -269,6 +314,7 @@
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
     .action-btn:active { background: var(--btn-bg); color: var(--text-main); }
     .action-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
@@ -287,12 +333,12 @@
       color: var(--text-main);
       cursor: pointer;
       transition: background 0.2s;
+      flex-shrink: 0;
     }
     .plus-btn:active { background: var(--btn-bg); }
     .plus-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .plus-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-    /* Общие стили для стекла (упрощенные) */
     .glass {
       background: var(--glass-bg);
       backdrop-filter: blur(20px) saturate(1.2);
@@ -301,32 +347,18 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), var(--glass-highlight);
     }
 
-    /* Шапка */
-    .header {
-      padding: 16px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: -0.5px;
-      border-bottom: 1px solid var(--glass-border);
-      background: var(--bg);
-      z-index: 10;
-    }
-
   </style>
 </head>
 <body>
 
   <div class="header">Jaim AI</div>
 
-  <!-- Чат -->
   <div class="chat-container" id="chatContainer">
     <div class="message ai">
       <div class="bubble">Привет! Я Jaim AI. Чем могу помочь?</div>
     </div>
   </div>
 
-  <!-- Нижняя панель -->
   <div class="bottom-ui">
     <div class="top-bar">
       <div class="icon-circle glass" onclick="document.getElementById('promptInput').focus()">
@@ -378,21 +410,14 @@
     // 🔑 НАСТРОЙКИ API
     // ==========================================
     const CONFIG = {
-      API_KEY: "sk-IzgSkKSveOQWBov7GrYzjXwXAIKER4OVhvcmrhgQv9dHJj7I", 
-      
+      API_KEY: "ВАШ_API_КЛЮЧ_ЗДЕСЬ", 
       BASE_URL: "https://api.zexkora.cc/v1",
       FALLBACK_URL: "https://2api.zexkora.cc/v1",
-
       MODEL_TEXT: "deepseek-v4-pro",
       MODEL_IMAGE: "gpt-image-2.5",
-
       SYSTEM_PROMPT: "Ты — полезный и вежливый AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (DeepSeek, OpenAI, GPT, DALL-E и т.д.). Отвечай на языке пользователя."
     };
 
-    // ==========================================
-    // ЛОГИКА
-    // ==========================================
-    
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
@@ -404,7 +429,6 @@
     const btnText = document.getElementById('btnText');
     const btnImage = document.getElementById('btnImage');
 
-    // Переключение режимов
     function switchMode(mode) {
       currentMode = mode;
       btnText.classList.toggle('active', mode === 'text');
@@ -420,6 +444,7 @@
       sendBtn.disabled = promptInput.value.trim() === '';
     });
 
+    // === РЕНДЕР СООБЩЕНИЯ ===
     function addMessage(text, sender, imageUrl = null) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
@@ -428,7 +453,36 @@
       bubble.className = 'bubble';
       
       if (imageUrl) {
-        bubble.innerHTML = `<p>${text}</p><img src="${imageUrl}" alt="Generated Image">`;
+        // Создаём текст
+        const p = document.createElement('p');
+        p.textContent = text;
+        bubble.appendChild(p);
+        
+        // Создаём контейнер для картинки
+        const imgWrapper = document.createElement('div');
+        imgWrapper.style.marginTop = '8px';
+        
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Generated';
+        img.loading = 'lazy';
+        
+        // Если картинка не загрузилась — показываем ссылку
+        img.onerror = () => {
+          imgWrapper.innerHTML = '';
+          const link = document.createElement('a');
+          link.href = imageUrl;
+          link.target = '_blank';
+          link.className = 'img-link';
+          link.textContent = '🔗 Открыть изображение';
+          imgWrapper.appendChild(link);
+        };
+        
+        // Если загрузилась — клик открывает в новой вкладке
+        img.onclick = () => window.open(imageUrl, '_blank');
+        
+        imgWrapper.appendChild(img);
+        bubble.appendChild(imgWrapper);
       } else {
         bubble.textContent = text;
       }
@@ -436,6 +490,7 @@
       msgDiv.appendChild(bubble);
       chatContainer.appendChild(msgDiv);
       
+      // Скролл вниз
       setTimeout(() => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }, 50);
@@ -455,10 +510,12 @@
       if (loading) loading.remove();
     }
 
+    // === ЗАПРОС С ФОЛЛБЭКОМ ===
     async function makeRequest(endpoint, payload) {
       const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
       
-      for (let url of urls) {
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
         try {
           const response = await fetch(`${url}${endpoint}`, {
             method: 'POST',
@@ -472,18 +529,19 @@
           if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
             if (response.status === 401) throw new Error("Неверный API ключ");
-            if (response.status >= 500) continue;
+            if (response.status >= 500 && i < urls.length - 1) continue;
             throw new Error(errData.error?.message || `Ошибка ${response.status}`);
           }
           
           return await response.json();
         } catch (err) {
           console.warn(`Ошибка на ${url}:`, err.message);
-          if (url === urls[urls.length - 1]) throw err;
+          if (i === urls.length - 1) throw err;
         }
       }
     }
 
+    // === ОТПРАВКА ===
     async function handleSend() {
       const text = promptInput.value.trim();
       if (!text) return;
@@ -506,6 +564,10 @@
             ]
           });
           hideLoading();
+          
+          if (!data.choices || !data.choices[0]?.message?.content) {
+            throw new Error("Пустой ответ от модели");
+          }
           addMessage(data.choices[0].message.content, 'ai');
           
         } else {
@@ -516,14 +578,28 @@
             size: "1024x1024"
           });
           hideLoading();
-          addMessage("Вот ваша картинка:", 'ai', data.data[0].url);
+          
+          // Проверяем, что вернулось
+          const imageUrl = data.data?.[0]?.url;
+          const b64 = data.data?.[0]?.b64_json;
+          
+          if (imageUrl) {
+            addMessage("Вот ваша картинка:", 'ai', imageUrl);
+          } else if (b64) {
+            // Если API вернул base64
+            const dataUrl = `data:image/png;base64,${b64}`;
+            addMessage("Вот ваша картинка:", 'ai', dataUrl);
+          } else {
+            throw new Error("API не вернул изображение");
+          }
         }
         
         if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         
       } catch (error) {
         hideLoading();
-        addMessage(`Ошибка: ${error.message}.`, 'ai');
+        console.error('Full error:', error);
+        addMessage(`Ошибка: ${error.message}`, 'ai');
         if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
       }
     }
