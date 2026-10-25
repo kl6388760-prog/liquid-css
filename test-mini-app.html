@@ -275,28 +275,56 @@
       border-radius: 12px;
       margin-top: 8px;
       display: block;
-      cursor: pointer;
-    }
-    .message.ai .bubble .img-link {
-      display: block;
-      margin-top: 8px;
-      color: var(--text-main);
-      font-size: 13px;
-      text-decoration: underline;
-      opacity: 0.8;
-      word-break: break-all;
     }
 
-    .cursor-blink {
-      display: inline-block;
-      width: 2px;
-      height: 1em;
-      background: var(--text-main);
-      vertical-align: text-bottom;
-      margin-left: 2px;
-      animation: blink 1s steps(2) infinite;
+    /* =========================================
+       БЛОК СКАЧИВАНИЯ ФАЙЛА
+       ========================================= */
+    .file-download-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
     }
-    @keyframes blink { 50% { opacity: 0; } }
+    .file-download-btn:active {
+      transform: scale(0.98);
+      background: var(--btn-bg);
+    }
+    .file-download-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .file-download-btn .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      overflow: hidden;
+    }
+    .file-download-btn .file-name {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-download-btn .file-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
 
     .loading-dots {
       display: flex;
@@ -483,7 +511,7 @@
         </div>
         <div class="feature-text">
           <h3>Умный текстовый чат</h3>
-          <p>Отвечает на любые вопросы, пишет код, переводит и помогает с текстами в реальном времени.</p>
+          <p>Отвечает на любые вопросы, пишет код, переводит и помогает с текстами.</p>
         </div>
       </div>
       <div class="feature-item">
@@ -491,8 +519,8 @@
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         </div>
         <div class="feature-text">
-          <h3>Генерация картинок</h3>
-          <p>Создавай уникальные изображения по текстовому описанию. От бабочек до космических пейзажей.</p>
+          <h3>Генерация файлов и фото</h3>
+          <p>Создавай уникальные изображения и скачивай готовые файлы прямо из чата.</p>
         </div>
       </div>
       <div class="feature-item">
@@ -501,7 +529,7 @@
         </div>
         <div class="feature-text">
           <h3>Молниеносная скорость</h3>
-          <p>Ответы появляются посимвольно сразу, как только модель начинает генерировать текст.</p>
+          <p>Ответы приходят моментально, как только модель заканчивает генерацию.</p>
         </div>
       </div>
     </div>
@@ -574,16 +602,17 @@
       API_KEY: "sk-IzgSkKSveOQWBov7GrYzjXwXAIKER4OVhvcmrhgQv9dHJj7I", // <--- ВСТАВЬТЕ КЛЮЧ
       BASE_URL: "https://api.zexkora.cc/v1",
       FALLBACK_URL: "https://2api.zexkora.cc/v1",
-      MODEL_TEXT: "deepseek-v4.1-flash-1017",
+      
+      // "deepseek-v4-pro" или "tk/gpt-6.1-sol"
+      MODEL_TEXT: "deepseek-v4-pro", 
       MODEL_IMAGE: "gpt-image-2.5",
-      SYSTEM_PROMPT: "Ты — полезный AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (GPT, OpenAI, DeepSeek, DALL-E и т.д.). Отвечай на языке пользователя. Отвечай кратко, по делу, без лишних вступлений."
+      
+      SYSTEM_PROMPT: "Ты — полезный AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (GPT, OpenAI, DeepSeek, DALL-E и т.д.). Отвечай на языке пользователя. Отвечай кратко, по делу, без лишних вступлений. Если пользователь просит написать код или документ, напиши его полностью в блоке ```."
     };
 
-    // === 🔧 ОЧИСТКА КЛЮЧА ОТ КИРИЛЛИЦЫ ===
     function cleanApiKey(key) {
       if (!key) return "";
-      const cleaned = key.replace(/[^\x20-\x7E]/g, '').trim();
-      return cleaned;
+      return key.replace(/[^\x20-\x7E]/g, '').trim();
     }
     CONFIG.API_KEY = cleanApiKey(CONFIG.API_KEY);
 
@@ -591,7 +620,7 @@
     if (tg) { tg.ready(); tg.expand(); }
 
     let currentMode = 'text';
-    let isStreaming = false;
+    let isGenerating = false;
     let chatHistory = [];
 
     const welcomeScreen = document.getElementById('welcomeScreen');
@@ -626,129 +655,71 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // === БЕЗОПАСНЫЙ FETCH ===
-    async function safeFetch(url, options) {
-      if (options.headers) {
-        for (const [key, value] of Object.entries(options.headers)) {
-          if (typeof value === 'string' && /[^\x00-\xFF]/.test(value)) {
-            throw new Error(`Заголовок "${key}" содержит недопустимые символы. Проверьте API-ключ.`);
-          }
-        }
-      }
-      return fetch(url, options);
-    }
-
-    // === СТРИМИНГ ===
-    async function streamChat(messages, onChunk, onDone, onError) {
-      const payload = {
-        model: CONFIG.MODEL_TEXT,
-        messages: messages,
-        stream: true,
-        max_completion_tokens: 4096 // ИСПРАВЛЕНО: для gpt-6.1-sol нужен этот параметр
-        // temperature НЕ ПЕРЕДАЁМ, иначе будет ошибка
-      };
-
-      const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
-
-      for (let i = 0; i < urls.length; i++) {
-        const url = urls[i];
-        try {
-          const response = await safeFetch(`${url}/chat/completions`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${CONFIG.API_KEY}`
-            },
-            body: JSON.stringify(payload)
-          });
-
-          if (!response.ok) {
-            if (response.status === 401) throw new Error("Неверный API ключ");
-            if (response.status >= 500 && i < urls.length - 1) continue;
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.error?.message || `Ошибка ${response.status}`);
-          }
-
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let buffer = '';
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop();
-
-            for (const line of lines) {
-              const trimmed = line.trim();
-              if (!trimmed || trimmed === 'data: [DONE]') continue;
-              if (trimmed.startsWith('data: ')) {
-                try {
-                  const json = JSON.parse(trimmed.slice(6));
-                  const delta = json.choices?.[0]?.delta?.content;
-                  if (delta) onChunk(delta);
-                } catch (e) { }
-              }
-            }
-          }
-          onDone();
-          return;
-        } catch (err) {
-          console.warn(`Stream err on ${url}:`, err.message);
-          if (i === urls.length - 1) onError(err);
-        }
-      }
-    }
-
-    function addMessage(text, sender, imageUrl = null) {
+    // === ДОБАВЛЕНИЕ СООБЩЕНИЯ С ФАЙЛОМ/КАРТИНКОЙ ===
+    function addMessage(text, sender, fileUrl = null, fileName = null) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
 
-      if (imageUrl) {
+      // Текст ответа
+      if (text) {
         const p = document.createElement('p');
         p.textContent = text;
         bubble.appendChild(p);
+      }
 
-        const wrapper = document.createElement('div');
-        wrapper.style.marginTop = '8px';
+      // Если есть файл/картинка
+      if (fileUrl) {
+        // Показываем превью картинки
         const img = document.createElement('img');
-        img.src = imageUrl;
-        img.alt = 'Generated';
-        img.onerror = () => {
-          wrapper.innerHTML = '';
-          const a = document.createElement('a');
-          a.href = imageUrl;
-          a.target = '_blank';
-          a.className = 'img-link';
-          a.textContent = '🔗 Открыть изображение';
-          wrapper.appendChild(a);
-        };
-        img.onclick = () => window.open(imageUrl, '_blank');
-        wrapper.appendChild(img);
-        bubble.appendChild(wrapper);
-      } else {
-        bubble.textContent = text;
+        img.src = fileUrl;
+        img.alt = fileName || 'Generated File';
+        img.style.cursor = 'pointer';
+        img.onclick = () => window.open(fileUrl, '_blank');
+        bubble.appendChild(img);
+
+        // Кнопка скачивания
+        const downloadBtn = document.createElement('a');
+        downloadBtn.href = fileUrl;
+        downloadBtn.download = fileName || 'image.png';
+        downloadBtn.className = 'file-download-btn';
+        downloadBtn.innerHTML = `
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div class="file-info">
+            <span class="file-name">${fileName || 'image.png'}</span>
+            <span class="file-sub">Нажмите, чтобы скачать</span>
+          </div>
+        `;
+        
+        // Для iOS/Android Mini Apps лучше использовать fetch + blob для скачивания
+        downloadBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+          
+          try {
+            const response = await fetch(fileUrl);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = fileName || 'image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+          } catch (err) {
+            // Если fetch не удался — открываем в новой вкладке
+            window.open(fileUrl, '_blank');
+          }
+        });
+
+        bubble.appendChild(downloadBtn);
       }
 
       msgDiv.appendChild(bubble);
       chatContainer.appendChild(msgDiv);
       setTimeout(scrollToBottom, 30);
-    }
-
-    function createStreamingBubble() {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'message ai';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.innerHTML = '<span class="stream-text"></span><span class="cursor-blink"></span>';
-      msgDiv.appendChild(bubble);
-      chatContainer.appendChild(msgDiv);
-      setTimeout(scrollToBottom, 30);
-      return bubble;
     }
 
     function showLoading() {
@@ -764,11 +735,56 @@
       if (el) el.remove();
     }
 
+    // === ЗАПРОС К ТЕКСТОВОЙ МОДЕЛИ ===
+    async function fetchAI(messages) {
+      const isGpt6 = CONFIG.MODEL_TEXT.includes('gpt-6');
+      const payload = {
+        model: CONFIG.MODEL_TEXT,
+        messages: messages,
+        stream: false,
+        ...(isGpt6 
+          ? { max_completion_tokens: 4096 } 
+          : { max_tokens: 4096, temperature: 0.7 }
+        )
+      };
+
+      const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
+        try {
+          const response = await fetch(`${url}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${CONFIG.API_KEY}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) throw new Error("Неверный API ключ");
+            if (response.status >= 500 && i < urls.length - 1) continue;
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error?.message || `Ошибка ${response.status}`);
+          }
+
+          const data = await response.json();
+          const reply = data.choices?.[0]?.message?.content;
+          if (!reply) throw new Error("Модель вернула пустой ответ");
+          return reply;
+          
+        } catch (err) {
+          if (i === urls.length - 1) throw err;
+        }
+      }
+    }
+
+    // === ГЕНЕРАЦИЯ КАРТИНКИ С ВОЗВРАТОМ URL ДЛЯ СКАЧИВАНИЯ ===
     async function generateImage(text) {
       const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
       for (let i = 0; i < urls.length; i++) {
         try {
-          const res = await safeFetch(`${urls[i]}/images/generations`, {
+          const res = await fetch(`${urls[i]}/images/generations`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -792,8 +808,21 @@
           const data = await res.json();
           const url = data.data?.[0]?.url;
           const b64 = data.data?.[0]?.b64_json;
-          if (url) return url;
-          if (b64) return `data:image/png;base64,${b64}`;
+
+          // Если вернулся base64 — конвертируем в blob URL
+          if (b64) {
+            const byteCharacters = atob(b64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let j = 0; j < byteCharacters.length; j++) {
+              byteNumbers[j] = byteCharacters.charCodeAt(j);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {type: 'image/png'});
+            return { url: URL.createObjectURL(blob), fileName: 'generated.png' };
+          }
+          // Если вернулась ссылка
+          if (url) return { url, fileName: 'generated.png' };
+          
           throw new Error("API не вернул изображение");
         } catch (err) {
           if (i === urls.length - 1) throw err;
@@ -802,86 +831,57 @@
     }
 
     async function handleSend() {
-      if (isStreaming) return;
+      if (isGenerating) return;
       const text = promptInput.value.trim();
       if (!text) return;
 
-      // Проверка ключа
       if (!CONFIG.API_KEY || CONFIG.API_KEY === "ВАШ_API_КЛЮЧ_ЗДЕСЬ") {
-        addMessage("❌ Ошибка: API-ключ не настроен. Вставьте ключ в переменную CONFIG.API_KEY.", 'ai');
+        addMessage("❌ Ошибка: API-ключ не настроен.", 'ai');
         return;
       }
 
       promptInput.value = '';
       sendBtn.disabled = true;
+      isGenerating = true;
 
       addMessage(text, 'user');
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
       if (currentMode === 'text') {
-        isStreaming = true;
-        
         chatHistory.push({ role: "user", content: text });
         const messagesToSend = [
           { role: "system", content: CONFIG.SYSTEM_PROMPT },
           ...chatHistory.slice(-10)
         ];
 
-        let bubble = null;
-        let fullText = '';
-        let firstChunk = true;
         showLoading();
 
-        await streamChat(
-          messagesToSend,
-          (chunk) => {
-            if (firstChunk) {
-              hideLoading();
-              bubble = createStreamingBubble();
-              firstChunk = false;
-            }
-            fullText += chunk;
-            if (bubble) {
-              const span = bubble.querySelector('.stream-text');
-              if (span) span.textContent = fullText;
-              scrollToBottom();
-            }
-          },
-          () => {
-            if (bubble) {
-              const cursor = bubble.querySelector('.cursor-blink');
-              if (cursor) cursor.remove();
-            }
-            hideLoading();
-            isStreaming = false;
-            chatHistory.push({ role: "assistant", content: fullText });
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-          },
-          (err) => {
-            hideLoading();
-            isStreaming = false;
-            if (bubble) {
-              const cursor = bubble.querySelector('.cursor-blink');
-              if (cursor) cursor.remove();
-              const span = bubble.querySelector('.stream-text');
-              if (span && !span.textContent) span.textContent = `Ошибка: ${err.message}`;
-            } else {
-              addMessage(`Ошибка: ${err.message}`, 'ai');
-            }
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-          }
-        );
-      } else {
-        showLoading();
         try {
-          const imgUrl = await generateImage(text);
+          const reply = await fetchAI(messagesToSend);
           hideLoading();
-          addMessage("Вот ваша картинка:", 'ai', imgUrl);
+          addMessage(reply, 'ai');
+          chatHistory.push({ role: "assistant", content: reply });
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } catch (err) {
           hideLoading();
           addMessage(`Ошибка: ${err.message}`, 'ai');
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        } finally {
+          isGenerating = false;
+        }
+      } else {
+        showLoading();
+        try {
+          const { url, fileName } = await generateImage(text);
+          hideLoading();
+          addMessage("Вот ваша картинка:", 'ai', url, fileName);
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        } catch (err) {
+          hideLoading();
+          addMessage(`Ошибка: ${err.message}`, 'ai');
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        } finally {
+          isGenerating = false;
         }
       }
     }
