@@ -1,2033 +1,541 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Liquid · NFT Market</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jaim AI</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    :root {
+      /* Значения по умолчанию (Темная тема) */
+      --bg: var(--tg-theme-bg-color, #000000);
+      --text-main: var(--tg-theme-text-color, #ffffff);
+      --text-muted: var(--tg-theme-hint-color, #8e8e93);
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      --bubble-user: rgba(255, 255, 255, 0.1);
+      --bubble-ai: transparent;
+      --input-bg: rgba(255, 255, 255, 0.04);
+      --btn-bg: rgba(255, 255, 255, 0.08);
+      --accent: #ffffff;
+    }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://kl6388760-prog.github.io/liquid-css/main.css">
+    /* Светлая тема */
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: var(--tg-theme-bg-color, #f2f2f7);
+        --text-main: var(--tg-theme-text-color, #000000);
+        --text-muted: var(--tg-theme-hint-color, #8e8e93);
+        --glass-bg: rgba(255, 255, 255, 0.5);
+        --glass-border: rgba(0, 0, 0, 0.08);
+        --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        --bubble-user: rgba(0, 0, 0, 0.05);
+        --bubble-ai: transparent;
+        --input-bg: rgba(0, 0, 0, 0.02);
+        --btn-bg: rgba(0, 0, 0, 0.05);
+        --accent: #000000;
+      }
+    }
 
-<style>
-  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0; min-height: 100%;
-    background: #000; color: var(--text-primary);
-    font-family: var(--font-sans);
-    overscroll-behavior: none;
-    -webkit-font-smoothing: antialiased;
-  }
-  body {
-    padding: 0 0 calc(120px + env(safe-area-inset-bottom));
-    max-width: 720px; margin: 0 auto; position: relative;
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at 15% 0%, rgba(120,90,255,0.10) 0%, transparent 40%),
-      radial-gradient(circle at 85% 10%, rgba(255,100,180,0.08) 0%, transparent 40%),
-      radial-gradient(circle at 50% 100%, rgba(80,160,255,0.08) 0%, transparent 50%),
-      #000;
-    background-attachment: fixed;
-  }
-  body.locked { overflow: hidden; }
-  button, input, select, textarea { font-family: inherit; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Manrope', -apple-system, sans-serif;
+    }
 
-  /* ============ LIQUID GLASS BASE ============ */
-  .glass {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.12),
-      inset 0 -1px 0 rgba(255,255,255,0.03),
-      0 20px 40px -20px rgba(0,0,0,0.8);
-  }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-  .glass-strong {
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
-    border: 1px solid rgba(255,255,255,0.18);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.18),
-      inset 0 -1px 0 rgba(255,255,255,0.05),
-      0 24px 48px -16px rgba(0,0,0,0.9);
-  }
+    /* --- Контейнер чата --- */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 220px; /* Место под нижнюю панель */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scrollbar-width: none;
+    }
+    .chat-container::-webkit-scrollbar { display: none; }
 
-  /* Specular highlight (follows cursor) */
-  .specular { position: relative; overflow: hidden; }
-  .specular::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle 120px at var(--lg-x, 50%) var(--lg-y, 50%),
-      rgba(255,255,255,0.25) 0%,
-      rgba(255,255,255,0.08) 30%,
-      transparent 70%
-    );
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .specular:hover::before { opacity: 1; }
-  .specular > * { position: relative; z-index: 2; }
+    /* --- Сообщения --- */
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+      animation: fadeIn 0.3s ease-out;
+    }
 
-  /* ============ BUTTONS ============ */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px;
-    border: none; cursor: pointer;
-    font-weight: 700; letter-spacing: -0.01em;
-    white-space: nowrap;
-    transition: transform 0.2s cubic-bezier(0.32,0.72,0,1), background 0.2s, box-shadow 0.2s, opacity 0.2s;
-    position: relative; overflow: hidden;
-    user-select: none;
-    border-radius: 16px;
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn:disabled { opacity: 0.4; pointer-events: none; }
-  .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-  .btn--primary {
-    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
-    color: #000;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,1),
-      inset 0 -1px 0 rgba(0,0,0,0.15),
-      0 8px 24px rgba(255,255,255,0.18),
-      0 2px 8px rgba(0,0,0,0.5);
-  }
-  .btn--primary:hover {
-    background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,1),
-      inset 0 -1px 0 rgba(0,0,0,0.15),
-      0 10px 32px rgba(255,255,255,0.28),
-      0 2px 8px rgba(0,0,0,0.5);
-  }
+    .message.user { align-self: flex-end; align-items: flex-end; }
+    .message.ai { align-self: flex-start; align-items: flex-start; }
 
-  .btn--glass {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
-    color: var(--text-primary);
-    border: 1px solid rgba(255,255,255,0.16);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.14),
-      inset 0 -1px 0 rgba(255,255,255,0.03),
-      0 6px 16px rgba(0,0,0,0.4);
-  }
-  .btn--glass:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-    border-color: rgba(255,255,255,0.24);
-  }
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
 
-  .btn--ghost {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid rgba(255,255,255,0.08);
-  }
-  .btn--ghost:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .message.user .bubble {
+      background: var(--bubble-user);
+      border: 1px solid var(--glass-border);
+      border-bottom-right-radius: 4px;
+      box-shadow: var(--glass-highlight);
+    }
 
-  .btn--sm { height: 38px; padding: 0 16px; font-size: 13px; border-radius: 12px; }
-  .btn--md { height: 48px; padding: 0 22px; font-size: 14px; border-radius: 15px; }
-  .btn--lg { height: 56px; padding: 0 28px; font-size: 15px; border-radius: 18px; }
-  .btn--block { width: 100%; }
+    .message.ai .bubble {
+      background: var(--bubble-ai);
+      border: 1px solid var(--glass-border);
+      border-bottom-left-radius: 4px;
+    }
 
-  .icon-btn {
-    width: 42px; height: 42px; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    display: grid; place-items: center;
-    color: var(--text-primary); cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    position: relative;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.12),
-      0 4px 12px rgba(0,0,0,0.4);
-  }
-  .icon-btn:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
-    border-color: rgba(255,255,255,0.22);
-  }
-  .icon-btn:active { transform: scale(0.92); }
-  .icon-btn svg { width: 18px; height: 18px; }
-  .icon-btn .dot {
-    position: absolute; top: 10px; right: 10px;
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #4ade80; box-shadow: 0 0 8px #4ade80;
-    border: 1.5px solid #000;
-  }
+    .message.ai .bubble img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: block;
+    }
 
-  /* ============ TOP BAR ============ */
-  .topbar {
-    position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-  }
-  .brand {
-    display: flex; align-items: center; gap: 10px;
-    font-weight: 700; font-size: 17px; letter-spacing: -0.03em;
-    cursor: pointer;
-  }
-  .brand__mark {
-    width: 36px; height: 36px; border-radius: 12px;
-    background: linear-gradient(135deg, #fff 0%, #b8b8b8 50%, #888 100%);
-    display: grid; place-items: center;
-    color: #000;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,1),
-      inset 0 -1px 0 rgba(0,0,0,0.2),
-      0 4px 14px rgba(255,255,255,0.15);
-  }
-  .brand__mark svg { width: 18px; height: 18px; }
-  .topbar__actions { display: flex; gap: 8px; align-items: center; }
+    /* --- Индикатор загрузки --- */
+    .loading-dots {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px;
+    }
+    .loading-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
 
-  .wallet-chip {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 14px; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    font-size: 12px; font-weight: 600;
-    color: var(--text-primary); cursor: pointer;
-    letter-spacing: -0.01em;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.12),
-      0 4px 12px rgba(0,0,0,0.4);
-  }
-  .wallet-chip:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
-    border-color: rgba(255,255,255,0.22);
-  }
-  .wallet-chip:active { transform: scale(0.95); }
-  .wallet-chip .ball {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #4ade80; box-shadow: 0 0 8px #4ade80;
-  }
+    /* --- Нижняя панель --- */
+    .bottom-ui {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+      background: var(--bg); /* Чистый фон без градиента */
+    }
 
-  /* ============ SCREENS ============ */
-  .screen { display: none; }
-  .screen.active { display: block; animation: screen-in 0.4s cubic-bezier(0.32,0.72,0,1); }
-  @keyframes screen-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    /* Верхние капсулы */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .top-bar::-webkit-scrollbar { display: none; }
 
-  /* ============ HERO ============ */
-  .hero-wrap { padding: 0 20px; margin-bottom: 28px; }
-  .hero {
-    position: relative;
-    border-radius: 30px; overflow: hidden;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
-    border: 1px solid rgba(255,255,255,0.16);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.15),
-      inset 0 -1px 0 rgba(255,255,255,0.04),
-      0 30px 60px -20px rgba(0,0,0,1);
-    cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  }
-  .hero:active { transform: scale(0.985); }
-  .hero__art {
-    aspect-ratio: 1.35 / 1;
-    position: relative;
-    display: grid; place-items: center;
-    overflow: hidden;
-  }
-  .hero__art svg { width: 70%; height: 70%; position: relative; z-index: 1; }
-  .hero__art::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg, transparent 20%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.95) 100%);
-    pointer-events: none; z-index: 2;
-  }
-  .hero__badges { position: absolute; top: 16px; left: 16px; z-index: 4; display: flex; gap: 6px; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 7px 12px; border-radius: 100px;
-    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.16);
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--text-primary);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .badge.live { color: #4ade80; border-color: rgba(74,222,128,0.35); }
-  .badge.live .dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #4ade80; box-shadow: 0 0 6px #4ade80;
-    animation: pulse-dot 1.8s ease-in-out infinite;
-  }
-  @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .icon-circle:active { transform: scale(0.92); }
+    .icon-circle svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  .hero__info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 4; padding: 22px 22px 24px; }
-  .hero__coll {
-    font-size: 11px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.1em;
-    font-weight: 700; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .verified {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: #4ade80; display: grid; place-items: center;
-    flex-shrink: 0;
-    box-shadow: 0 0 8px rgba(74,222,128,0.4);
-  }
-  .verified svg { width: 8px; height: 8px; stroke: #000; stroke-width: 3; fill: none; }
-  .hero__title {
-    font-size: 28px; font-weight: 800;
-    letter-spacing: -0.035em; line-height: 1.08;
-    margin: 0 0 10px;
-  }
-  .hero__by {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--text-secondary);
-    margin-bottom: 18px;
-  }
-  .avatar {
-    width: 24px; height: 24px; border-radius: 50%;
-    display: grid; place-items: center;
-    font-size: 10px; font-weight: 700; color: #fff;
-    border: 1px solid rgba(255,255,255,0.18);
-    flex-shrink: 0;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-    overflow: hidden;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar.lg { width: 28px; height: 28px; font-size: 12px; }
-  .avatar.xl { width: 88px; height: 88px; font-size: 36px; border-width: 3px; box-shadow: 0 12px 32px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.15); }
+    .pill-btn {
+      height: 48px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-main);
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .pill-btn:active { transform: scale(0.96); }
+    .pill-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  .hero__bottom {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: 12px; padding-top: 18px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  .price-label {
-    font-size: 10px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 4px; font-weight: 700;
-  }
-  .price-value {
-    font-size: 22px; font-weight: 800;
-    letter-spacing: -0.025em;
-    display: flex; align-items: baseline; gap: 8px;
-  }
-  .price-fiat { font-size: 13px; color: var(--text-tertiary); font-weight: 500; }
+    .pill-btn.active {
+      background: var(--btn-bg);
+      border-color: var(--text-main);
+    }
 
-  /* ============ STATS ============ */
-  .stats {
-    padding: 0 20px;
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 28px;
-  }
-  .stat {
-    padding: 16px 12px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    text-align: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.3);
-  }
-  .stat__v { font-size: 18px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 3px; }
-  .stat__l { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+    /* Карточка ввода */
+    .input-card {
+      border-radius: 32px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
 
-  /* ============ CATS ============ */
-  .cats {
-    display: flex; gap: 8px;
-    overflow-x: auto;
-    padding: 0 20px 16px;
-    margin-bottom: 4px;
-    scrollbar-width: none; -ms-overflow-style: none;
-  }
-  .cats::-webkit-scrollbar { display: none; }
-  .cat {
-    flex-shrink: 0;
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 10px 16px;
-    border-radius: 100px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    color: var(--text-secondary);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    white-space: nowrap;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .cat svg { width: 14px; height: 14px; }
-  .cat:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
-  .cat.active {
-    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
-    border-color: #fff; color: #000;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,1),
-      inset 0 -1px 0 rgba(0,0,0,0.15),
-      0 6px 20px rgba(255,255,255,0.2);
-  }
-  .cat:active { transform: scale(0.94); }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-  /* ============ TABS ============ */
-  .tabs {
-    padding: 0 20px; display: flex; gap: 4px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    overflow-x: auto; scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    padding: 12px 14px;
-    background: none; border: none;
-    color: var(--text-tertiary);
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; position: relative;
-    white-space: nowrap; transition: color 0.15s;
-    letter-spacing: -0.01em;
-  }
-  .tab:hover { color: var(--text-secondary); }
-  .tab.active { color: var(--text-primary); }
-  .tab.active::after {
-    content: ''; position: absolute;
-    left: 14px; right: 14px; bottom: -1px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #fff, transparent);
-    border-radius: 2px;
-    box-shadow: 0 0 8px rgba(255,255,255,0.5);
-  }
+    .input-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 17px;
+      color: var(--text-main);
+      font-weight: 400;
+    }
+    .input-row input::placeholder { color: var(--text-muted); }
 
-  /* ============ GRID ============ */
-  .grid {
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-  @media (min-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    .mic-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      flex-shrink: 0;
+    }
+    .mic-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-  .card {
-    border-radius: 22px;
-    overflow: hidden;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.12);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.32,0.72,0,1), border-color 0.25s, box-shadow 0.25s;
-    position: relative;
-    animation: fadeInUp 0.5s cubic-bezier(0.32,0.72,0,1) backwards;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.1),
-      inset 0 -1px 0 rgba(255,255,255,0.03),
-      0 12px 28px -12px rgba(0,0,0,0.9);
-  }
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  .card:hover { border-color: rgba(255,255,255,0.22); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 16px 40px -12px rgba(0,0,0,1); }
-  .card:active { transform: scale(0.97); }
-  .card__art {
-    aspect-ratio: 1;
-    display: grid; place-items: center;
-    position: relative; overflow: hidden;
-  }
-  .card__art svg { width: 65%; height: 65%; transition: transform 0.4s cubic-bezier(0.32,0.72,0,1); }
-  .card:hover .card__art svg { transform: scale(1.06); }
-  .card__art::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.4) 100%);
-    pointer-events: none;
-  }
-  .card__rank {
-    position: absolute; top: 10px; left: 10px; z-index: 2;
-    padding: 5px 9px; border-radius: 100px;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    font-size: 9px; font-weight: 800;
-    letter-spacing: 0.05em; text-transform: uppercase;
-    color: #fff; border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .card__rank.mythic { color: #fbbf24; border-color: rgba(251,191,36,0.5); background: rgba(251,191,36,0.12); }
-  .card__rank.legendary { color: #f472b6; border-color: rgba(244,114,182,0.5); background: rgba(244,114,182,0.12); }
-  .card__rank.epic { color: #a78bfa; border-color: rgba(167,139,250,0.5); background: rgba(167,139,250,0.12); }
-  .card__fav {
-    position: absolute; top: 10px; right: 10px; z-index: 2;
-    width: 32px; height: 32px; border-radius: 10px;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.16);
-    display: grid; place-items: center;
-    cursor: pointer; padding: 0;
-    transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .card__fav svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.2; transition: all 0.15s; }
-  .card__fav:hover { background: rgba(0,0,0,0.8); }
-  .card__fav:active { transform: scale(0.85); }
-  .card__fav.on svg { fill: #f472b6; stroke: #f472b6; filter: drop-shadow(0 0 6px rgba(244,114,182,0.6)); }
-  .card__info { padding: 12px 14px 14px; }
-  .card__coll {
-    font-size: 9px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    font-weight: 700; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .card__coll .verified { width: 10px; height: 10px; }
-  .card__coll .verified svg { width: 6px; height: 6px; }
-  .card__name {
-    font-size: 13px; font-weight: 700;
-    letter-spacing: -0.015em; margin: 0 0 10px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .card__row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .card__price-label {
-    font-size: 9px; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    margin-bottom: 2px; font-weight: 600;
-  }
-  .card__price {
-    font-size: 13px; font-weight: 800;
-    letter-spacing: -0.02em;
-    display: flex; align-items: baseline; gap: 3px;
-  }
-  .card__price small { font-size: 10px; font-weight: 600; color: var(--text-tertiary); }
-  .card__trend {
-    font-size: 10px; font-weight: 700;
-    padding: 4px 8px; border-radius: 100px;
-    display: flex; align-items: center; gap: 2px;
-  }
-  .card__trend svg { width: 9px; height: 9px; }
-  .card__trend.up { color: #4ade80; background: rgba(74,222,128,0.12); }
-  .card__trend.down { color: #f87171; background: rgba(248,113,113,0.12); }
+    .divider {
+      height: 1px;
+      background: var(--glass-border);
+      width: 100%;
+    }
 
-  /* Section head */
-  .section-head {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    padding: 0 20px; margin-bottom: 14px; gap: 12px;
-  }
-  .section-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.15; }
-  .section-sub { font-size: 13px; color: var(--text-tertiary); margin: 4px 0 0; font-weight: 500; }
-  .section-link {
-    font-size: 13px; color: var(--text-secondary);
-    background: none; border: none; padding: 4px;
-    cursor: pointer; font-weight: 600;
-    transition: color 0.15s; flex-shrink: 0;
-  }
-  .section-link:active { color: var(--text-primary); }
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  /* ============ EXPLORE ============ */
-  .coll-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
-  .coll-row {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.3);
-  }
-  .coll-row:hover { background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%); border-color: rgba(255,255,255,0.2); }
-  .coll-row:active { transform: scale(0.98); }
-  .coll-row__rank { font-size: 14px; font-weight: 800; color: var(--text-tertiary); width: 24px; text-align: center; flex-shrink: 0; }
-  .coll-row__art {
-    width: 56px; height: 56px; border-radius: 16px;
-    display: grid; place-items: center;
-    flex-shrink: 0; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .coll-row__art svg { width: 80%; height: 80%; }
-  .coll-row__info { flex: 1; min-width: 0; }
-  .coll-row__name {
-    font-size: 14px; font-weight: 700;
-    letter-spacing: -0.015em; margin-bottom: 3px;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .coll-row__name .verified { width: 12px; height: 12px; }
-  .coll-row__name .verified svg { width: 7px; height: 7px; }
-  .coll-row__meta { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
-  .coll-row__stat { text-align: right; flex-shrink: 0; }
-  .coll-row__stat-v { font-size: 14px; font-weight: 800; letter-spacing: -0.02em; }
-  .coll-row__stat-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; font-weight: 700; }
+    .action-group {
+      display: flex;
+      gap: 8px;
+    }
 
-  .creators-scroll {
-    display: flex; gap: 16px;
-    overflow-x: auto; padding: 0 20px 8px;
-    scrollbar-width: none;
-  }
-  .creators-scroll::-webkit-scrollbar { display: none; }
-  .creator {
-    flex-shrink: 0;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px; cursor: pointer;
-    transition: transform 0.15s;
-  }
-  .creator:active { transform: scale(0.94); }
-  .creator__art {
-    width: 72px; height: 72px; border-radius: 50%;
-    display: grid; place-items: center;
-    border: 2px solid rgba(255,255,255,0.18);
-    overflow: hidden;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 16px rgba(0,0,0,0.4);
-  }
-  .creator__art svg { width: 70%; height: 70%; }
-  .creator__name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .action-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--input-bg);
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-btn:active { background: var(--btn-bg); color: var(--text-main); }
+    .action-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-  /* ============ CREATE ============ */
-  .create-wrap { padding: 0 20px; }
-  .create-card {
-    padding: 22px;
-    border-radius: 26px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 40px -20px rgba(0,0,0,0.8);
-    margin-bottom: 16px;
-  }
-  .form-group { margin-bottom: 18px; }
-  .form-label {
-    display: block;
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-tertiary); margin-bottom: 8px;
-  }
-  .form-input, .form-textarea, .form-select {
-    width: 100%; padding: 15px 16px;
-    border-radius: 14px;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: var(--text-primary); font-size: 14px; font-weight: 500;
-    outline: none;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.3);
-  }
-  .form-input:focus, .form-textarea:focus, .form-select:focus {
-    background: rgba(0,0,0,0.5);
-    border-color: rgba(255,255,255,0.3);
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .form-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
-  .form-select { appearance: none; cursor: pointer; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 18px; }
-  .form-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; font-weight: 500; }
+    .plus-btn {
+      height: 44px;
+      padding: 0 16px 0 20px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--input-bg);
+      border: 1px solid transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .plus-btn:active { background: var(--btn-bg); }
+    .plus-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .plus-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-  .art-picker {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 10px; margin-bottom: 8px;
-  }
-  .art-option {
-    aspect-ratio: 1;
-    border-radius: 16px;
-    border: 2px solid rgba(255,255,255,0.08);
-    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
-    display: grid; place-items: center;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    padding: 6px;
-  }
-  .art-option svg { width: 100%; height: 100%; }
-  .art-option:hover { border-color: rgba(255,255,255,0.2); }
-  .art-option.selected {
-    border-color: #fff;
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-  }
+    /* Общие стили для стекла (упрощенные) */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), var(--glass-highlight);
+    }
 
-  .create-preview {
-    padding: 16px;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.14);
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 14px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .create-preview__art {
-    width: 68px; height: 68px; border-radius: 16px;
-    display: grid; place-items: center;
-    border: 1px solid rgba(255,255,255,0.14);
-    overflow: hidden; flex-shrink: 0;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .create-preview__art svg { width: 80%; height: 80%; }
-  .create-preview__info { flex: 1; min-width: 0; }
-  .create-preview__name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .create-preview__meta { font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
+    /* Шапка */
+    .header {
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--bg);
+      z-index: 10;
+    }
 
-  /* ============ ACTIVITY ============ */
-  .activity-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
-  .activity-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.3);
-  }
-  .activity-item:hover { background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%); border-color: rgba(255,255,255,0.2); }
-  .activity-item__art {
-    width: 44px; height: 44px; border-radius: 12px;
-    display: grid; place-items: center;
-    overflow: hidden; flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .activity-item__art svg { width: 75%; height: 75%; }
-  .activity-item__info { flex: 1; min-width: 0; }
-  .activity-item__action { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 2px; }
-  .activity-item__action .accent { color: var(--text-tertiary); font-weight: 500; }
-  .activity-item__time { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
-  .activity-item__price { text-align: right; flex-shrink: 0; }
-  .activity-item__price-v { font-size: 13px; font-weight: 800; letter-spacing: -0.02em; }
-  .activity-item__price-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 2px; }
-  .activity-item__icon {
-    width: 28px; height: 28px; border-radius: 10px;
-    display: grid; place-items: center;
-    flex-shrink: 0;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .activity-item__icon svg { width: 14px; height: 14px; }
-  .activity-item__icon.buy { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
-  .activity-item__icon.sell { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
-  .activity-item__icon.bid { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-  .activity-item__icon.mint { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
-  .activity-item__icon.transfer { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.2); }
-
-  /* ============ PROFILE ============ */
-  .profile-hero { padding: 0 20px; margin-bottom: 24px; text-align: center; }
-  .profile-avatar {
-    width: 96px; height: 96px; border-radius: 50%;
-    margin: 0 auto 16px;
-    display: grid; place-items: center;
-    font-size: 36px; font-weight: 800;
-    border: 3px solid rgba(255,255,255,0.2);
-    box-shadow:
-      0 12px 32px rgba(0,0,0,0.6),
-      inset 0 2px 0 rgba(255,255,255,0.2),
-      0 0 0 6px rgba(255,255,255,0.03);
-    overflow: hidden;
-    position: relative;
-  }
-  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-name { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 4px; }
-  .profile-addr {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 10px; border-radius: 100px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    font-size: 11px; color: var(--text-tertiary); font-weight: 600;
-    margin-bottom: 14px; font-family: monospace;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .profile-addr:hover { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
-  .profile-addr svg { width: 12px; height: 12px; }
-  .profile-bio { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 18px; max-width: 320px; margin-left: auto; margin-right: auto; }
-
-  .profile-stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 8px; margin-bottom: 18px;
-  }
-  .profile-stat {
-    padding: 14px 8px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    text-align: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .profile-stat__v { font-size: 17px; font-weight: 800; letter-spacing: -0.025em; }
-  .profile-stat__l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 700; }
-
-  .profile-tabs {
-    padding: 0 20px;
-    display: flex; gap: 4px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .profile-tab {
-    flex: 1;
-    padding: 12px 4px;
-    background: none; border: none;
-    color: var(--text-tertiary);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer; position: relative;
-    transition: color 0.15s;
-    letter-spacing: -0.01em;
-  }
-  .profile-tab.active { color: var(--text-primary); }
-  .profile-tab.active::after {
-    content: ''; position: absolute;
-    left: 4px; right: 4px; bottom: -1px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #fff, transparent);
-    border-radius: 2px;
-    box-shadow: 0 0 8px rgba(255,255,255,0.5);
-  }
-
-  /* ============ BOTTOM NAV ============ */
-  .nav {
-    position: fixed;
-    left: 50%; transform: translateX(-50%);
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    width: min(calc(100% - 32px), 680px);
-    display: flex;
-    padding: 10px;
-    border-radius: 32px;
-    background: linear-gradient(135deg, rgba(30,30,30,0.85) 0%, rgba(18,18,18,0.85) 100%);
-    border: 1px solid rgba(255,255,255,0.16);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.15),
-      inset 0 -1px 0 rgba(255,255,255,0.03),
-      0 24px 48px -12px rgba(0,0,0,1),
-      0 0 0 1px rgba(255,255,255,0.03);
-    z-index: 100;
-    gap: 2px;
-  }
-  .nav-btn {
-    flex: 1;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 3px;
-    padding: 10px 0;
-    border: none; background: none;
-    color: var(--text-tertiary);
-    font-size: 10px; font-weight: 700;
-    cursor: pointer;
-    border-radius: 22px;
-    transition: all 0.2s cubic-bezier(0.32,0.72,0,1);
-    letter-spacing: -0.01em;
-    position: relative;
-  }
-  .nav-btn svg { width: 22px; height: 22px; transition: transform 0.2s cubic-bezier(0.32,0.72,0,1); }
-  .nav-btn:hover { color: var(--text-secondary); }
-  .nav-btn.active {
-    color: #fff;
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.3);
-  }
-  .nav-btn.active svg { transform: scale(1.08); }
-  .nav-btn:active { transform: scale(0.94); }
-
-  /* ============ MODAL ============ */
-  .modal {
-    position: fixed; inset: 0; z-index: 200;
-    display: none; align-items: flex-end; justify-content: center;
-  }
-  .modal.is-open { display: flex; }
-  .modal__backdrop {
-    position: absolute; inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    animation: fadeIn 0.25s cubic-bezier(0.32,0.72,0,1);
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .modal__sheet {
-    position: relative;
-    width: 100%; max-width: 640px; max-height: 92vh;
-    overflow-y: auto;
-    border-radius: 32px 32px 0 0;
-    background: linear-gradient(180deg, rgba(24,24,24,0.96) 0%, rgba(16,16,16,0.98) 100%);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.15),
-      0 -20px 60px rgba(0,0,0,0.9);
-    animation: slideUp 0.4s cubic-bezier(0.32,0.72,0,1);
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    scrollbar-width: none;
-  }
-  .modal__sheet::-webkit-scrollbar { display: none; }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .modal__handle {
-    width: 44px; height: 5px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 3px;
-    margin: 10px auto 0;
-  }
-  .modal__close {
-    position: absolute; top: 16px; right: 16px; z-index: 5;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: grid; place-items: center;
-    cursor: pointer; color: var(--text-primary);
-    transition: all 0.15s cubic-bezier(0.32,0.72,0,1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-  }
-  .modal__close:hover { background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%); }
-  .modal__close:active { transform: scale(0.9); }
-  .modal__close svg { width: 16px; height: 16px; }
-
-  .sheet__art {
-    width: 100%; aspect-ratio: 1.05;
-    display: grid; place-items: center;
-    position: relative; overflow: hidden;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .sheet__art svg { width: 65%; height: 65%; position: relative; z-index: 1; }
-  .sheet__art::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(180deg, transparent 55%, rgba(18,18,18,1) 100%);
-    pointer-events: none; z-index: 2;
-  }
-  .sheet__body { padding: 4px 22px 22px; position: relative; z-index: 3; }
-  .sheet__coll-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .sheet__coll { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
-  .sheet__title { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 8px; line-height: 1.15; }
-  .sheet__by { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
-  .sheet__by strong { color: var(--text-primary); font-weight: 700; }
-
-  .sheet__price-box {
-    padding: 20px; border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.12);
-    margin-bottom: 16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .sheet__price-labels { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .sheet__price-big { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; display: flex; align-items: baseline; gap: 8px; }
-  .sheet__price-big small { font-size: 14px; color: var(--text-tertiary); font-weight: 600; }
-  .sheet__price-fiat { font-size: 13px; color: var(--text-tertiary); margin-top: 4px; font-weight: 500; }
-  .sheet__price-trend { text-align: right; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; }
-  .sheet__price-trend small { display: block; font-size: 9px; opacity: 0.7; margin-top: 1px; font-weight: 600; }
-
-  .sheet__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-  .sheet__stat {
-    padding: 14px 8px; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    text-align: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .sheet__stat-v { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
-  .sheet__stat-l { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 700; }
-  .sheet__section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin: 0 0 10px; }
-  .sheet__desc { font-size: 13px; line-height: 1.55; color: var(--text-secondary); margin: 0 0 20px; }
-  .sheet__traits { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .trait {
-    padding: 10px 14px; border-radius: 12px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    font-size: 11px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .trait strong { display: block; font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; font-weight: 700; }
-  .trait span { font-weight: 700; letter-spacing: -0.01em; }
-  .sheet__actions { display: flex; gap: 10px; }
-  .sheet__actions .btn--primary { flex: 1; }
-
-  /* ============ TOAST ============ */
-  .toast-wrap {
-    position: fixed; top: calc(20px + env(safe-area-inset-top));
-    left: 50%; transform: translateX(-50%);
-    z-index: 300; pointer-events: none;
-    display: flex; flex-direction: column; gap: 8px;
-    width: calc(100% - 40px); max-width: 400px;
-  }
-  .toast {
-    padding: 14px 18px; border-radius: 18px;
-    background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(20,20,20,0.95) 100%);
-    border: 1px solid rgba(255,255,255,0.18);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    font-size: 13px; font-weight: 600;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 12px 32px rgba(0,0,0,0.7);
-    transform: translateY(-20px); opacity: 0;
-    transition: all 0.3s cubic-bezier(0.32,0.72,0,1);
-    display: flex; align-items: center; gap: 11px;
-    letter-spacing: -0.01em;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast__icon { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
-  .toast__icon svg { width: 13px; height: 13px; }
-  .toast__icon.success { background: rgba(74,222,128,0.2); color: #4ade80; box-shadow: 0 0 12px rgba(74,222,128,0.3); }
-  .toast__icon.info { background: rgba(96,165,250,0.2); color: #60a5fa; }
-  .toast__icon.warn { background: rgba(251,191,36,0.2); color: #fbbf24; }
-  .toast__icon.error { background: rgba(248,113,113,0.2); color: #f87171; }
-
-  /* ============ SEARCH ============ */
-  .search-overlay {
-    position: fixed; inset: 0; z-index: 250;
-    display: none;
-    background: rgba(0,0,0,0.9);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-  }
-  .search-overlay.is-open { display: block; animation: fadeIn 0.2s; }
-  .search-panel { padding: calc(16px + env(safe-area-inset-top)) 20px 20px; max-width: 720px; margin: 0 auto; }
-  .search-input-wrap {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 18px; height: 54px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    margin-bottom: 16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-  }
-  .search-input-wrap svg { width: 18px; height: 18px; color: var(--text-tertiary); flex-shrink: 0; }
-  .search-input { flex: 1; background: none; border: none; color: var(--text-primary); font-size: 16px; font-weight: 500; outline: none; }
-  .search-input::placeholder { color: var(--text-tertiary); }
-  .search-cancel { background: none; border: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; }
-  .search-results { display: flex; flex-direction: column; gap: 10px; }
-  .search-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px; border-radius: 16px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    cursor: pointer; transition: all 0.15s;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .search-item:hover { background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%); border-color: rgba(255,255,255,0.2); }
-  .search-item__art { width: 50px; height: 50px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.14); }
-  .search-item__art svg { width: 70%; height: 70%; }
-  .search-item__info { flex: 1; min-width: 0; }
-  .search-item__name { font-size: 14px; font-weight: 700; letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-  .search-item__price { font-size: 12px; color: var(--text-tertiary); font-weight: 600; }
-  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-tertiary); font-size: 14px; }
-
-  /* ============ EMPTY ============ */
-  .empty { text-align: center; padding: 60px 20px; }
-  .empty__icon {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.1);
-    display: grid; place-items: center;
-    margin: 0 auto 16px; color: var(--text-tertiary);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .empty__icon svg { width: 24px; height: 24px; }
-  .empty__title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-  .empty__text { font-size: 13px; color: var(--text-tertiary); }
-
-  /* ============ CONFETTI ============ */
-  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
-  .confetti-piece {
-    position: absolute; width: 8px; height: 8px;
-    opacity: 0;
-    animation: confetti-fall 1.8s cubic-bezier(0.32,0.72,0,1) forwards;
-  }
-  @keyframes confetti-fall {
-    0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
-    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  }
-</style>
+  </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="brand" id="brandHome">
-    <div class="brand__mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 8v8l8 6 8-6V8z"/><path d="M12 22V12M4 8l8 4 8-4"/></svg>
-    </div>
-    <span>Liquid</span>
-  </div>
-  <div class="topbar__actions">
-    <button class="icon-btn" id="searchBtn" aria-label="Search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    </button>
-    <button class="icon-btn" id="notifBtn" aria-label="Notifications">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      <span class="dot"></span>
-    </button>
-    <button class="wallet-chip" id="walletBtn">
-      <span class="ball"></span>
-      <span id="walletLabel">0x7a…3f2e</span>
-    </button>
-  </div>
-</div>
+  <div class="header">Jaim AI</div>
 
-<!-- HOME -->
-<div class="screen active" id="screen-home">
-  <div class="hero-wrap">
-    <article class="hero" id="heroCard">
-      <div class="hero__art" style="background: radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%);" id="heroArt"></div>
-      <div class="hero__badges">
-        <span class="badge live"><span class="dot"></span> Live auction</span>
-        <span class="badge">#042</span>
+  <!-- Чат -->
+  <div class="chat-container" id="chatContainer">
+    <div class="message ai">
+      <div class="bubble">Привет! Я Jaim AI. Чем могу помочь?</div>
+    </div>
+  </div>
+
+  <!-- Нижняя панель -->
+  <div class="bottom-ui">
+    <div class="top-bar">
+      <div class="icon-circle glass" onclick="document.getElementById('promptInput').focus()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       </div>
-      <div class="hero__info">
-        <div class="hero__coll">
-          Cosmos Collection
-          <span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-        </div>
-        <h2 class="hero__title">Cosmic Drift</h2>
-        <div class="hero__by">
-          <div class="avatar lg" style="background:linear-gradient(135deg,#4a4a8a,#1a1a2e)">V</div>
-          <span>by <strong style="color:var(--text-primary);font-weight:700">voidwalker</strong></span>
-        </div>
-        <div class="hero__bottom">
-          <div>
-            <div class="price-label">Current bid</div>
-            <div class="price-value">2.4 ETH <span class="price-fiat">$6,180</span></div>
-          </div>
-          <button class="btn btn--primary btn--lg" id="heroBid">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-6 6"/><path d="M20 10H8a4 4 0 0 0-4 4v0"/></svg>
-            Bid
+      <div class="pill-btn glass active" id="btnText" onclick="switchMode('text')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Текст
+      </div>
+      <div class="pill-btn glass" id="btnImage" onclick="switchMode('image')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Картинка
+      </div>
+    </div>
+
+    <div class="input-card glass">
+      <div class="input-row">
+        <input type="text" id="promptInput" placeholder="Search or ask anything" autocomplete="off">
+        <button class="mic-btn" onclick="document.getElementById('promptInput').focus()">
+          <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="bottom-row">
+        <div class="action-group">
+          <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+          <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><line x1="18" y1="3" x2="18" y2="9"/><line x1="15" y1="6" x2="21" y2="6"/></svg>
           </button>
         </div>
-      </div>
-    </article>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="stat__v">12.4K</div><div class="stat__l">Items</div></div>
-    <div class="stat"><div class="stat__v">3.8K</div><div class="stat__l">Owners</div></div>
-    <div class="stat"><div class="stat__v">142 Ξ</div><div class="stat__l">Volume</div></div>
-  </div>
-
-  <div class="cats" id="cats">
-    <button class="cat active" data-cat="all">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>
-      All
-    </button>
-    <button class="cat" data-cat="art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>Art</button>
-    <button class="cat" data-cat="pixel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Pixel</button>
-    <button class="cat" data-cat="3d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5M12 22V12"/></svg>3D</button>
-    <button class="cat" data-cat="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/></svg>Photo</button>
-    <button class="cat" data-cat="abstract"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9"/><path d="M12 3c-3 3-3 15 0 18"/></svg>Abstract</button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="trending">Trending</button>
-    <button class="tab" data-tab="new">New</button>
-    <button class="tab" data-tab="top">Top</button>
-    <button class="tab" data-tab="ending">Ending soon</button>
-  </div>
-
-  <div class="grid" id="grid"></div>
-</div>
-
-<!-- EXPLORE -->
-<div class="screen" id="screen-explore">
-  <div class="section-head" style="margin-top:8px;">
-    <div><h2 class="section-title">Top creators</h2><p class="section-sub">Artists on Liquid right now</p></div>
-  </div>
-  <div class="creators-scroll" id="creatorsScroll"></div>
-  <div class="section-head" style="margin-top:24px;">
-    <div><h2 class="section-title">Collections</h2><p class="section-sub">Ranked by 24h volume</p></div>
-  </div>
-  <div class="coll-list" id="collList"></div>
-</div>
-
-<!-- CREATE -->
-<div class="screen" id="screen-create">
-  <div class="section-head" style="margin-top:8px;">
-    <div><h2 class="section-title">Create NFT</h2><p class="section-sub">Mint your artwork on-chain</p></div>
-  </div>
-  <div class="create-wrap">
-    <div class="create-card">
-      <div class="form-group">
-        <label class="form-label">Artwork</label>
-        <div class="art-picker" id="artPicker"></div>
-        <div class="form-hint">Choose a preview for your NFT</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Name</label>
-        <input type="text" class="form-input" id="cName" placeholder="Cosmic Drift #043" maxlength="40">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-textarea" id="cDesc" placeholder="Tell collectors about your work…" maxlength="300"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Collection</label>
-        <select class="form-select" id="cColl">
-          <option value="Cosmos">Cosmos</option>
-          <option value="Ronin">Ronin</option>
-          <option value="PixelPaws">PixelPaws</option>
-          <option value="Chrome">Chrome</option>
-          <option value="Liquid">Liquid</option>
-          <option value="Wasteland">Wasteland</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Price (ETH)</label>
-        <input type="number" class="form-input" id="cPrice" placeholder="0.5" min="0.01" step="0.01" value="0.5">
-        <div class="form-hint" id="cFiat">≈ $1,288</div>
-      </div>
-      <div class="create-preview">
-        <div class="create-preview__art" id="cPreviewArt"></div>
-        <div class="create-preview__info">
-          <div class="create-preview__name" id="cPreviewName">Untitled</div>
-          <div class="create-preview__meta" id="cPreviewMeta">Cosmos · 0.5 ETH</div>
-        </div>
-      </div>
-      <button class="btn btn--primary btn--lg btn--block" id="mintBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5"/></svg>
-        Mint NFT
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ACTIVITY -->
-<div class="screen" id="screen-activity">
-  <div class="section-head" style="margin-top:8px;">
-    <div><h2 class="section-title">Activity</h2><p class="section-sub">Latest on-chain events</p></div>
-  </div>
-  <div class="activity-list" id="activityList"></div>
-</div>
-
-<!-- PROFILE -->
-<div class="screen" id="screen-profile">
-  <div class="profile-hero">
-    <div class="profile-avatar" id="profileAvatar"></div>
-    <h2 class="profile-name" id="profileName">Loading…</h2>
-    <div class="profile-addr" id="profileAddr">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      <span id="profileAddrText">0x7a9f…3f2e</span>
-    </div>
-    <p class="profile-bio" id="profileBio">Collector & creator on Liquid. Building the future of digital art.</p>
-    <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat__v" id="pOwned">0</div><div class="profile-stat__l">Owned</div></div>
-      <div class="profile-stat"><div class="profile-stat__v" id="pFavs">0</div><div class="profile-stat__l">Favorites</div></div>
-      <div class="profile-stat"><div class="profile-stat__v">4.2 Ξ</div><div class="profile-stat__l">Volume</div></div>
-    </div>
-    <div class="profile-tabs">
-      <button class="profile-tab active" data-ptab="owned">Owned</button>
-      <button class="profile-tab" data-ptab="favorites">Favorites</button>
-      <button class="profile-tab" data-ptab="created">Created</button>
-    </div>
-  </div>
-  <div class="grid" id="profileGrid"></div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="nav">
-  <button class="nav-btn active" data-nav="home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9v8a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>
-    <span>Home</span>
-  </button>
-  <button class="nav-btn" data-nav="explore">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <span>Explore</span>
-  </button>
-  <button class="nav-btn" data-nav="create">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-    <span>Create</span>
-  </button>
-  <button class="nav-btn" data-nav="activity">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
-    <span>Activity</span>
-  </button>
-  <button class="nav-btn" data-nav="profile">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
-    <span>Profile</span>
-  </button>
-</nav>
-
-<!-- MODAL -->
-<div class="modal" id="modal" role="dialog" aria-modal="true">
-  <div class="modal__backdrop" data-close></div>
-  <div class="modal__sheet">
-    <div class="modal__handle"></div>
-    <button class="modal__close" data-close aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-    <div class="sheet__art" id="mArt"></div>
-    <div class="sheet__body">
-      <div class="sheet__coll-row">
-        <span class="sheet__coll" id="mColl">—</span>
-        <span class="verified" id="mVerified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-      </div>
-      <h2 class="sheet__title" id="mTitle">—</h2>
-      <div class="sheet__by">
-        <div class="avatar" id="mAvatar">A</div>
-        <span>by <strong id="mAuthor">—</strong></span>
-        <span style="color:var(--text-tertiary)" id="mRarity">· —</span>
-      </div>
-      <div class="sheet__price-box">
-        <div class="sheet__price-labels">
-          <div>
-            <div class="sheet__price-big" id="mPrice">— <small>ETH</small></div>
-            <div class="sheet__price-fiat" id="mFiat">≈ $0</div>
-          </div>
-          <div class="sheet__price-trend" id="mTrend">+0%<small>24h</small></div>
-        </div>
-      </div>
-      <div class="sheet__stats">
-        <div class="sheet__stat"><div class="sheet__stat-v" id="mFloor">—</div><div class="sheet__stat-l">Floor</div></div>
-        <div class="sheet__stat"><div class="sheet__stat-v" id="mOwners">—</div><div class="sheet__stat-l">Owners</div></div>
-        <div class="sheet__stat"><div class="sheet__stat-v" id="mVolume">—</div><div class="sheet__stat-l">Volume</div></div>
-      </div>
-      <h3 class="sheet__section-title">Properties</h3>
-      <div class="sheet__traits" id="mTraits"></div>
-      <h3 class="sheet__section-title">About</h3>
-      <p class="sheet__desc" id="mDesc">—</p>
-      <div class="sheet__actions">
-        <button class="btn btn--glass btn--md" id="mFavBtn" aria-label="Favorite" style="width:56px;padding:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        
+        <button class="plus-btn" id="sendBtn" disabled>
+          Отправить
+          <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
         </button>
-        <button class="btn btn--glass btn--md" id="mShareBtn" aria-label="Share" style="width:56px;padding:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-        </button>
-        <button class="btn btn--primary btn--md" id="mBuy" style="flex:1">Buy now</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- SEARCH -->
-<div class="search-overlay" id="searchOverlay">
-  <div class="search-panel">
-    <div class="search-input-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="Search NFTs, collections, creators…" autocomplete="off">
-      <button class="search-cancel" id="searchCancel">Cancel</button>
-    </div>
-    <div class="search-results" id="searchResults"></div>
-  </div>
-</div>
+  <script>
+    // ==========================================
+    // 🔑 НАСТРОЙКИ API
+    // ==========================================
+    const CONFIG = {
+      API_KEY: "ВАШ_API_КЛЮЧ_ЗДЕСЬ", 
+      
+      BASE_URL: "https://api.zexkora.cc/v1",
+      FALLBACK_URL: "https://2api.zexkora.cc/v1",
 
-<!-- TOAST -->
-<div class="toast-wrap" id="toastWrap"></div>
+      MODEL_TEXT: "deepseek-v4-pro",
+      MODEL_IMAGE: "gpt-image-2.5",
 
-<script>
-  // ============ TELEGRAM ============
-  const tg = window.Telegram?.WebApp;
-  if (tg) {
-    tg.ready(); tg.expand();
-    tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000');
-    try { tg.disableVerticalSwipes?.(); } catch(e) {}
-  }
-  const haptic = (t = 'light') => { try { tg?.HapticFeedback?.impactOccurred(t); } catch(e){} };
-  const notify = (t = 'success') => { try { tg?.HapticFeedback?.notificationOccurred(t); } catch(e){} };
-
-  // ============ TELEGRAM USER DATA ============
-  const tgUser = tg?.initDataUnsafe?.user || null;
-  const userFirst = tgUser?.first_name || '';
-  const userLast = tgUser?.last_name || '';
-  const userFullName = [userFirst, userLast].filter(Boolean).join(' ') || 'Guest User';
-  const userUsername = tgUser?.username || '';
-  const userId = tgUser?.id || null;
-  const userPhoto = tgUser?.photo_url || null;
-  const userInitial = (userFirst || userUsername || 'U').charAt(0).toUpperCase();
-  // Short wallet-like address from Telegram ID (deterministic, not random)
-  const userAddr = userId ? ('0x' + userId.toString(16).padStart(8, '0').slice(0, 4) + '…' + userId.toString(16).padStart(8, '0').slice(-4)) : '0x7a9f…3f2e';
-
-  // Update topbar wallet + profile header with real data
-  const walletLabel = document.getElementById('walletLabel');
-  if (walletLabel) walletLabel.textContent = userUsername ? '@' + userUsername : userAddr;
-
-  document.getElementById('profileName').textContent = userFullName;
-  document.getElementById('profileAddrText').textContent = userAddr;
-  document.getElementById('profileBio').textContent = userUsername
-    ? `@${userUsername} · Collector & creator on Liquid`
-    : 'Collector & creator on Liquid. Building the future of digital art.';
-
-  const profileAvatarEl = document.getElementById('profileAvatar');
-  if (userPhoto) {
-    profileAvatarEl.innerHTML = `<img src="${esc(userPhoto)}" alt="${esc(userFullName)}" referrerpolicy="no-referrer">`;
-    profileAvatarEl.style.background = '#1a1a2e';
-  } else {
-    profileAvatarEl.textContent = userInitial;
-    profileAvatarEl.style.background = 'linear-gradient(135deg, #4a4a8a 0%, #1a1a2e 100%)';
-  }
-
-  // Also update hero avatar to show real user if available? No — hero is by voidwalker
-  // Update wallet chip in topbar with mini avatar
-  const walletChip = document.getElementById('walletBtn');
-  const ball = walletChip.querySelector('.ball');
-  if (userPhoto) {
-    ball.style.background = 'transparent';
-    ball.style.boxShadow = 'none';
-    ball.style.width = '16px';
-    ball.style.height = '16px';
-    ball.style.borderRadius = '50%';
-    ball.style.overflow = 'hidden';
-    ball.style.border = '1px solid rgba(255,255,255,0.2)';
-    ball.innerHTML = `<img src="${esc(userPhoto)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">`;
-  }
-
-  // ============ SVG ARTS ============
-  const SVG_ARTS = {
-    cosmic: `<svg viewBox="0 0 200 200" fill="none"><defs><radialGradient id="cg1" cx="30%" cy="30%" r="60%"><stop offset="0%" stop-color="#a78bfa" stop-opacity="0.9"/><stop offset="60%" stop-color="#6d28d9" stop-opacity="0.4"/><stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/></radialGradient><radialGradient id="cg2" cx="70%" cy="70%" r="50%"><stop offset="0%" stop-color="#f472b6" stop-opacity="0.7"/><stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/></radialGradient></defs><circle cx="60" cy="60" r="80" fill="url(#cg1)"/><circle cx="140" cy="140" r="60" fill="url(#cg2)"/><circle cx="100" cy="100" r="45" fill="#0f0f1a" stroke="#a78bfa" stroke-opacity="0.3"/><ellipse cx="100" cy="100" rx="70" ry="18" stroke="#fff" stroke-opacity="0.15" stroke-width="1.5" transform="rotate(-20 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff" opacity="0.9"/><circle cx="100" cy="100" r="4" fill="#a78bfa"/><circle cx="60" cy="60" r="2" fill="#fff" opacity="0.6"/><circle cx="150" cy="50" r="1.5" fill="#fff" opacity="0.5"/><circle cx="40" cy="130" r="1.5" fill="#fff" opacity="0.5"/></svg>`,
-    samurai: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient><radialGradient id="sgbg" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#7c3aed" stop-opacity="0.3"/><stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="90" r="80" fill="url(#sgbg)"/><path d="M60 120 L140 120 L130 180 L70 180 Z" fill="#1a1a1a" stroke="url(#sg1)" stroke-width="1.5"/><circle cx="100" cy="90" r="35" fill="#0a0a0a" stroke="url(#sg1)" stroke-width="1.5"/><path d="M75 85 Q100 60 125 85" stroke="url(#sg1)" stroke-width="2" fill="none"/><circle cx="88" cy="88" r="3" fill="#f472b6"/><circle cx="112" cy="88" r="3" fill="#f472b6"/><path d="M85 120 L115 120 L110 145 L90 145 Z" fill="#2a2a2a"/><path d="M30 40 L45 55 M170 40 L155 55 M30 160 L45 145 M170 160 L155 145" stroke="#f472b6" stroke-width="1.5" opacity="0.5"/></svg>`,
-    pixelcat: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges"><rect x="60" y="60" width="80" height="80" fill="#4ade80" opacity="0.15"/><rect x="70" y="50" width="15" height="15" fill="#4ade80"/><rect x="115" y="50" width="15" height="15" fill="#4ade80"/><rect x="60" y="65" width="80" height="15" fill="#4ade80"/><rect x="60" y="80" width="15" height="50" fill="#4ade80"/><rect x="125" y="80" width="15" height="50" fill="#4ade80"/><rect x="75" y="80" width="50" height="50" fill="#22c55e"/><rect x="80" y="90" width="10" height="10" fill="#000"/><rect x="110" y="90" width="10" height="10" fill="#000"/><rect x="95" y="105" width="10" height="5" fill="#000"/><rect x="75" y="130" width="50" height="15" fill="#15803d"/><rect x="140" y="60" width="10" height="10" fill="#fbbf24"/></svg>`,
-    chrome: `<svg viewBox="0 0 200 200" fill="none"><defs><radialGradient id="cg3" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#d1d5db"/><stop offset="60%" stop-color="#6b7280"/><stop offset="100%" stop-color="#1f2937"/></radialGradient></defs><circle cx="100" cy="100" r="70" fill="url(#cg3)"/><ellipse cx="75" cy="70" rx="30" ry="20" fill="#fff" opacity="0.5" transform="rotate(-30 75 70)"/><ellipse cx="130" cy="140" rx="15" ry="10" fill="#fff" opacity="0.15" transform="rotate(-30 130 140)"/></svg>`,
-    desert: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="dg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.6"/><stop offset="60%" stop-color="#b45309" stop-opacity="0.4"/><stop offset="100%" stop-color="#1c1917"/></linearGradient><linearGradient id="dg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#0c0a09"/></linearGradient></defs><rect width="200" height="200" fill="url(#dg2)"/><circle cx="150" cy="50" r="20" fill="#fbbf24" opacity="0.8"/><circle cx="150" cy="50" r="25" fill="#fbbf24" opacity="0.2"/><path d="M0 130 Q50 100 100 120 T200 110 L200 200 L0 200 Z" fill="url(#dg1)"/><path d="M0 150 Q60 130 120 145 T200 140 L200 200 L0 200 Z" fill="#7c2d12" opacity="0.7"/><path d="M0 165 Q80 150 140 160 T200 155 L200 200 L0 200 Z" fill="#431407"/></svg>`,
-    liquid: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#60a5fa"/><stop offset="50%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient><radialGradient id="lg2" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#93c5fd" stop-opacity="0.8"/><stop offset="100%" stop-color="#1e40af" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="75" fill="url(#lg2)"/><path d="M100 40 Q140 60 140 100 Q140 140 100 160 Q60 140 60 100 Q60 60 100 40 Z" fill="url(#lg1)" opacity="0.7"/><ellipse cx="85" cy="80" rx="15" ry="25" fill="#fff" opacity="0.4" transform="rotate(-20 85 80)"/></svg>`,
-    oni: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="og1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs><path d="M60 80 L50 40 L75 65 Z" fill="url(#og1)"/><path d="M140 80 L150 40 L125 65 Z" fill="url(#og1)"/><path d="M100 50 Q150 60 155 110 Q155 150 100 165 Q45 150 45 110 Q50 60 100 50 Z" fill="#1a1a1a" stroke="url(#og1)" stroke-width="2"/><path d="M70 95 L85 105 L70 115 Z" fill="#fbbf24"/><path d="M130 95 L115 105 L130 115 Z" fill="#fbbf24"/><path d="M80 135 L100 145 L120 135 L115 155 L85 155 Z" fill="#7f1d1d"/></svg>`,
-    voidcube: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="vg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#374151"/><stop offset="100%" stop-color="#030712"/></linearGradient></defs><path d="M100 40 L160 75 L160 145 L100 180 L40 145 L40 75 Z" fill="url(#vg1)" stroke="#4b5563" stroke-width="1"/><path d="M100 40 L160 75 L100 110 L40 75 Z" fill="#1f2937"/><path d="M100 110 L160 75 L160 145 L100 180 Z" fill="#111827"/><path d="M100 110 L40 75 L40 145 L100 180 Z" fill="#0a0a0a"/><circle cx="100" cy="110" r="3" fill="#60a5fa" opacity="0.8"/><circle cx="100" cy="110" r="8" fill="#60a5fa" opacity="0.15"/></svg>`,
-    pixelape: `<svg viewBox="0 0 200 200" fill="none" shape-rendering="crispEdges"><rect x="55" y="55" width="90" height="90" fill="#78572e"/><rect x="60" y="60" width="30" height="10" fill="#fbbf24"/><rect x="110" y="60" width="30" height="10" fill="#fbbf24"/><rect x="55" y="75" width="90" height="55" fill="#8b6b3a"/><rect x="70" y="85" width="15" height="15" fill="#000"/><rect x="115" y="85" width="15" height="15" fill="#000"/><rect x="73" y="88" width="6" height="6" fill="#fff"/><rect x="118" y="88" width="6" height="6" fill="#fff"/><rect x="85" y="110" width="30" height="10" fill="#5a4523"/><rect x="65" y="130" width="70" height="15" fill="#3b2f1e"/></svg>`,
-    gradient: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="gw1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="50%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#60a5fa"/></linearGradient></defs><rect x="40" y="60" width="120" height="80" rx="8" fill="url(#gw1)" opacity="0.3"/><path d="M20 100 Q60 40 100 100 T180 100" stroke="url(#gw1)" stroke-width="3" fill="none"/><path d="M20 120 Q60 60 100 120 T180 120" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.6"/><path d="M20 140 Q60 80 100 140 T180 140" stroke="url(#gw1)" stroke-width="3" fill="none" opacity="0.3"/><circle cx="100" cy="100" r="20" fill="url(#gw1)" opacity="0.8"/></svg>`,
-    temple: `<svg viewBox="0 0 200 200" fill="none"><defs><linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/><stop offset="100%" stop-color="#0c0a09"/></linearGradient></defs><rect width="200" height="200" fill="#0a0a0a"/><circle cx="100" cy="60" r="25" fill="#fbbf24" opacity="0.6"/><path d="M50 180 L50 120 L100 80 L150 120 L150 180 Z" fill="#1a1a1a" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/><path d="M40 120 L100 70 L160 120" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><path d="M0 180 Q50 170 100 175 T200 170 L200 200 L0 200 Z" fill="url(#tg1)"/></svg>`,
-    neongrid: `<svg viewBox="0 0 200 200" fill="none"><rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="80" r="35" fill="#a78bfa" opacity="0.15"/><circle cx="100" cy="80" r="25" fill="#f472b6" opacity="0.2"/><path d="M0 140 L200 140" stroke="#a78bfa" stroke-width="1" opacity="0.5"/><g opacity="0.7"><path d="M0 150 L200 150 M0 165 L200 165 M0 185 L200 185" stroke="#a78bfa" stroke-width="0.7"/><path d="M100 140 L100 200 M70 140 L40 200 M130 140 L160 200 M40 140 L-20 200 M160 140 L220 200" stroke="#f472b6" stroke-width="0.7"/></g></svg>`,
-  };
-
-  // ============ DATA ============
-  const COLLECTIONS = {
-    Cosmos:   { verified: true, floor: '2.1', owners: '1.2K', volume: '24 Ξ', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)', art: 'cosmic' },
-    Ronin:    { verified: true, floor: '1.4', owners: '890', volume: '18 Ξ', bg: 'radial-gradient(circle at 70% 30%, #2a1a2e 0%, #0a0a14 70%)', art: 'samurai' },
-    PixelPaws:{ verified: true, floor: '0.3', owners: '2.4K', volume: '9 Ξ', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)', art: 'pixelcat' },
-    Chrome:   { verified: true, floor: '2.8', owners: '640', volume: '31 Ξ', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)', art: 'chrome' },
-    Wasteland:{ verified: false, floor: '0.8', owners: '410', volume: '5 Ξ', bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)', art: 'desert' },
-    Liquid:   { verified: true, floor: '1.1', owners: '720', volume: '12 Ξ', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)', art: 'liquid' },
-  };
-
-  const CREATORS = [
-    { name: 'voidwalker', coll: 'Cosmos', art: 'cosmic', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)' },
-    { name: 'kuro.eth', coll: 'Ronin', art: 'samurai', bg: 'radial-gradient(circle at 70% 30%, #2a1a2e 0%, #0a0a14 70%)' },
-    { name: 'pixelfiend', coll: 'PixelPaws', art: 'pixelcat', bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)' },
-    { name: 'matter.form', coll: 'Chrome', art: 'chrome', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)' },
-    { name: 'lens.eth', coll: 'Wasteland', art: 'desert', bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)' },
-    { name: 'flowstate', coll: 'Liquid', art: 'liquid', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)' },
-  ];
-
-  const NFTS = [
-    { id: 1, name: 'Cosmic Drift #042', author: 'voidwalker', art: 'cosmic', cat: 'abstract', coll: 'Cosmos', rarity: 'Legendary', price: 2.4, trend: 12, rank: 'legendary', bg: 'radial-gradient(circle at 30% 30%, #1e1e34 0%, #06060c 70%)', desc: 'A rare fragment from the outer rim of the Cosmic Drift collection. Each piece captures a unique stellar configuration frozen at the moment of its minting.', traits: [{k:'Background',v:'Deep Space'},{k:'Rarity',v:'Legendary'},{k:'Aura',v:'Nebula'},{k:'Core',v:'Binary Star'}] },
-    { id: 2, name: 'Neon Samurai', author: 'kuro.eth', art: 'samurai', cat: 'art', coll: 'Ronin', rarity: 'Epic', price: 1.8, trend: 8, rank: 'epic', bg: 'radial-gradient(circle at 70% 30%, #2a1a2e 0%, #0a0a14 70%)', desc: 'Hand-painted digital artwork with a cyberpunk aesthetic. The Samurai series explores identity in a hyper-digital world.', traits: [{k:'Background',v:'Neon'},{k:'Rarity',v:'Epic'},{k:'Weapon',v:'Katana'},{k:'Mask',v:'Oni'}] },
-    { id: 3, name: 'Pixel Cat #12', author: 'pixelfiend', art: 'pixelcat', cat: 'pixel', coll: 'PixelPaws', rarity: 'Rare', price: 0.35, trend: -3, rank: null, bg: 'radial-gradient(circle at 50% 50%, #1a2a1a 0%, #0a0a0a 70%)', desc: 'Part of a limited 100-piece pixel collection. Each cat has procedurally generated accessories.', traits: [{k:'Background',v:'Forest'},{k:'Rarity',v:'Rare'},{k:'Eyes',v:'Black'},{k:'Fur',v:'Green'}] },
-    { id: 4, name: 'Chrome Sphere', author: 'matter.form', art: 'chrome', cat: '3d', coll: 'Chrome', rarity: 'Legendary', price: 3.1, trend: 24, rank: 'legendary', bg: 'radial-gradient(circle at 40% 40%, #2a2a2a 0%, #0a0a0a 70%)', desc: 'Physically-based rendering of a perfect chrome sphere. Rendered at 8K resolution with ray-traced reflections.', traits: [{k:'Material',v:'Chrome'},{k:'Rarity',v:'Legendary'},{k:'Lighting',v:'Studio'},{k:'Reflection',v:'Mirror'}] },
-    { id: 5, name: 'Desert Ghost', author: 'lens.eth', art: 'desert', cat: 'photo', coll: 'Wasteland', rarity: 'Rare', price: 0.9, trend: 5, rank: null, bg: 'radial-gradient(circle at 60% 40%, #2a201a 0%, #0a0a0a 70%)', desc: 'An original photograph from a 2019 expedition across the Atacama. Processed with custom film emulation.', traits: [{k:'Location',v:'Atacama'},{k:'Rarity',v:'Rare'},{k:'Time',v:'Sunset'},{k:'Lens',v:'50mm'}] },
-    { id: 6, name: 'Liquid Form #7', author: 'flowstate', art: 'liquid', cat: 'abstract', coll: 'Liquid', rarity: 'Epic', price: 1.2, trend: 15, rank: 'epic', bg: 'radial-gradient(circle at 30% 70%, #1a1a2a 0%, #0a0a0a 70%)', desc: 'Generative fluid dynamics simulation captured as static art. One of 50 unique forms.', traits: [{k:'Background',v:'Azure'},{k:'Rarity',v:'Epic'},{k:'Flow',v:'Vortex'},{k:'Viscosity',v:'Medium'}] },
-    { id: 7, name: 'Oni Mask', author: 'kuro.eth', art: 'oni', cat: 'art', coll: 'Ronin', rarity: 'Epic', price: 2.0, trend: 7, rank: 'epic', bg: 'radial-gradient(circle at 50% 40%, #2a1a1a 0%, #0a0a0a 70%)', desc: 'Japanese folklore reinterpreted through a glitch-art lens. Each mask has hidden metadata.', traits: [{k:'Background',v:'Crimson'},{k:'Rarity',v:'Epic'},{k:'Horns',v:'Red'},{k:'Eyes',v:'Golden'}] },
-    { id: 8, name: 'Void Cube', author: 'matter.form', art: 'voidcube', cat: '3d', coll: 'Chrome', rarity: 'Mythic', price: 4.5, trend: 32, rank: 'mythic', bg: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 70%)', desc: 'The rarest piece in the Chrome collection — a black cube that absorbs all light. Only 10 exist.', traits: [{k:'Material',v:'Void'},{k:'Rarity',v:'Mythic'},{k:'Lighting',v:'None'},{k:'Core',v:'Singularity'}] },
-    { id: 9, name: 'Pixel Ape #88', author: 'pixelfiend', art: 'pixelape', cat: 'pixel', coll: 'PixelPaws', rarity: 'Rare', price: 0.75, trend: -8, rank: null, bg: 'radial-gradient(circle at 40% 60%, #2a201a 0%, #0a0a0a 70%)', desc: 'From the iconic Pixel Ape series. This one comes with a golden crown trait.', traits: [{k:'Background',v:'Cave'},{k:'Rarity',v:'Rare'},{k:'Crown',v:'Golden'},{k:'Eyes',v:'White'}] },
-    { id: 10, name: 'Gradient Wave', author: 'flowstate', art: 'gradient', cat: 'abstract', coll: 'Liquid', rarity: 'Epic', price: 1.6, trend: 11, rank: 'epic', bg: 'radial-gradient(circle at 70% 60%, #2a1a2a 0%, #0a0a0a 70%)', desc: 'A study in smooth color transitions. The piece reacts to on-chain activity.', traits: [{k:'Palette',v:'Pink-Blue'},{k:'Rarity',v:'Epic'},{k:'Motion',v:'Wave'},{k:'Depth',v:'3 layers'}] },
-    { id: 11, name: 'Sky Temple', author: 'lens.eth', art: 'temple', cat: 'photo', coll: 'Wasteland', rarity: 'Rare', price: 1.1, trend: 4, rank: null, bg: 'radial-gradient(circle at 50% 50%, #2a1a2a 0%, #0a0a0a 70%)', desc: 'Aerial photograph of a remote temple in the Himalayas. Shot at sunrise, edited for high dynamic range.', traits: [{k:'Location',v:'Himalayas'},{k:'Rarity',v:'Rare'},{k:'Time',v:'Sunrise'},{k:'Altitude',v:'4200m'}] },
-    { id: 12, name: 'Neon Grid', author: 'pixelfiend', art: 'neongrid', cat: 'pixel', coll: 'PixelPaws', rarity: 'Epic', price: 1.05, trend: 19, rank: 'epic', bg: 'radial-gradient(circle at 60% 40%, #1a1a2a 0%, #0a0a0a 70%)', desc: 'A pixel-art reimagining of a synthwave landscape. Includes original soundtrack NFT.', traits: [{k:'Background',v:'Synthwave'},{k:'Rarity',v:'Epic'},{k:'Grid',v:'Neon'},{k:'Sun',v:'Violet'}] },
-  ];
-
-  const ACTIVITY = [
-    { id: 1, type: 'buy', nftId: 1, from: 'voidwalker', to: userUsername || 'you', price: 2.4, time: '2 min ago' },
-    { id: 2, type: 'bid', nftId: 4, from: 'cryptoqueen', to: 'alex.eth', price: 3.0, time: '8 min ago' },
-    { id: 3, type: 'sell', nftId: 2, from: 'alex.eth', to: 'kuro.eth', price: 1.75, time: '15 min ago' },
-    { id: 4, type: 'mint', nftId: 12, from: 'pixelfiend', to: 'pixelfiend', price: 0, time: '22 min ago' },
-    { id: 5, type: 'buy', nftId: 6, from: 'flowstate', to: 'nftwhale', price: 1.2, time: '34 min ago' },
-    { id: 6, type: 'transfer', nftId: 8, from: 'matter.form', to: userUsername || 'you', price: 0, time: '1 hr ago' },
-    { id: 7, type: 'bid', nftId: 7, from: 'yuki.eth', to: 'kuro.eth', price: 1.95, time: '1 hr ago' },
-    { id: 8, type: 'buy', nftId: 11, from: 'lens.eth', to: 'traveler', price: 1.05, time: '2 hr ago' },
-    { id: 9, type: 'sell', nftId: 3, from: 'pixelfiend', to: 'catlover', price: 0.33, time: '3 hr ago' },
-    { id: 10, type: 'buy', nftId: 10, from: 'flowstate', to: 'artdealer', price: 1.55, time: '4 hr ago' },
-  ];
-
-  const ETH_PRICE = 2575;
-
-  // ============ STATE ============
-  const state = {
-    cat: 'all',
-    tab: 'trending',
-    favorites: new Set([4, 8]),
-    owned: [1, 6, 11],
-    created: [2, 7],
-    currentItem: null,
-    profileTab: 'owned',
-    createArt: 'cosmic',
-    currentScreen: 'home',
-  };
-
-  // ============ HELPERS ============
-  const fiat = (eth) => '$' + Math.round(eth * ETH_PRICE).toLocaleString();
-  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const VERIFIED_SVG = '<span class="verified"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>';
-
-  // ============ TOAST ============
-  const toastWrap = document.getElementById('toastWrap');
-  const TOAST_ICONS = {
-    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 8h.01M12 12v5"/></svg>',
-    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 8v5M12 17h.01"/></svg>',
-    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-  };
-  function showToast(msg, type = 'success', dur = 2400) {
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.innerHTML = `<div class="toast__icon ${type}">${TOAST_ICONS[type] || TOAST_ICONS.info}</div><span>${msg}</span>`;
-    toastWrap.appendChild(el);
-    requestAnimationFrame(() => el.classList.add('show'));
-    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 320); }, dur);
-  }
-
-  // ============ CONFETTI ============
-  function fireConfetti() {
-    const colors = ['#4ade80','#60a5fa','#f472b6','#fbbf24','#a78bfa','#fff'];
-    const wrap = document.createElement('div');
-    wrap.className = 'confetti';
-    document.body.appendChild(wrap);
-    for (let i = 0; i < 40; i++) {
-      const p = document.createElement('div');
-      p.className = 'confetti-piece';
-      p.style.left = (10 + Math.random() * 80) + '%';
-      p.style.top = '0';
-      p.style.background = colors[Math.floor(Math.random() * colors.length)];
-      p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-      p.style.animationDelay = (Math.random() * 0.4) + 's';
-      p.style.animationDuration = (1.5 + Math.random() * 0.8) + 's';
-      wrap.appendChild(p);
-    }
-    setTimeout(() => wrap.remove(), 2800);
-  }
-
-  // ============ CARD RENDER ============
-  const TREND_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
-  const TREND_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
-
-  function cardHTML(n) {
-    const coll = COLLECTIONS[n.coll] || { verified: false };
-    const isFav = state.favorites.has(n.id);
-    return `
-      <article class="card" data-id="${n.id}">
-        <div class="card__art" style="background:${n.bg}">
-          ${n.rank ? `<div class="card__rank ${n.rank}">${n.rarity}</div>` : ''}
-          <button class="card__fav ${isFav ? 'on' : ''}" data-fav="${n.id}" aria-label="Favorite">
-            <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
-          </button>
-          ${SVG_ARTS[n.art]}
-        </div>
-        <div class="card__info">
-          <div class="card__coll">${n.coll}${coll.verified ? VERIFIED_SVG : ''}</div>
-          <h3 class="card__name">${esc(n.name)}</h3>
-          <div class="card__row">
-            <div>
-              <div class="card__price-label">Price</div>
-              <div class="card__price">${n.price} <small>ETH</small></div>
-            </div>
-            <div class="card__trend ${n.trend >= 0 ? 'up' : 'down'}">${n.trend >= 0 ? TREND_UP : TREND_DOWN}${Math.abs(n.trend)}%</div>
-          </div>
-        </div>
-      </article>
-    `;
-  }
-
-  function bindCards(container) {
-    container.addEventListener('click', (e) => {
-      const favBtn = e.target.closest('[data-fav]');
-      if (favBtn) { e.stopPropagation(); toggleFav(Number(favBtn.dataset.fav)); return; }
-      const card = e.target.closest('.card');
-      if (card) openDetail(Number(card.dataset.id));
-    });
-  }
-
-  // ============ HOME GRID ============
-  const grid = document.getElementById('grid');
-
-  function getFilteredList() {
-    let list = [...NFTS];
-    if (state.cat !== 'all') list = list.filter(n => n.cat === state.cat);
-    if (state.tab === 'trending') list.sort((a, b) => b.trend - a.trend);
-    else if (state.tab === 'new') list.sort((a, b) => b.id - a.id);
-    else if (state.tab === 'top') list.sort((a, b) => b.price - a.price);
-    else if (state.tab === 'ending') list.sort((a, b) => a.price - b.price);
-    return list;
-  }
-
-  function renderGrid() {
-    const list = getFilteredList();
-    grid.innerHTML = '';
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="empty__title">No items found</div><div class="empty__text">Try a different filter</div></div>`;
-      return;
-    }
-    list.forEach((n, i) => {
-      const div = document.createElement('div');
-      div.innerHTML = cardHTML(n);
-      const card = div.firstElementChild;
-      card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
-      grid.appendChild(card);
-    });
-  }
-  bindCards(grid);
-
-  // ============ FAVORITES ============
-  function toggleFav(id) {
-    if (state.favorites.has(id)) {
-      state.favorites.delete(id);
-      showToast('Removed from favorites', 'info', 1600);
-    } else {
-      state.favorites.add(id);
-      showToast('Added to favorites', 'success', 1600);
-    }
-    haptic('light');
-    renderGrid();
-    updateProfile();
-    if (state.currentItem?.id === id) syncModalFav();
-  }
-
-  function syncModalFav() {
-    const btn = document.getElementById('mFavBtn');
-    const isFav = state.currentItem && state.favorites.has(state.currentItem.id);
-    const svg = btn.querySelector('svg');
-    svg.style.fill = isFav ? '#f472b6' : 'none';
-    svg.style.stroke = isFav ? '#f472b6' : 'currentColor';
-    svg.style.filter = isFav ? 'drop-shadow(0 0 6px rgba(244,114,182,0.6))' : 'none';
-  }
-
-  // ============ CATS ============
-  document.getElementById('cats').addEventListener('click', (e) => {
-    const btn = e.target.closest('.cat');
-    if (!btn) return;
-    document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    state.cat = btn.dataset.cat;
-    haptic('light');
-    renderGrid();
-  });
-
-  // ============ TABS ============
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.tab = tab.dataset.tab;
-      haptic('light');
-      renderGrid();
-    });
-  });
-
-  // ============ SCREEN SWITCHING ============
-  const screens = {
-    home: document.getElementById('screen-home'),
-    explore: document.getElementById('screen-explore'),
-    create: document.getElementById('screen-create'),
-    activity: document.getElementById('screen-activity'),
-    profile: document.getElementById('screen-profile'),
-  };
-
-  function switchScreen(name) {
-    if (!screens[name]) return;
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
-    state.currentScreen = name;
-    document.querySelectorAll('.nav-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.nav === name);
-    });
-    window.scrollTo({ top: 0 });
-    haptic('light');
-    if (name === 'profile') updateProfile();
-    if (name === 'activity') renderActivity();
-    if (name === 'explore') renderExplore();
-  }
-
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchScreen(btn.dataset.nav));
-  });
-
-  document.getElementById('brandHome').addEventListener('click', () => switchScreen('home'));
-
-  // ============ EXPLORE ============
-  function renderExplore() {
-    const creatorsScroll = document.getElementById('creatorsScroll');
-    creatorsScroll.innerHTML = CREATORS.map(c => `
-      <div class="creator" data-creator="${c.name}">
-        <div class="creator__art" style="background:${c.bg}">${SVG_ARTS[c.art]}</div>
-        <div class="creator__name">${c.name}</div>
-      </div>
-    `).join('');
-
-    const sorted = Object.entries(COLLECTIONS).sort((a, b) => parseFloat(b[1].volume) - parseFloat(a[1].volume));
-    const collList = document.getElementById('collList');
-    collList.innerHTML = sorted.map(([name, c], i) => `
-      <div class="coll-row" data-coll="${name}">
-        <div class="coll-row__rank">${i + 1}</div>
-        <div class="coll-row__art" style="background:${c.bg}">${SVG_ARTS[c.art]}</div>
-        <div class="coll-row__info">
-          <div class="coll-row__name">${name}${c.verified ? VERIFIED_SVG : ''}</div>
-          <div class="coll-row__meta">${c.owners} owners · ${c.floor} Ξ floor</div>
-        </div>
-        <div class="coll-row__stat">
-          <div class="coll-row__stat-v">${c.volume}</div>
-          <div class="coll-row__stat-l">Volume</div>
-        </div>
-      </div>
-    `).join('');
-
-    collList.querySelectorAll('.coll-row').forEach(row => {
-      row.addEventListener('click', () => {
-        const coll = row.dataset.coll;
-        switchScreen('home');
-        setTimeout(() => {
-          showToast(`Showing ${coll} items`, 'info', 1800);
-          grid.innerHTML = '';
-          const items = NFTS.filter(n => n.coll === coll);
-          items.forEach((n, i) => {
-            const div = document.createElement('div');
-            div.innerHTML = cardHTML(n);
-            const card = div.firstElementChild;
-            card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
-            grid.appendChild(card);
-          });
-        }, 350);
-      });
-    });
-
-    creatorsScroll.querySelectorAll('.creator').forEach(c => {
-      c.addEventListener('click', () => showToast(`@${c.dataset.creator}`, 'info'));
-    });
-  }
-
-  // ============ CREATE ============
-  const artPicker = document.getElementById('artPicker');
-  const createArts = ['cosmic','samurai','pixelcat','chrome','desert','liquid','oni','voidcube','pixelape','gradient','temple','neongrid'];
-
-  function renderArtPicker() {
-    artPicker.innerHTML = createArts.map(a => `
-      <div class="art-option ${a === state.createArt ? 'selected' : ''}" data-art="${a}">${SVG_ARTS[a]}</div>
-    `).join('');
-    artPicker.querySelectorAll('.art-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        state.createArt = opt.dataset.art;
-        renderArtPicker();
-        updateCreatePreview();
-        haptic('light');
-      });
-    });
-  }
-
-  function updateCreatePreview() {
-    const name = document.getElementById('cName').value || 'Untitled';
-    const coll = document.getElementById('cColl').value;
-    const price = parseFloat(document.getElementById('cPrice').value) || 0;
-    const artBg = COLLECTIONS[coll]?.bg || COLLECTIONS.Cosmos.bg;
-    document.getElementById('cPreviewArt').style.background = artBg;
-    document.getElementById('cPreviewArt').innerHTML = SVG_ARTS[state.createArt];
-    document.getElementById('cPreviewName').textContent = name;
-    document.getElementById('cPreviewMeta').textContent = `${coll} · ${price} ETH`;
-    document.getElementById('cFiat').textContent = '≈ ' + fiat(price);
-  }
-
-  ['cName', 'cColl', 'cPrice'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateCreatePreview);
-    document.getElementById(id).addEventListener('change', updateCreatePreview);
-  });
-
-  document.getElementById('mintBtn').addEventListener('click', () => {
-    const name = document.getElementById('cName').value.trim();
-    const price = parseFloat(document.getElementById('cPrice').value);
-    if (!name) { showToast('Enter a name', 'warn'); haptic('medium'); return; }
-    if (!price || price <= 0) { showToast('Enter a valid price', 'warn'); haptic('medium'); return; }
-
-    const newNft = {
-      id: NFTS.length + 1,
-      name,
-      author: userUsername || userFullName || 'you',
-      art: state.createArt,
-      cat: 'abstract',
-      coll: document.getElementById('cColl').value,
-      rarity: 'Rare',
-      price,
-      trend: 0,
-      rank: null,
-      bg: COLLECTIONS[document.getElementById('cColl').value]?.bg || COLLECTIONS.Cosmos.bg,
-      desc: document.getElementById('cDesc').value || 'A new artwork minted on Liquid.',
-      traits: [{k:'Creator',v:userUsername || userFullName || 'you'},{k:'Collection',v:document.getElementById('cColl').value},{k:'Minted',v:'Just now'}],
+      SYSTEM_PROMPT: "Ты — полезный и вежливый AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (DeepSeek, OpenAI, GPT, DALL-E и т.д.). Отвечай на языке пользователя."
     };
-    NFTS.unshift(newNft);
-    state.created.unshift(newNft.id);
 
-    fireConfetti();
-    notify('success');
-    showToast(`"${name}" minted!`, 'success', 3000);
+    // ==========================================
+    // ЛОГИКА
+    // ==========================================
+    
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
 
-    document.getElementById('cName').value = '';
-    document.getElementById('cDesc').value = '';
-    document.getElementById('cPrice').value = '0.5';
-    updateCreatePreview();
-    renderGrid();
-    setTimeout(() => switchScreen('home'), 800);
-  });
+    let currentMode = 'text'; 
+    
+    const chatContainer = document.getElementById('chatContainer');
+    const promptInput = document.getElementById('promptInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const btnText = document.getElementById('btnText');
+    const btnImage = document.getElementById('btnImage');
 
-  // ============ ACTIVITY ============
-  const ACTIVITY_META = {
-    buy: { label: 'Bought', icon: 'buy', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>' },
-    sell: { label: 'Sold', icon: 'sell', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' },
-    bid: { label: 'Bid', icon: 'bid', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-6 6"/><path d="M20 10H8a4 4 0 0 0-4 4v0"/></svg>' },
-    mint: { label: 'Minted', icon: 'mint', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10l10 5 10-5V7z"/><path d="M2 7l10 5 10-5"/></svg>' },
-    transfer: { label: 'Transferred', icon: 'transfer', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>' },
-  };
-
-  function renderActivity() {
-    const list = document.getElementById('activityList');
-    list.innerHTML = ACTIVITY.map(a => {
-      const nft = NFTS.find(n => n.id === a.nftId);
-      if (!nft) return '';
-      const meta = ACTIVITY_META[a.type];
-      return `
-        <div class="activity-item" data-id="${a.nftId}">
-          <div class="activity-item__icon ${meta.icon}">${meta.svg}</div>
-          <div class="activity-item__art" style="background:${nft.bg}">${SVG_ARTS[nft.art]}</div>
-          <div class="activity-item__info">
-            <div class="activity-item__action">${meta.label} <span class="accent">${esc(nft.name)}</span></div>
-            <div class="activity-item__time">${a.time}</div>
-          </div>
-          ${a.price > 0 ? `<div class="activity-item__price"><div class="activity-item__price-v">${a.price} Ξ</div><div class="activity-item__price-l">${fiat(a.price)}</div></div>` : ''}
-        </div>
-      `;
-    }).join('');
-
-    list.querySelectorAll('.activity-item').forEach(item => {
-      item.addEventListener('click', () => openDetail(Number(item.dataset.id)));
-    });
-  }
-
-  // ============ PROFILE ============
-  function updateProfile() {
-    document.getElementById('pOwned').textContent = state.owned.length;
-    document.getElementById('pFavs').textContent = state.favorites.size;
-    renderProfileGrid();
-  }
-
-  function renderProfileGrid() {
-    let list;
-    if (state.profileTab === 'owned') list = NFTS.filter(n => state.owned.includes(n.id));
-    else if (state.profileTab === 'favorites') list = NFTS.filter(n => state.favorites.has(n.id));
-    else list = NFTS.filter(n => state.created.includes(n.id));
-
-    const pGrid = document.getElementById('profileGrid');
-    pGrid.innerHTML = '';
-    if (list.length === 0) {
-      pGrid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14"/></svg></div><div class="empty__title">Nothing here yet</div><div class="empty__text">${state.profileTab === 'favorites' ? 'Tap the heart on any NFT' : 'Start collecting'}</div></div>`;
-      return;
+    // Переключение режимов
+    function switchMode(mode) {
+      currentMode = mode;
+      btnText.classList.toggle('active', mode === 'text');
+      btnImage.classList.toggle('active', mode === 'image');
+      
+      promptInput.placeholder = mode === 'text' ? "Search or ask anything" : "Describe the image...";
+      promptInput.focus();
+      
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
     }
-    list.forEach((n, i) => {
-      const div = document.createElement('div');
-      div.innerHTML = cardHTML(n);
-      const card = div.firstElementChild;
-      card.style.animationDelay = `${Math.min(i * 30, 300)}ms`;
-      pGrid.appendChild(card);
+
+    promptInput.addEventListener('input', () => {
+      sendBtn.disabled = promptInput.value.trim() === '';
     });
-  }
 
-  bindCards(document.getElementById('profileGrid'));
+    function addMessage(text, sender, imageUrl = null) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${sender}`;
+      
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      
+      if (imageUrl) {
+        bubble.innerHTML = `<p>${text}</p><img src="${imageUrl}" alt="Generated Image">`;
+      } else {
+        bubble.textContent = text;
+      }
+      
+      msgDiv.appendChild(bubble);
+      chatContainer.appendChild(msgDiv);
+      
+      setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 50);
+    }
 
-  document.querySelectorAll('.profile-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.profileTab = tab.dataset.ptab;
-      haptic('light');
-      renderProfileGrid();
+    function showLoading() {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ai';
+      msgDiv.id = 'loadingMsg';
+      msgDiv.innerHTML = '<div class="bubble" style="border:none; background:transparent; padding: 0;"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function hideLoading() {
+      const loading = document.getElementById('loadingMsg');
+      if (loading) loading.remove();
+    }
+
+    async function makeRequest(endpoint, payload) {
+      const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
+      
+      for (let url of urls) {
+        try {
+          const response = await fetch(`${url}${endpoint}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${CONFIG.API_KEY}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            if (response.status === 401) throw new Error("Неверный API ключ");
+            if (response.status >= 500) continue;
+            throw new Error(errData.error?.message || `Ошибка ${response.status}`);
+          }
+          
+          return await response.json();
+        } catch (err) {
+          console.warn(`Ошибка на ${url}:`, err.message);
+          if (url === urls[urls.length - 1]) throw err;
+        }
+      }
+    }
+
+    async function handleSend() {
+      const text = promptInput.value.trim();
+      if (!text) return;
+
+      promptInput.value = '';
+      sendBtn.disabled = true;
+      
+      addMessage(text, 'user');
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      
+      showLoading();
+
+      try {
+        if (currentMode === 'text') {
+          const data = await makeRequest('/chat/completions', {
+            model: CONFIG.MODEL_TEXT,
+            messages: [
+              { role: "system", content: CONFIG.SYSTEM_PROMPT },
+              { role: "user", content: text }
+            ]
+          });
+          hideLoading();
+          addMessage(data.choices[0].message.content, 'ai');
+          
+        } else {
+          const data = await makeRequest('/images/generations', {
+            model: CONFIG.MODEL_IMAGE,
+            prompt: text,
+            n: 1,
+            size: "1024x1024"
+          });
+          hideLoading();
+          addMessage("Вот ваша картинка:", 'ai', data.data[0].url);
+        }
+        
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        
+      } catch (error) {
+        hideLoading();
+        addMessage(`Ошибка: ${error.message}.`, 'ai');
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    promptInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!sendBtn.disabled) handleSend();
+      }
     });
-  });
 
-  // ============ MODAL ============
-  const modal = document.getElementById('modal');
-
-  function openDetail(id) {
-    const n = NFTS.find(x => x.id === id);
-    if (!n) return;
-    state.currentItem = n;
-    const coll = COLLECTIONS[n.coll] || { verified: false, floor: '—', owners: '—', volume: '—' };
-
-    document.getElementById('mArt').style.background = n.bg;
-    document.getElementById('mArt').innerHTML = SVG_ARTS[n.art];
-    document.getElementById('mColl').textContent = n.coll;
-    document.getElementById('mVerified').style.display = coll.verified ? 'grid' : 'none';
-    document.getElementById('mTitle').textContent = n.name;
-    document.getElementById('mAvatar').textContent = n.author[0].toUpperCase();
-    document.getElementById('mAvatar').style.background = n.bg;
-    document.getElementById('mAuthor').textContent = n.author;
-    document.getElementById('mRarity').textContent = '· ' + n.rarity;
-    document.getElementById('mPrice').innerHTML = `${n.price} <small>ETH</small>`;
-    document.getElementById('mFiat').textContent = '≈ ' + fiat(n.price);
-    const trendEl = document.getElementById('mTrend');
-    trendEl.innerHTML = `${n.trend >= 0 ? '+' : ''}${n.trend}%<small>24h</small>`;
-    trendEl.style.background = n.trend >= 0 ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)';
-    trendEl.style.color = n.trend >= 0 ? '#4ade80' : '#f87171';
-    document.getElementById('mFloor').textContent = coll.floor + (coll.floor !== '—' ? ' Ξ' : '');
-    document.getElementById('mOwners').textContent = coll.owners;
-    document.getElementById('mVolume').textContent = coll.volume;
-    document.getElementById('mTraits').innerHTML = n.traits.map(t =>
-      `<div class="trait"><strong>${esc(t.k)}</strong><span>${esc(t.v)}</span></div>`
-    ).join('');
-    document.getElementById('mDesc').textContent = n.desc;
-    syncModalFav();
-
-    modal.classList.add('is-open');
-    document.body.classList.add('locked');
-    haptic('medium');
-  }
-
-  function closeModal() {
-    modal.classList.remove('is-open');
-    document.body.classList.remove('locked');
-    haptic('light');
-  }
-
-  modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
-
-  document.getElementById('mBuy').addEventListener('click', () => {
-    if (!state.currentItem) return;
-    if (!state.owned.includes(state.currentItem.id)) state.owned.push(state.currentItem.id);
-    notify('success');
-    fireConfetti();
-    closeModal();
-    setTimeout(() => {
-      showToast(`Purchased "${state.currentItem.name}"`, 'success', 3000);
-      updateProfile();
-    }, 300);
-  });
-
-  document.getElementById('mFavBtn').addEventListener('click', () => {
-    if (!state.currentItem) return;
-    toggleFav(state.currentItem.id);
-  });
-
-  document.getElementById('mShareBtn').addEventListener('click', async () => {
-    const n = state.currentItem;
-    if (!n) return;
-    const shareData = { title: n.name, text: `Check out "${n.name}" by ${n.author} on Liquid`, url: window.location.href };
-    try {
-      if (navigator.share) await navigator.share(shareData);
-      else if (tg?.openTelegramLink) tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`);
-      else { await navigator.clipboard.writeText(shareData.url); showToast('Link copied', 'success'); }
-    } catch(err) {}
-    haptic('light');
-  });
-
-  // ============ HERO ============
-  document.getElementById('heroArt').innerHTML = SVG_ARTS.cosmic;
-  document.getElementById('heroCard').addEventListener('click', () => openDetail(1));
-  document.getElementById('heroBid').addEventListener('click', (e) => {
-    e.stopPropagation();
-    notify('success');
-    fireConfetti();
-    showToast('Bid placed: 2.4 ETH', 'success');
-  });
-
-  // ============ TOPBAR ============
-  document.getElementById('walletBtn').addEventListener('click', () => {
-    haptic('medium');
-    showToast(`${userUsername ? '@' + userUsername : userAddr} · 4.2 ETH`, 'success');
-  });
-  document.getElementById('notifBtn').addEventListener('click', () => {
-    document.querySelector('#notifBtn .dot')?.remove();
-    showToast('3 new notifications', 'info');
-  });
-
-  // Profile addr copy
-  document.getElementById('profileAddr').addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(userAddr); showToast('Address copied', 'success'); }
-    catch { showToast('Address: ' + userAddr, 'info'); }
-    haptic('light');
-  });
-
-  // ============ SEARCH ============
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-
-  function openSearch() {
-    searchOverlay.classList.add('is-open');
-    document.body.classList.add('locked');
-    setTimeout(() => searchInput.focus(), 100);
-    renderSearch('');
-  }
-  function closeSearch() {
-    searchOverlay.classList.remove('is-open');
-    document.body.classList.remove('locked');
-    searchInput.value = '';
-    haptic('light');
-  }
-  function renderSearch(q) {
-    const query = q.trim().toLowerCase();
-    let list = NFTS;
-    if (query) {
-      list = NFTS.filter(n =>
-        n.name.toLowerCase().includes(query) ||
-        n.author.toLowerCase().includes(query) ||
-        n.coll.toLowerCase().includes(query) ||
-        n.cat.toLowerCase().includes(query)
-      );
-    }
-    if (list.length === 0) {
-      searchResults.innerHTML = `<div class="search-empty">Nothing found for "${esc(q)}"</div>`;
-      return;
-    }
-    searchResults.innerHTML = list.map(n => `
-      <div class="search-item" data-id="${n.id}">
-        <div class="search-item__art" style="background:${n.bg}">${SVG_ARTS[n.art]}</div>
-        <div class="search-item__info">
-          <div class="search-item__name">${esc(n.name)}</div>
-          <div class="search-item__price">${n.coll} · ${n.price} ETH</div>
-        </div>
-      </div>
-    `).join('');
-  }
-  searchInput.addEventListener('input', (e) => renderSearch(e.target.value));
-  document.getElementById('searchBtn').addEventListener('click', openSearch);
-  document.getElementById('searchCancel').addEventListener('click', closeSearch);
-  searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
-  searchResults.addEventListener('click', (e) => {
-    const item = e.target.closest('.search-item');
-    if (!item) return;
-    closeSearch();
-    setTimeout(() => openDetail(Number(item.dataset.id)), 150);
-  });
-
-  // ============ KEYBOARD ============
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (modal.classList.contains('is-open')) closeModal();
-      if (searchOverlay.classList.contains('is-open')) closeSearch();
-    }
-  });
-
-  // ============ SPECULAR ============
-  document.querySelectorAll('.specular').forEach(el => {
-    el.addEventListener('mousemove', e => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--lg-x', ((e.clientX - r.left) / r.width) * 100 + '%');
-      el.style.setProperty('--lg-y', ((e.clientY - r.top) / r.height) * 100 + '%');
-    });
-  });
-
-  // ============ INIT ============
-  renderGrid();
-  renderArtPicker();
-  updateCreatePreview();
-  updateProfile();
-</script>
+  </script>
 </body>
 </html>
