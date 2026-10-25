@@ -572,24 +572,27 @@
     // ==========================================
     const CONFIG = {
       API_KEY: "sk-IzgSkKSveOQWBov7GrYzjXwXAIKER4OVhvcmrhgQv9dHJj7I", // <--- ВСТАВЬТЕ КЛЮЧ
-      
       BASE_URL: "https://api.zexkora.cc/v1",
       FALLBACK_URL: "https://2api.zexkora.cc/v1",
-      
-      // Модели
-      MODEL_TEXT: "deepseek-v4.1-flash-1017",   // Новая быстрая модель
-      MODEL_IMAGE: "gpt-image-2.5",   // Генерация картинок
-
-      // Промпт для защиты личности
+      MODEL_TEXT: "tk/gpt-6.1-sol",
+      MODEL_IMAGE: "gpt-image-2.5",
       SYSTEM_PROMPT: "Ты — полезный AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (GPT, OpenAI, DeepSeek, DALL-E и т.д.). Отвечай на языке пользователя. Отвечай кратко, по делу, без лишних вступлений."
     };
+
+    // === 🔧 ОЧИСТКА КЛЮЧА ОТ КИРИЛЛИЦЫ ===
+    function cleanApiKey(key) {
+      if (!key) return "";
+      const cleaned = key.replace(/[^\x20-\x7E]/g, '').trim();
+      return cleaned;
+    }
+    CONFIG.API_KEY = cleanApiKey(CONFIG.API_KEY);
 
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
     let currentMode = 'text';
     let isStreaming = false;
-    let chatHistory = []; // Храним историю для контекста
+    let chatHistory = [];
 
     const welcomeScreen = document.getElementById('welcomeScreen');
     const mainApp = document.getElementById('mainApp');
@@ -599,7 +602,6 @@
     const btnText = document.getElementById('btnText');
     const btnImage = document.getElementById('btnImage');
 
-    // === СТАРТ ПРИЛОЖЕНИЯ ===
     function startApp() {
       welcomeScreen.classList.add('hidden');
       mainApp.classList.add('active');
@@ -607,7 +609,6 @@
       setTimeout(() => promptInput.focus(), 300);
     }
 
-    // === РЕЖИМЫ ===
     function switchMode(mode) {
       currentMode = mode;
       btnText.classList.toggle('active', mode === 'text');
@@ -625,14 +626,26 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // === БЕЗОПАСНЫЙ FETCH ===
+    async function safeFetch(url, options) {
+      if (options.headers) {
+        for (const [key, value] of Object.entries(options.headers)) {
+          if (typeof value === 'string' && /[^\x00-\xFF]/.test(value)) {
+            throw new Error(`Заголовок "${key}" содержит недопустимые символы. Проверьте API-ключ.`);
+          }
+        }
+      }
+      return fetch(url, options);
+    }
+
     // === СТРИМИНГ ===
     async function streamChat(messages, onChunk, onDone, onError) {
       const payload = {
         model: CONFIG.MODEL_TEXT,
         messages: messages,
         stream: true,
-        max_tokens: 8192, // Тратим токены не жалея
-        temperature: 0.7
+        max_completion_tokens: 4096 // ИСПРАВЛЕНО: для gpt-6.1-sol нужен этот параметр
+        // temperature НЕ ПЕРЕДАЁМ, иначе будет ошибка
       };
 
       const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
@@ -640,7 +653,7 @@
       for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
         try {
-          const response = await fetch(`${url}/chat/completions`, {
+          const response = await safeFetch(`${url}/chat/completions`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -689,7 +702,6 @@
       }
     }
 
-    // === ДОБАВЛЕНИЕ СООБЩЕНИЙ ===
     function addMessage(text, sender, imageUrl = null) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
@@ -752,12 +764,11 @@
       if (el) el.remove();
     }
 
-    // === ГЕНЕРАЦИЯ КАРТИНКИ ===
     async function generateImage(text) {
       const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
       for (let i = 0; i < urls.length; i++) {
         try {
-          const res = await fetch(`${urls[i]}/images/generations`, {
+          const res = await safeFetch(`${urls[i]}/images/generations`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -790,11 +801,16 @@
       }
     }
 
-    // === ОТПРАВКА ===
     async function handleSend() {
       if (isStreaming) return;
       const text = promptInput.value.trim();
       if (!text) return;
+
+      // Проверка ключа
+      if (!CONFIG.API_KEY || CONFIG.API_KEY === "ВАШ_API_КЛЮЧ_ЗДЕСЬ") {
+        addMessage("❌ Ошибка: API-ключ не настроен. Вставьте ключ в переменную CONFIG.API_KEY.", 'ai');
+        return;
+      }
 
       promptInput.value = '';
       sendBtn.disabled = true;
@@ -805,11 +821,10 @@
       if (currentMode === 'text') {
         isStreaming = true;
         
-        // Подготовка истории
         chatHistory.push({ role: "user", content: text });
         const messagesToSend = [
           { role: "system", content: CONFIG.SYSTEM_PROMPT },
-          ...chatHistory.slice(-10) // Последние 10 сообщений для контекста
+          ...chatHistory.slice(-10)
         ];
 
         let bubble = null;
@@ -857,7 +872,6 @@
           }
         );
       } else {
-        // Генерация картинки
         showLoading();
         try {
           const imgUrl = await generateImage(text);
@@ -881,9 +895,6 @@
     });
 
     window.addEventListener('resize', scrollToBottom);
-
-    // Если пользователь уже заходил (опционально можно сделать сохранение в localStorage)
-    // Но пока всегда показываем приветствие.
   </script>
 </body>
 </html>
