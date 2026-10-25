@@ -3,495 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#050506">
   <title>Jaim AI</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     :root {
-      --bg: var(--tg-theme-bg-color, #000000);
-      --text-main: var(--tg-theme-text-color, #ffffff);
-      --text-muted: var(--tg-theme-hint-color, #8e8e93);
-      --glass-bg: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      --bubble-user: rgba(255, 255, 255, 0.1);
-      --input-bg: rgba(255, 255, 255, 0.04);
-      --btn-bg: rgba(255, 255, 255, 0.08);
+      --bg: #050506;
+      --bg-elevated: #0f0f13;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-hover: rgba(255, 255, 255, 0.1);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.15);
+      --text-primary: #f5f5f7;
+      --text-secondary: #8e8e93;
       --accent: #ffffff;
+      --accent-gradient: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+      --danger: #ff453a;
+      --success: #32d74b;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg: var(--tg-theme-bg-color, #f2f2f7);
-        --text-main: var(--tg-theme-text-color, #000000);
-        --text-muted: var(--tg-theme-hint-color, #8e8e93);
-        --glass-bg: rgba(255, 255, 255, 0.5);
-        --glass-border: rgba(0, 0, 0, 0.08);
-        --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        --bubble-user: rgba(0, 0, 0, 0.05);
-        --input-bg: rgba(0, 0, 0, 0.02);
-        --btn-bg: rgba(0, 0, 0, 0.05);
-        --accent: #000000;
-      }
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      font-family: 'Manrope', -apple-system, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Inter', -apple-system, sans-serif; }
 
     html, body {
       height: 100%;
       overflow: hidden;
-      overscroll-behavior: none;
       background-color: var(--bg);
-      color: var(--text-main);
-      touch-action: pan-y;
+      color: var(--text-primary);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
     }
 
-    body {
-      height: 100dvh;
+    body { height: 100dvh; display: flex; flex-direction: column; touch-action: pan-y; }
+
+    /* =========================================
+       ОБЩИЕ КОМПОНЕНТЫ
+       ========================================= */
+    .glass { background: var(--glass); backdrop-filter: blur(24px) saturate(1.8); -webkit-backdrop-filter: blur(24px) saturate(1.8); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* =========================================
+       ГЛАВНЫЙ КОНТЕЙНЕР
+       ========================================= */
+    .app-container {
       display: flex;
       flex-direction: column;
-      transition: background-color 0.3s, color 0.3s;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
     }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 90px; /* Место под таб-бар */
+      -webkit-overflow-scrolling: touch;
+      display: none;
+      flex-direction: column;
+    }
+    .tab-content.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================================
+       ВКЛАДКА: ЧАТ
+       ========================================= */
+    .chat-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(5, 5, 6, 0.8);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .chat-header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
+    .tokens-badge {
+      font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
+      background: var(--glass); border: 1px solid var(--border); color: var(--text-secondary);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tokens-badge span { color: var(--text-primary); }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .message { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.3s ease-out; flex-shrink: 0; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user { align-self: flex-end; align-items: flex-end; }
+    .message.ai { align-self: flex-start; align-items: flex-start; }
+    
+    .bubble {
+      padding: 12px 16px; border-radius: 22px; font-size: 15px; line-height: 1.45;
+      word-wrap: break-word; word-break: break-word; max-width: 100%; white-space: pre-wrap;
+    }
+    .message.user .bubble { background: var(--glass-hover); border: 1px solid var(--border-light); border-bottom-right-radius: 6px; }
+    .message.ai .bubble { background: transparent; border: 1px solid var(--border); border-bottom-left-radius: 6px; }
+    .message.ai .bubble img { max-width: 100%; height: auto; border-radius: 14px; margin-top: 10px; display: block; border: 1px solid var(--border); }
+
+    .file-download-btn {
+      display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 16px;
+      background: var(--glass); border: 1px solid var(--border); border-radius: 14px;
+      color: var(--text-primary); font-size: 14px; font-weight: 500;
+      text-decoration: none; cursor: pointer; transition: background 0.2s;
+    }
+    .file-download-btn:active { background: var(--glass-hover); }
+    .file-download-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.5; fill: none; flex-shrink: 0; }
+    .file-download-btn .file-info { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow: hidden; }
+    .file-download-btn .file-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-download-btn .file-sub { font-size: 11px; color: var(--text-secondary); }
+
+    .loading-dots { display: flex; gap: 4px; padding: 4px 0; }
+    .loading-dots span { width: 6px; height: 6px; background: var(--text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+    .cursor-blink { display: inline-block; width: 2px; height: 1em; background: var(--text-primary); vertical-align: text-bottom; margin-left: 2px; animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* =========================================
+       ПАНЕЛЬ ВВОДА (ВНУТРИ ЧАТА)
+       ========================================= */
+    .input-area {
+      padding: 12px 16px;
+      background: rgba(5, 5, 6, 0.9);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mode-switch { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+    .mode-switch::-webkit-scrollbar { display: none; }
+    .pill-btn {
+      height: 38px; border-radius: 100px; display: flex; align-items: center; gap: 6px; padding: 0 14px;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; cursor: pointer;
+      flex-shrink: 0; transition: all 0.2s; border: 1px solid transparent; background: transparent;
+    }
+    .pill-btn:active { transform: scale(0.96); }
+    .pill-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .pill-btn.active { background: var(--glass-hover); border-color: var(--border-light); color: var(--text-primary); }
+
+    .input-card {
+      border-radius: 100px; padding: 6px; display: flex; align-items: center; gap: 8px;
+      background: var(--glass); border: 1px solid var(--border); transition: border-color 0.3s;
+    }
+    .input-card:focus-within { border-color: var(--border-light); }
+    .input-row { display: flex; align-items: center; flex: 1; padding-left: 16px; }
+    .input-row input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; font-size: 16px; color: var(--text-primary); padding: 10px 0; }
+    .input-row input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+    
+    .send-btn {
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: var(--accent); color: var(--bg); border: none; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .send-btn:active { transform: scale(0.92); opacity: 0.9; }
+    .send-btn:disabled { opacity: 0.2; cursor: not-allowed; background: var(--text-secondary); }
+    .send-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* =========================================
+       ВКЛАДКА: ПРОФИЛЬ
+       ========================================= */
+    .profile-view { padding: 32px 16px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%; background: var(--accent-gradient);
+      display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700;
+      color: #fff; border: 2px solid var(--border-light); box-shadow: 0 8px 32px rgba(63,43,150,0.4);
+    }
+    .profile-name { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    .profile-id { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+    
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 400px; margin-top: 12px; }
+    .stat-card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    .stat-value span { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+
+    /* =========================================
+       ВКЛАДКА: НАСТРОЙКИ
+       ========================================= */
+    .settings-view { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .settings-group { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .settings-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-item-left { display: flex; align-items: center; gap: 12px; }
+    .settings-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; }
+    .settings-icon svg { width: 18px; height: 18px; stroke: var(--text-primary); stroke-width: 1.5; fill: none; }
+    .settings-label { font-size: 15px; font-weight: 500; }
+    .settings-value { font-size: 14px; color: var(--text-secondary); }
+    
+    .lang-switch { display: flex; background: rgba(0,0,0,0.3); border-radius: 100px; padding: 2px; }
+    .lang-btn { padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-secondary); transition: all 0.2s; }
+    .lang-btn.active { background: var(--glass-hover); color: var(--text-primary); }
+
+    /* =========================================
+       НИЖНИЙ ТАБ-БАР
+       ========================================= */
+    .tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 80px; padding-bottom: var(--safe-bottom);
+      background: rgba(5, 5, 6, 0.85);
+      backdrop-filter: blur(24px) saturate(1.8);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 100;
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 20px; cursor: pointer; transition: all 0.2s;
+      color: var(--text-secondary);
+    }
+    .tab-item.active { color: var(--text-primary); }
+    .tab-item svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .tab-item span { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; }
 
     /* =========================================
        ПРИВЕТСТВЕННЫЙ ЭКРАН
        ========================================= */
     .welcome-screen {
-      position: absolute;
-      inset: 0;
-      background: var(--bg);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      overflow-y: auto;
-      transition: opacity 0.4s, transform 0.4s;
+      position: absolute; inset: 0; background: var(--bg); z-index: 200;
+      display: flex; flex-direction: column; padding: 24px; overflow-y: auto;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    
-    .welcome-screen.hidden {
-      opacity: 0;
-      transform: translateY(20px);
-      pointer-events: none;
-    }
-
+    .welcome-screen.hidden { opacity: 0; transform: translateY(-20px) scale(0.98); pointer-events: none; }
     .welcome-logo {
-      width: 80px;
-      height: 80px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px auto 24px;
-      box-shadow: var(--glass-highlight);
+      width: 80px; height: 80px; background: var(--accent-gradient); border-radius: 24px;
+      display: flex; align-items: center; justify-content: center; margin: 40px auto 24px;
+      box-shadow: 0 20px 40px rgba(63,43,150,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
     }
-    .welcome-logo svg {
-      width: 40px;
-      height: 40px;
-      stroke: var(--accent);
-      stroke-width: 2;
-      fill: none;
-    }
-
-    .welcome-screen h1 {
-      text-align: center;
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 8px;
-    }
-    .welcome-screen .subtitle {
-      text-align: center;
-      font-size: 15px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-      line-height: 1.4;
-    }
-
-    .features-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px;
-      border-radius: 20px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-    }
-
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--btn-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .feature-icon svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2; fill: none; }
-
-    .feature-text h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .feature-text p {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .start-btn {
-      width: 100%;
-      padding: 18px;
-      border-radius: 100px;
-      background: var(--text-main);
-      color: var(--bg);
-      border: none;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: auto;
-      transition: transform 0.1s, opacity 0.2s;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
+    .welcome-logo svg { width: 40px; height: 40px; stroke: #fff; stroke-width: 1.5; fill: none; }
+    .welcome-screen h1 { text-align: center; font-size: 36px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px; background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .welcome-screen .subtitle { text-align: center; font-size: 16px; color: var(--text-secondary); margin-bottom: 48px; line-height: 1.5; max-width: 300px; margin-left: auto; margin-right: auto; font-weight: 500; }
+    .features-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+    .feature-item { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 20px; background: var(--glass); border: 1px solid var(--border); }
+    .feature-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .feature-icon svg { width: 22px; height: 22px; stroke: var(--text-primary); stroke-width: 1.5; fill: none; }
+    .feature-text h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .feature-text p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+    .start-btn { width: 100%; padding: 20px; border-radius: 100px; background: var(--text-primary); color: var(--bg); border: none; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: auto; transition: transform 0.2s; box-shadow: 0 8px 32px rgba(255,255,255,0.15); }
     .start-btn:active { transform: scale(0.97); }
 
-    /* =========================================
-       ОСНОВНОЙ ИНТЕРФЕЙС
-       ========================================= */
-    .main-app {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 0.4s;
-      pointer-events: none;
-    }
-    .main-app.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .header {
-      flex-shrink: 0;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--glass-border);
-      background: var(--bg);
-      z-index: 10;
-    }
-    .header-title {
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: -0.5px;
-    }
-    .header-badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 100px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-    }
-
-    .chat-container {
-      flex: 1 1 0;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      scrollbar-width: thin;
-      scrollbar-color: var(--glass-border) transparent;
-    }
-    .chat-container::-webkit-scrollbar { width: 4px; }
-    .chat-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
-
-    .message {
-      display: flex;
-      flex-direction: column;
-      max-width: 88%;
-      animation: fadeIn 0.25s ease-out;
-      flex-shrink: 0;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user { align-self: flex-end; align-items: flex-end; }
-    .message.ai { align-self: flex-start; align-items: flex-start; }
-
-    .bubble {
-      padding: 12px 16px;
-      border-radius: 20px;
-      font-size: 15px;
-      line-height: 1.5;
-      word-wrap: break-word;
-      word-break: break-word;
-      max-width: 100%;
-      white-space: pre-wrap;
-    }
-
-    .message.user .bubble {
-      background: var(--bubble-user);
-      border: 1px solid var(--glass-border);
-      border-bottom-right-radius: 4px;
-      box-shadow: var(--glass-highlight);
-    }
-    .message.ai .bubble {
-      background: transparent;
-      border: 1px solid var(--glass-border);
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.ai .bubble img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-      margin-top: 8px;
-      display: block;
-    }
-
-    /* =========================================
-       БЛОК СКАЧИВАНИЯ ФАЙЛА
-       ========================================= */
-    .file-download-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding: 12px 16px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      color: var(--text-main);
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .file-download-btn:active {
-      transform: scale(0.98);
-      background: var(--btn-bg);
-    }
-    .file-download-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      flex-shrink: 0;
-    }
-    .file-download-btn .file-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      flex: 1;
-      overflow: hidden;
-    }
-    .file-download-btn .file-name {
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .file-download-btn .file-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .loading-dots {
-      display: flex;
-      gap: 4px;
-      padding: 4px 0;
-    }
-    .loading-dots span {
-      width: 6px;
-      height: 6px;
-      background: var(--text-muted);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out both;
-    }
-    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
-
-    .bottom-ui {
-      flex-shrink: 0;
-      padding: 12px 16px;
-      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: var(--bg);
-      border-top: 1px solid var(--glass-border);
-      z-index: 10;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 4px;
-    }
-    .top-bar::-webkit-scrollbar { display: none; }
-
-    .icon-circle {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: transform 0.1s, background 0.2s;
-    }
-    .icon-circle:active { transform: scale(0.92); }
-    .icon-circle svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-    .pill-btn {
-      height: 48px;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 20px;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-main);
-      white-space: nowrap;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 0.1s, background 0.2s;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-bg);
-    }
-    .pill-btn:active { transform: scale(0.96); }
-    .pill-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-    .pill-btn.active {
-      background: var(--btn-bg);
-      border-color: var(--text-main);
-    }
-
-    .input-card {
-      border-radius: 32px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05), var(--glass-highlight);
-    }
-
-    .input-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .input-row input {
-      flex: 1;
-      min-width: 0;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-size: 17px;
-      color: var(--text-main);
-    }
-    .input-row input::placeholder { color: var(--text-muted); }
-
-    .mic-btn {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      flex-shrink: 0;
-    }
-    .mic-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
-
-    .divider { height: 1px; background: var(--glass-border); width: 100%; }
-
-    .bottom-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-group { display: flex; gap: 8px; }
-
-    .action-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--input-bg);
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .action-btn:active { background: var(--btn-bg); color: var(--text-main); }
-    .action-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
-
-    .plus-btn {
-      height: 44px;
-      padding: 0 16px 0 20px;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 15px;
-      font-weight: 600;
-      background: var(--input-bg);
-      border: 1px solid transparent;
-      color: var(--text-main);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .plus-btn:active { background: var(--btn-bg); }
-    .plus-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .plus-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+    /* Скрываем скроллбары */
+    ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
 </head>
 <body>
@@ -502,96 +269,122 @@
       <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
     </div>
     <h1>Jaim AI</h1>
-    <p class="subtitle">Твой умный помощник на базе передовых нейросетей. Пиши, спрашивай, создавай.</p>
-
+    <p class="subtitle" data-i18n="welcome_subtitle">Персональный интеллект нового поколения. Создан для скорости, дизайна и мощи.</p>
     <div class="features-list">
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <div class="feature-text">
-          <h3>Умный текстовый чат</h3>
-          <p>Отвечает на любые вопросы, пишет код, переводит и помогает с текстами.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <div class="feature-text">
-          <h3>Генерация файлов и фото</h3>
-          <p>Создавай уникальные изображения и скачивай готовые файлы прямо из чата.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <div class="feature-text">
-          <h3>Молниеносная скорость</h3>
-          <p>Ответы приходят моментально, как только модель заканчивает генерацию.</p>
-        </div>
-      </div>
+      <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="feature-text"><h3 data-i18n="welcome_f1_title">Мгновенный отклик</h3><p data-i18n="welcome_f1_desc">Стриминговый текст появляется быстрее, чем ты моргнёшь.</p></div></div>
+      <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="feature-text"><h3 data-i18n="welcome_f2_title">Генерация контента</h3><p data-i18n="welcome_f2_desc">Создавай фото, код и документы одним касанием.</p></div></div>
+      <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="feature-text"><h3 data-i18n="welcome_f3_title">Премиальный дизайн</h3><p data-i18n="welcome_f3_desc">Минимализм в стиле Linear и Vercel.</p></div></div>
     </div>
-
-    <button class="start-btn" onclick="startApp()">Начать работу</button>
+    <button class="start-btn" onclick="startApp()" data-i18n="welcome_start">Начать работу</button>
   </div>
 
-  <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
-  <div class="main-app" id="mainApp">
-    <div class="header">
-      <div class="header-title">Jaim AI</div>
-      <div class="header-badge">Beta</div>
-    </div>
-
-    <div class="chat-container" id="chatContainer">
-      <div class="message ai">
-        <div class="bubble">Привет! Я готов к работе. Выбери режим внизу и напиши свой запрос.</div>
+  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+  <div class="app-container">
+    
+    <!-- ВКЛАДКА: ЧАТ -->
+    <div class="tab-content active" id="tabChat">
+      <div class="chat-header">
+        <h1 data-i18n="nav_chat">Чат</h1>
+        <div class="tokens-badge" id="headerTokens">⚡ <span>0</span></div>
       </div>
-    </div>
-
-    <div class="bottom-ui">
-      <div class="top-bar">
-        <div class="icon-circle glass" onclick="document.getElementById('promptInput').focus()" style="background:var(--glass-bg); border:1px solid var(--glass-border);">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        </div>
-        <div class="pill-btn active" id="btnText" onclick="switchMode('text')">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-          Текст
-        </div>
-        <div class="pill-btn" id="btnImage" onclick="switchMode('image')">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Картинка
-        </div>
+      
+      <div class="chat-messages" id="chatContainer">
+        <div class="message ai"><div class="bubble" data-i18n="chat_hello">Привет! Я готов к работе. Выбери режим внизу и напиши свой запрос.</div></div>
       </div>
 
-      <div class="input-card">
-        <div class="input-row">
-          <input type="text" id="promptInput" placeholder="Search or ask anything" autocomplete="off">
-          <button class="mic-btn" onclick="document.getElementById('promptInput').focus()">
-            <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          </button>
-        </div>
-        <div class="divider"></div>
-        <div class="bottom-row">
-          <div class="action-group">
-            <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
-              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            </button>
-            <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
-              <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            </button>
-            <button class="action-btn" onclick="document.getElementById('promptInput').focus()">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><line x1="18" y1="3" x2="18" y2="9"/><line x1="15" y1="6" x2="21" y2="6"/></svg>
-            </button>
+      <div class="input-area">
+        <div class="mode-switch">
+          <div class="pill-btn active" id="btnText" onclick="switchMode('text')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span data-i18n="mode_text">Текст</span>
           </div>
-          <button class="plus-btn" id="sendBtn" disabled>
-            Отправить
+          <div class="pill-btn" id="btnImage" onclick="switchMode('image')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span data-i18n="mode_image">Картинка</span>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <div class="input-row">
+            <input type="text" id="promptInput" placeholder="Спроси о чём угодно..." data-i18n-placeholder="chat_placeholder" autocomplete="off">
+          </div>
+          <button class="send-btn" id="sendBtn" disabled>
             <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
           </button>
         </div>
       </div>
     </div>
+
+    <!-- ВКЛАДКА: ПРОФИЛЬ -->
+    <div class="tab-content" id="tabProfile">
+      <div class="profile-view">
+        <div class="profile-avatar" id="profileAvatar">J</div>
+        <div style="text-align: center;">
+          <div class="profile-name" id="profileName">User</div>
+          <div class="profile-id" id="profileId">ID: 000000000</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label" data-i18n="profile_tokens">Баланс токенов</div>
+            <div class="stat-value" id="statTokens">0 <span>tk</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label" data-i18n="profile_requests">Запросов</div>
+            <div class="stat-value" id="statRequests">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА: НАСТРОЙКИ -->
+    <div class="tab-content" id="tabSettings">
+      <div class="settings-view">
+        
+        <!-- Язык -->
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <div class="settings-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+              <div class="settings-label" data-i18n="settings_lang">Язык</div>
+            </div>
+            <div class="lang-switch">
+              <div class="lang-btn active" id="langRU" onclick="setLang('ru')">RU</div>
+              <div class="lang-btn" id="langEN" onclick="setLang('en')">EN</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- О приложении -->
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <div class="settings-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+              <div class="settings-label" data-i18n="settings_about">О приложении</div>
+            </div>
+            <div class="settings-value">v2.0</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- НИЖНИЙ ТАБ-БАР -->
+    <div class="tab-bar">
+      <div class="tab-item active" data-tab="chat" onclick="switchTab('chat')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span data-i18n="nav_chat">Чат</span>
+      </div>
+      <div class="tab-item" data-tab="profile" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="nav_profile">Профиль</span>
+      </div>
+      <div class="tab-item" data-tab="settings" onclick="switchTab('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="nav_settings">Настройки</span>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -601,48 +394,190 @@
     const CONFIG = {
       API_KEY: "sk-IzgSkKSveOQWBov7GrYzjXwXAIKER4OVhvcmrhgQv9dHJj7I", // <--- ВСТАВЬТЕ КЛЮЧ
       BASE_URL: "https://api.zexkora.cc/v1",
-      FALLBACK_URL: "https://2api.zexkora.cc/v1",
-      
-      // "deepseek-v4-pro" или "tk/gpt-6.1-sol"
-      MODEL_TEXT: "tk/deepseek-v4.1-flash-1017", 
+      MODEL_TEXT: "deepseek-v4-pro", 
       MODEL_IMAGE: "gpt-image-2.5",
-      
-      SYSTEM_PROMPT: "Ты — полезный AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (GPT, OpenAI, DeepSeek, DALL-E и т.д.). Отвечай на языке пользователя. Отвечай кратко, по делу, без лишних вступлений. Если пользователь просит написать код или документ, напиши его полностью в блоке ```."
+      SYSTEM_PROMPT: "Ты — полезный AI-ассистент Jaim AI. Ты НИКОГДА не должен говорить, какая модель или компания-разработчик стоит за тобой. Если пользователь спрашивает, кто ты, отвечай: 'Я — Jaim AI, твой персональный ассистент.' Никогда не упоминай названия моделей (GPT, OpenAI, DeepSeek, DALL-E и т.д.). Отвечай на языке пользователя. Отвечай кратко, по делу, без лишних вступлений."
     };
 
-    function cleanApiKey(key) {
-      if (!key) return "";
-      return key.replace(/[^\x20-\x7E]/g, '').trim();
-    }
-    CONFIG.API_KEY = cleanApiKey(CONFIG.API_KEY);
+    CONFIG.API_KEY = CONFIG.API_KEY.replace(/[^\x20-\x7E]/g, '').trim();
 
+    // Telegram
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
+    // ==========================================
+    // ЛОКАЛИЗАЦИЯ
+    // ==========================================
+    const TRANSLATIONS = {
+      ru: {
+        nav_chat: "Чат",
+        nav_profile: "Профиль",
+        nav_settings: "Настройки",
+        welcome_subtitle: "Персональный интеллект нового поколения. Создан для скорости, дизайна и мощи.",
+        welcome_start: "Начать работу",
+        welcome_f1_title: "Мгновенный отклик",
+        welcome_f1_desc: "Стриминговый текст появляется быстрее, чем ты моргнёшь.",
+        welcome_f2_title: "Генерация контента",
+        welcome_f2_desc: "Создавай фото, код и документы одним касанием.",
+        welcome_f3_title: "Премиальный дизайн",
+        welcome_f3_desc: "Минимализм в стиле Linear и Vercel.",
+        mode_text: "Текст",
+        mode_image: "Картинка",
+        chat_placeholder: "Спроси о чём угодно...",
+        chat_hello: "Привет! Я готов к работе. Выбери режим внизу и напиши свой запрос.",
+        profile_tokens: "Баланс токенов",
+        profile_requests: "Запросов",
+        settings_lang: "Язык",
+        settings_about: "О приложении",
+        error_key: "❌ Ошибка: API-ключ не настроен.",
+        error_api: "Ошибка API",
+        download_file: "Нажмите, чтобы скачать",
+        generated_image: "Вот ваша картинка:"
+      },
+      en: {
+        nav_chat: "Chat",
+        nav_profile: "Profile",
+        nav_settings: "Settings",
+        welcome_subtitle: "Next-gen personal intelligence. Built for speed, design and power.",
+        welcome_start: "Get Started",
+        welcome_f1_title: "Instant Response",
+        welcome_f1_desc: "Streaming text appears faster than you blink.",
+        welcome_f2_title: "Content Generation",
+        welcome_f2_desc: "Create photos, code and documents with one tap.",
+        welcome_f3_title: "Premium Design",
+        welcome_f3_desc: "Minimalism in the style of Linear and Vercel.",
+        mode_text: "Text",
+        mode_image: "Image",
+        chat_placeholder: "Ask anything...",
+        chat_hello: "Hi! I'm ready. Choose a mode below and type your request.",
+        profile_tokens: "Token Balance",
+        profile_requests: "Requests",
+        settings_lang: "Language",
+        settings_about: "About",
+        error_key: "❌ Error: API key is not configured.",
+        error_api: "API Error",
+        download_file: "Tap to download",
+        generated_image: "Here is your image:"
+      }
+    };
+
+    let currentLang = 'ru';
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('langRU').classList.toggle('active', lang === 'ru');
+      document.getElementById('langEN').classList.toggle('active', lang === 'en');
+      
+      // Применяем переводы
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (TRANSLATIONS[lang][key]) el.textContent = TRANSLATIONS[lang][key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (TRANSLATIONS[lang][key]) el.placeholder = TRANSLATIONS[lang][key];
+      });
+      
+      saveUserData();
+    }
+
+    // ==========================================
+    // НАВИГАЦИЯ (ТАБЫ)
+    // ==========================================
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      
+      document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    }
+
+    // ==========================================
+    // ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (СОХРАНЕНИЕ)
+    // ==========================================
+    let userData = {
+      name: "User",
+      id: "000000000",
+      tokens: 0,
+      requests: 0,
+      lang: 'ru'
+    };
+
+    function loadUserData() {
+      if (tg?.CloudStorage) {
+        tg.CloudStorage.getItem('jaim_user_data', (err, value) => {
+          if (!err && value) {
+            try { userData = { ...userData, ...JSON.parse(value) }; } catch(e) {}
+          }
+          updateUI();
+          setLang(userData.lang || 'ru');
+        });
+      } else {
+        const saved = localStorage.getItem('jaim_user_data');
+        if (saved) {
+          try { userData = { ...userData, ...JSON.parse(saved) }; } catch(e) {}
+        }
+        updateUI();
+        setLang(userData.lang || 'ru');
+      }
+    }
+
+    function saveUserData() {
+      userData.lang = currentLang;
+      const dataStr = JSON.stringify(userData);
+      if (tg?.CloudStorage) {
+        tg.CloudStorage.setItem('jaim_user_data', dataStr);
+      } else {
+        localStorage.setItem('jaim_user_data', dataStr);
+      }
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById('headerTokens').innerHTML = `⚡ <span>${userData.tokens}</span>`;
+      document.getElementById('profileAvatar').textContent = userData.name.charAt(0).toUpperCase();
+      document.getElementById('profileName').textContent = userData.name;
+      document.getElementById('profileId').textContent = `ID: ${userData.id}`;
+      document.getElementById('statTokens').innerHTML = `${userData.tokens} <span>tk</span>`;
+      document.getElementById('statRequests').textContent = userData.requests;
+    }
+
+    // ==========================================
+    // ЗАПУСК ПРИЛОЖЕНИЯ
+    // ==========================================
+    function startApp() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      
+      if (tg?.initDataUnsafe?.user) {
+        const u = tg.initDataUnsafe.user;
+        userData.name = u.first_name || "User";
+        userData.id = u.id || "000000000";
+      }
+      
+      loadUserData();
+      
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+      setTimeout(() => document.getElementById('promptInput').focus(), 500);
+    }
+
+    // ==========================================
+    // ЛОГИКА ЧАТА
+    // ==========================================
     let currentMode = 'text';
-    let isGenerating = false;
+    let isStreaming = false;
     let chatHistory = [];
 
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const mainApp = document.getElementById('mainApp');
     const chatContainer = document.getElementById('chatContainer');
     const promptInput = document.getElementById('promptInput');
     const sendBtn = document.getElementById('sendBtn');
-    const btnText = document.getElementById('btnText');
-    const btnImage = document.getElementById('btnImage');
-
-    function startApp() {
-      welcomeScreen.classList.add('hidden');
-      mainApp.classList.add('active');
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-      setTimeout(() => promptInput.focus(), 300);
-    }
 
     function switchMode(mode) {
       currentMode = mode;
-      btnText.classList.toggle('active', mode === 'text');
-      btnImage.classList.toggle('active', mode === 'image');
-      promptInput.placeholder = mode === 'text' ? "Спроси о чём угодно..." : "Опиши картинку...";
+      document.getElementById('btnText').classList.toggle('active', mode === 'text');
+      document.getElementById('btnImage').classList.toggle('active', mode === 'image');
+      promptInput.placeholder = mode === 'text' ? TRANSLATIONS[currentLang].chat_placeholder : (currentLang === 'ru' ? "Опиши картинку..." : "Describe the image...");
       promptInput.focus();
       if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
     }
@@ -651,52 +586,39 @@
       sendBtn.disabled = promptInput.value.trim() === '';
     });
 
-    function scrollToBottom() {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
+    function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
 
-    // === ДОБАВЛЕНИЕ СООБЩЕНИЯ С ФАЙЛОМ/КАРТИНКОЙ ===
     function addMessage(text, sender, fileUrl = null, fileName = null) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
 
-      // Текст ответа
       if (text) {
         const p = document.createElement('p');
         p.textContent = text;
         bubble.appendChild(p);
       }
 
-      // Если есть файл/картинка
       if (fileUrl) {
-        // Показываем превью картинки
         const img = document.createElement('img');
         img.src = fileUrl;
-        img.alt = fileName || 'Generated File';
+        img.alt = fileName || 'File';
         img.style.cursor = 'pointer';
         img.onclick = () => window.open(fileUrl, '_blank');
         bubble.appendChild(img);
 
-        // Кнопка скачивания
         const downloadBtn = document.createElement('a');
         downloadBtn.href = fileUrl;
         downloadBtn.download = fileName || 'image.png';
         downloadBtn.className = 'file-download-btn';
         downloadBtn.innerHTML = `
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <div class="file-info">
-            <span class="file-name">${fileName || 'image.png'}</span>
-            <span class="file-sub">Нажмите, чтобы скачать</span>
-          </div>
+          <div class="file-info"><span class="file-name">${fileName || 'image.png'}</span><span class="file-sub">${TRANSLATIONS[currentLang].download_file}</span></div>
         `;
-        
-        // Для iOS/Android Mini Apps лучше использовать fetch + blob для скачивания
         downloadBtn.addEventListener('click', async (e) => {
           e.preventDefault();
           if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-          
           try {
             const response = await fetch(fileUrl);
             const blob = await response.blob();
@@ -704,22 +626,28 @@
             const a = document.createElement('a');
             a.href = blobUrl;
             a.download = fileName || 'image.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
             URL.revokeObjectURL(blobUrl);
-          } catch (err) {
-            // Если fetch не удался — открываем в новой вкладке
-            window.open(fileUrl, '_blank');
-          }
+          } catch { window.open(fileUrl, '_blank'); }
         });
-
         bubble.appendChild(downloadBtn);
       }
 
       msgDiv.appendChild(bubble);
       chatContainer.appendChild(msgDiv);
       setTimeout(scrollToBottom, 30);
+    }
+
+    function createStreamingBubble() {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ai';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = '<span class="stream-text"></span><span class="cursor-blink"></span>';
+      msgDiv.appendChild(bubble);
+      chatContainer.appendChild(msgDiv);
+      setTimeout(scrollToBottom, 30);
+      return bubble;
     }
 
     function showLoading() {
@@ -735,163 +663,163 @@
       if (el) el.remove();
     }
 
-    // === ЗАПРОС К ТЕКСТОВОЙ МОДЕЛИ ===
-    async function fetchAI(messages) {
-      const isGpt6 = CONFIG.MODEL_TEXT.includes('gpt-6');
-      const payload = {
-        model: CONFIG.MODEL_TEXT,
-        messages: messages,
-        stream: false,
-        ...(isGpt6 
-          ? { max_completion_tokens: 4096 } 
-          : { max_tokens: 4096, temperature: 0.7 }
-        )
-      };
+    async function streamChat(messages, onChunk, onDone, onError) {
+      const payload = { model: CONFIG.MODEL_TEXT, messages: messages, stream: true };
 
-      const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
-      for (let i = 0; i < urls.length; i++) {
-        const url = urls[i];
-        try {
-          const response = await fetch(`${url}/chat/completions`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${CONFIG.API_KEY}`
-            },
-            body: JSON.stringify(payload)
-          });
+      try {
+        const response = await fetch(`${CONFIG.BASE_URL}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.API_KEY}` },
+          body: JSON.stringify(payload)
+        });
 
-          if (!response.ok) {
-            if (response.status === 401) throw new Error("Неверный API ключ");
-            if (response.status >= 500 && i < urls.length - 1) continue;
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.error?.message || `Ошибка ${response.status}`);
-          }
-
-          const data = await response.json();
-          const reply = data.choices?.[0]?.message?.content;
-          if (!reply) throw new Error("Модель вернула пустой ответ");
-          return reply;
-          
-        } catch (err) {
-          if (i === urls.length - 1) throw err;
+        if (!response.ok) {
+          if (response.status === 401) throw new Error("Invalid API Key");
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Error ${response.status}`);
         }
-      }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let tokens = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed === 'data: [DONE]') continue;
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const json = JSON.parse(trimmed.slice(6));
+                const delta = json.choices?.[0]?.delta?.content;
+                if (delta) { tokens++; onChunk(delta); }
+              } catch (e) { }
+            }
+          }
+        }
+        
+        userData.tokens += tokens;
+        saveUserData();
+        onDone();
+      } catch (err) { onError(err); }
     }
 
-    // === ГЕНЕРАЦИЯ КАРТИНКИ С ВОЗВРАТОМ URL ДЛЯ СКАЧИВАНИЯ ===
     async function generateImage(text) {
-      const urls = [CONFIG.BASE_URL, CONFIG.FALLBACK_URL];
-      for (let i = 0; i < urls.length; i++) {
-        try {
-          const res = await fetch(`${urls[i]}/images/generations`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${CONFIG.API_KEY}`
-            },
-            body: JSON.stringify({
-              model: CONFIG.MODEL_IMAGE,
-              prompt: text,
-              n: 1,
-              size: "1024x1024"
-            })
-          });
+      try {
+        const res = await fetch(`${CONFIG.BASE_URL}/images/generations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.API_KEY}` },
+          body: JSON.stringify({ model: CONFIG.MODEL_IMAGE, prompt: text, n: 1, size: "1024x1024" })
+        });
 
-          if (!res.ok) {
-            if (res.status === 401) throw new Error("Неверный API ключ");
-            if (res.status >= 500 && i < urls.length - 1) continue;
-            const e = await res.json().catch(() => ({}));
-            throw new Error(e.error?.message || `Ошибка ${res.status}`);
-          }
-
-          const data = await res.json();
-          const url = data.data?.[0]?.url;
-          const b64 = data.data?.[0]?.b64_json;
-
-          // Если вернулся base64 — конвертируем в blob URL
-          if (b64) {
-            const byteCharacters = atob(b64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let j = 0; j < byteCharacters.length; j++) {
-              byteNumbers[j] = byteCharacters.charCodeAt(j);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], {type: 'image/png'});
-            return { url: URL.createObjectURL(blob), fileName: 'generated.png' };
-          }
-          // Если вернулась ссылка
-          if (url) return { url, fileName: 'generated.png' };
-          
-          throw new Error("API не вернул изображение");
-        } catch (err) {
-          if (i === urls.length - 1) throw err;
+        if (!res.ok) {
+          if (res.status === 401) throw new Error("Invalid API Key");
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error?.message || `Error ${res.status}`);
         }
-      }
+
+        const data = await res.json();
+        const url = data.data?.[0]?.url;
+        const b64 = data.data?.[0]?.b64_json;
+
+        if (b64) {
+          const byteCharacters = atob(b64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let j = 0; j < byteCharacters.length; j++) byteNumbers[j] = byteCharacters.charCodeAt(j);
+          const blob = new Blob([new Uint8Array(byteNumbers)], {type: 'image/png'});
+          return { url: URL.createObjectURL(blob), fileName: 'generated.png' };
+        }
+        if (url) return { url, fileName: 'generated.png' };
+        throw new Error("No image returned");
+      } catch (err) { throw err; }
     }
 
     async function handleSend() {
-      if (isGenerating) return;
+      if (isStreaming) return;
       const text = promptInput.value.trim();
       if (!text) return;
 
       if (!CONFIG.API_KEY || CONFIG.API_KEY === "ВАШ_API_КЛЮЧ_ЗДЕСЬ") {
-        addMessage("❌ Ошибка: API-ключ не настроен.", 'ai');
+        addMessage(TRANSLATIONS[currentLang].error_key, 'ai');
         return;
       }
 
       promptInput.value = '';
       sendBtn.disabled = true;
-      isGenerating = true;
-
       addMessage(text, 'user');
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      
+      userData.requests++;
+      saveUserData();
 
       if (currentMode === 'text') {
+        isStreaming = true;
         chatHistory.push({ role: "user", content: text });
-        const messagesToSend = [
-          { role: "system", content: CONFIG.SYSTEM_PROMPT },
-          ...chatHistory.slice(-10)
-        ];
+        const messagesToSend = [{ role: "system", content: CONFIG.SYSTEM_PROMPT }, ...chatHistory.slice(-10)];
+
+        let bubble = null;
+        let fullText = '';
+        let firstChunk = true;
 
         showLoading();
 
-        try {
-          const reply = await fetchAI(messagesToSend);
-          hideLoading();
-          addMessage(reply, 'ai');
-          chatHistory.push({ role: "assistant", content: reply });
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        } catch (err) {
-          hideLoading();
-          addMessage(`Ошибка: ${err.message}`, 'ai');
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-        } finally {
-          isGenerating = false;
-        }
+        await streamChat(
+          messagesToSend,
+          (chunk) => {
+            if (firstChunk) { hideLoading(); bubble = createStreamingBubble(); firstChunk = false; }
+            fullText += chunk;
+            if (bubble) {
+              const span = bubble.querySelector('.stream-text');
+              if (span) span.textContent = fullText;
+              scrollToBottom();
+            }
+          },
+          () => {
+            if (bubble) { const cursor = bubble.querySelector('.cursor-blink'); if (cursor) cursor.remove(); }
+            hideLoading();
+            isStreaming = false;
+            chatHistory.push({ role: "assistant", content: fullText });
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          },
+          (err) => {
+            hideLoading();
+            isStreaming = false;
+            if (bubble) {
+              const cursor = bubble.querySelector('.cursor-blink'); if (cursor) cursor.remove();
+              const span = bubble.querySelector('.stream-text');
+              if (span && !span.textContent) span.textContent = `${TRANSLATIONS[currentLang].error_api}: ${err.message}`;
+            } else {
+              addMessage(`${TRANSLATIONS[currentLang].error_api}: ${err.message}`, 'ai');
+            }
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+          }
+        );
       } else {
         showLoading();
         try {
           const { url, fileName } = await generateImage(text);
           hideLoading();
-          addMessage("Вот ваша картинка:", 'ai', url, fileName);
+          addMessage(TRANSLATIONS[currentLang].generated_image, 'ai', url, fileName);
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } catch (err) {
           hideLoading();
-          addMessage(`Ошибка: ${err.message}`, 'ai');
+          addMessage(`${TRANSLATIONS[currentLang].error_api}: ${err.message}`, 'ai');
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
         } finally {
-          isGenerating = false;
+          isStreaming = false;
         }
       }
     }
 
     sendBtn.addEventListener('click', handleSend);
     promptInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (!sendBtn.disabled) handleSend();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); if (!sendBtn.disabled) handleSend(); }
     });
 
     window.addEventListener('resize', scrollToBottom);
