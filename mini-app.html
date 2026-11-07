@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Браузер</title>
     
-    <!-- Подключение шрифта Inter -->
+    <!-- Шрифт Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,10 +13,12 @@
     <style>
         :root {
             --bg-color: #17212b; 
-            --surface-color: #242f3d;
+            --surface-color: #242f3d; 
             --text-primary: #ffffff;
             --text-secondary: #8c9aa8;
             --accent-blue: #3ea6ff;
+            --accent-blue-hover: #2b90e5;
+            --success-green: #32c7a6;
         }
 
         * {
@@ -56,7 +58,6 @@
             width: 100%;
         }
 
-        /* Иконка браузера (SVG) */
         .avatar-icon {
             width: 86px;
             height: 86px;
@@ -66,7 +67,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .avatar-icon svg {
@@ -90,14 +91,16 @@
             font-weight: 400;
         }
 
-        .description a {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
+        /* Форма */
+        .form-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        /* Поиск */
-        .search-container {
+        .input-group {
             background-color: var(--surface-color);
             border-radius: 12px;
             display: flex;
@@ -105,14 +108,20 @@
             padding: 14px 16px;
             width: 100%;
             gap: 12px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
         }
 
-        .search-container svg {
+        .input-group:focus-within {
+            border-color: var(--accent-blue);
+        }
+
+        .input-group svg {
             color: var(--text-secondary);
             flex-shrink: 0;
         }
 
-        .search-container input {
+        .input-group input {
             background: transparent;
             border: none;
             color: var(--text-primary);
@@ -123,8 +132,105 @@
             font-weight: 400;
         }
 
-        .search-container input::placeholder {
+        .input-group input::placeholder {
             color: var(--text-secondary);
+        }
+
+        /* Кнопка */
+        .btn {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            background-color: var(--accent-blue-hover);
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Блок с результатом (скрыт по умолчанию) */
+        .result-container {
+            display: none;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-container.active {
+            display: flex;
+        }
+
+        .result-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .link-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1c2633;
+            padding: 12px;
+            border-radius: 8px;
+            gap: 10px;
+        }
+
+        .link-text {
+            color: var(--accent-blue);
+            font-size: 15px;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .copy-btn.copied {
+            color: var(--success-green);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
     </style>
@@ -135,8 +241,7 @@
         
         <!-- Шапка -->
         <div class="profile-header">
-            
-            <!-- Иконка глобуса (Браузер) -->
+            <!-- Иконка глобуса + звена цепи -->
             <div class="avatar-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -148,20 +253,109 @@
             <h1 class="title">Браузер</h1>
             
             <div class="description">
-                Быстрый и безопасный доступ к сети. Управляйте вкладками, историей и закладками. <a href="#">Узнать больше &rsaquo;</a>
+                Создавайте красивые ссылки и делитесь ими с друзьями в один клик.
             </div>
         </div>
 
-        <!-- Строка поиска -->
-        <div class="search-container">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" placeholder="Поиск" autocomplete="off">
+        <!-- Форма создания -->
+        <div class="form-container">
+            <div class="input-group">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <input type="url" id="urlInput" placeholder="Вставьте вашу ссылку..." autocomplete="off">
+            </div>
+            
+            <button class="btn" id="createBtn">
+                Создать ссылку
+            </button>
+        </div>
+
+        <!-- Результат -->
+        <div class="result-container" id="resultContainer">
+            <span class="result-label">Ваша ссылка готова:</span>
+            <div class="link-box">
+                <span class="link-text" id="generatedLink">https://t.me/share/url?...</span>
+                <button class="copy-btn" id="copyBtn" title="Скопировать">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
 
     </div>
 
+    <!-- Логика (JS) -->
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const createBtn = document.getElementById('createBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const generatedLink = document.getElementById('generatedLink');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Обработка кнопки "Создать ссылку"
+        createBtn.addEventListener('click', () => {
+            let userUrl = urlInput.value.trim();
+            
+            if (!userUrl) {
+                // Если пусто, показываем алерт (или можно тряхнуть инпут)
+                urlInput.style.borderColor = '#e53935';
+                setTimeout(() => urlInput.style.borderColor = 'transparent', 1000);
+                return;
+            }
+
+            // Добавляем https:// если пользователь забыл
+            if (!userUrl.startsWith('http://') && !userUrl.startsWith('https://')) {
+                userUrl = 'https://' + userUrl;
+            }
+
+            // Эмуляция создания ссылки (для примера используем Telegram Share)
+            const shortLink = `https://t.me/share/url?url=${encodeURIComponent(userUrl)}`;
+            
+            generatedLink.textContent = shortLink;
+            resultContainer.classList.add('active');
+            
+            // Сбрасываем иконку копирования
+            copyBtn.classList.remove('copied');
+            copyBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            `;
+        });
+
+        // Обработка копирования
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = generatedLink.textContent;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                `;
+                
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    `;
+                }, 2000);
+            });
+        });
+
+        // Убираем красную рамку при вводе текста
+        urlInput.addEventListener('input', () => {
+            urlInput.style.borderColor = 'transparent';
+        });
+    </script>
 </body>
 </html>
